@@ -1,0 +1,27 @@
+/* Tutorial1.hoc
+
+Author: Jose Guzman
+Mail: jose.guzman __at__ physiologie.uni-freiburg.de
+
+*/
+// load Neuron graphical user interface
+load_file("nrngui.hoc")
+
+create soma
+access soma
+
+soma {
+    nseg = 3
+    diam = 30
+    L = 30
+}
+
+insert hh
+
+objectvar stimulator
+stimulator = new IClamp(.5)
+
+
+stimulator.del = 0.1
+stimulator.dur = 0.8
+stimulator.amp = 1.2

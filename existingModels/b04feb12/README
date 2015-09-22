@@ -1,0 +1,67 @@
+% $Id: README,v 1.5 2004/02/10 15:51:41 billl Exp $
+
+To run under linux/unix:
+  unzip b04feb12.zip
+  cd b04feb12
+  nrnivmodl
+  $CPU/special batch_.hoc -
+To run under mswin:
+  unzip the archive b04feb12.zip
+  run mknrndll and find the directory b04feb12 that came from the zip file and make
+  the nrnmech.dll file
+  start the simulation by double clicking on mosinit.hoc
+  
+This is a pretty good replica of simulations shown in Fig. 2A (jcomputnsci1:39F2A.gif)
+and Fig. 3 (jcomputnsci1:39F3.gif) of:
+  author = 	"Pinsky, P and Rinzel, J",
+  title = 	"Intrinsic and Network Rhythomogenesis in a Reduced
+		  Traub Model for CA3 Neurons",
+  journal = 	"J Computational Neuroscience",
+  year = 	"1994",
+  volume = 	"1",
+  pages = 	"39-60",
+
+The simulation provided will create 3 graphs: 
+  Fig. 3 using Neuron (upper left)
+  Fig. 3 using xppaut (upper right)
+  Fig. 2A using Neuron (black) and xppaut (red) -- xppaut is same as in journal
+The xppaut results are read into Neuron from a data file.  
+
+The correct simulation is available in the download as booth_bose.ode
+This program can be run under Bard Ermentraut's simulator xppaut 
+                http://www.math.pitt.edu/~bard/xpp/xpp.html
+The booth_bose.ode provided here is slightly modified from the original obtained
+from Victoria Booth's home page; the originals include more extensive simulations:
+                http://www.math.njit.edu/~vbooth/
+
+I have not perfectly replicated the simulation: the morphology of the bursts are
+very close to being correct but the timing of bursts in the 1500 ms simulation is 
+off (as can be seen by zooming in on the final burst). This is due to the precise
+timing of threshold crossings (see next paragraph).   The data for the xppaut, 
+accurate replica is provided in xpp.dat.  The columns are 't vs vd cad hs ns sd cd
+qd gkq gkc'.  The first 3 state variables from this data file are opened in Neuron
+by vectors of the same name (time is in tvec).
+
+The difficulty in porting this program to Neuron can be seen by looking at the
+FInitializeHandler and nafPR.mod.  In the hoc file, we unset state variables (set
+to zero) using FInitializeHandler("unset()").  Notice that even h_nafPR, which
+would typically be set to a value near 1 to start (ie sodium channel fully
+deinactivated) is set to 0 and must therefore gradually relax to 1 during the
+first few ms of the simulation.  In nafPR.mod, we see that the sodium conductance
+is not dependent on state variable 'm' but instead on the steady-state value
+'minf'.  Here I found that I got different results depending on my implementation
+of nafPR.  Another likely location for differences in the simulations arises in
+the handling of the thresholds for the calcium-sensitive potassium channels.  Iahp
+(here called rkq under Neuron -- historical -- and Kahp under xppaut) has
+discontinuity at a Ca (chi) level of 500 ('min(0.00002*Cad,0.01)' in
+booth_bose.ode); Kc (kcRT03 bzw. KC) at 250 -- 'min(Cad/250.0,1.0)'.  Precise
+simulation results depend on exactly when these are handled.
+
+I'm sure that these limitations can be overcome but I suspect that it would
+require looking closely at the BREAKPOINT mechanism to make sure that values are
+made available at the same time step in both xppaut and Neuron (both simulations
+are using CVODE/CVODES)
+
+I also have not incorporated the 'p' variable which sets the dendrite/soma
+area ratio.  It is called pp and set to 0.5 but not incorporated in the geometry
+setting routines.

@@ -1,0 +1,4654 @@
+// Created 02/11/04 17:05:44 by /usr/site/scripts/loadfiles
+//================================================================
+// INSERTED batch.hoc
+// $Id: batch.hoc,v 1.3 2004/02/12 22:05:15 billl Exp $
+
+mapped_nrnmainmenu_ = 1
+batch_flag = 1
+
+//================================================================
+// INSERTED /usr/site/nrniv/local/hoc/setup.hoc
+// $Id: setup.hoc,v 1.17 2003/07/23 17:44:26 billl Exp $
+// variables normally controlled by SIMCTRL
+
+// load_file("setup.hoc")
+
+show_panel=0
+proc setup () {}
+strdef simname, filename, output_file, datestr, uname, comment, section, osname
+objref tmpfile,nil,graphItem
+tmpfile = new File()
+simname = "sim"      // helpful if running multiple simulations simultaneously
+runnum = 2           // updated at end of run
+datestr = "99aug01"  // updated at end of day
+output_file = "data/99aug01.01"  // assumes a subdir called data
+comment = "current comment for saving sim"
+uname = "i686"  // keep track of type of machine for byte compatibility
+osname = "Linux"  // will want to grab this from env
+printStep = 0.25 // time interval for saving to vector
+graph_flag=1
+xwindows = 1     // can still save but not look without xwindows
+
+// load_file("nrnoc.hoc")
+// END /usr/site/nrniv/local/hoc/setup.hoc
+//================================================================
+//================================================================
+// INSERTED /usr/site/nrniv/simctrl/hoc/nrnoc.hoc
+// $Id: nrnoc.hoc,v 1.59 2003/10/24 14:11:03 billl Exp $
+
+proc nrnoc () {}
+
+// Users should not edit nrnoc.hoc or default.hoc.  Any local 
+// changes to these files should be made in local.hoc.
+
+// key '*&*' is picked up by to indicate command for emacs
+proc elisp () { printf("*&* %s\n",$s1) }
+// if (not exists(simname)) { strdef simname, output_file, datestr, comment }
+
+// Simctrl.hoc will automatically load stdgraph.hoc which automatically
+// loads stdrun.hoc
+strdef temp_string_, user_string_  // needed for simctrl
+/* Global variable default values.  NOTE that stdrun.hoc, stdgraph.hoc
+and simctrl.hoc all contain variable definitions and thus default.hoc
+should be loaded after these files */
+//================================================================
+// INSERTED /usr/site/nrniv/simctrl/hoc/default.hoc
+// $Id: default.hoc,v 1.5 2003/07/08 16:16:52 billl Exp $
+/* This file contains various global defaults for hoc
+
+** Users should not edit nrnoc.hoc or default.hoc.  Any local 
+changes to these files should be made in local.hoc.
+----------------------------------------------------------------*/
+
+/*------------------------------------------------------------
+Object defaults
+------------------------------------------------------------*/
+
+/*** Define a "nil" object ***/
+objectvar nil
+
+/*------------------------------------------------------------
+String defaults
+------------------------------------------------------------*/
+
+/*** "Section" is used if errors are found in the initializiations ***/
+strdef section
+
+/*** Misc defines used by graphic routines ***/
+temp_string_ = "t"
+tempvar = 0
+
+/*------------------------------------------------------------
+Simulation defaults
+------------------------------------------------------------*/
+
+                        /* To be consistent w/the nmodl values */
+FARADAY = 96520.        /* Hoc default = 96484.56 */
+PI      = 3.14159       /* Hoc default = 3.1415927 */
+
+                        /* 0=off, 1=on */
+print_flag  = 0         /* Write to output file */
+graph_flag  = 1         /* Plot output */
+iv_flag     = 1         /* Using Interviews plotting */
+batch_flag  = 0         /* Using batch_run() */
+compress_flag = 0       /* Compress output file when saved */
+stoprun     = 0         /* 0=running, 1=stopped */
+iv_loaded   = 0         /* Load initial iv stuff on once */
+
+init_seed   = 830529
+run_seed    = 680612
+
+t           = 0         /* msec */
+dt          = .01       /* msec */
+tstop       = 100       /* msec */
+printStep   = 0.1       /* msec */
+plotStep    = 0.1       /* msec */
+flushStep   = 0.1       /* msec */
+eventStep   = 50        /* Number of nstep's before a doEvent */
+
+secondorder = 0
+
+celsius     = 6.3       /* degC */
+
+v_init      = -70       /* (mV) */
+global_ra   = 200       /* (ohm-cm) specific axial resisitivity */
+
+/*** Ion parameters ***/
+ca_init     = 50e-6     /* mM */
+na_init     = 10        /* mM */
+k_init      = 54.4      /* mM */
+
+// END /usr/site/nrniv/simctrl/hoc/default.hoc
+//================================================================
+
+/* Allows arrays of strings */
+objref hoc_obj_[2]
+load_file("stdgui.hoc")
+//================================================================
+// INSERTED /usr/site/nrniv/simctrl/hoc/simctrl.hoc
+// $Id: simctrl.hoc,v 1.14 2000/11/27 21:59:33 billl Exp $
+// Graphic routines for neuremacs simulation control
+
+proc sim_panel () {
+    xpanel(simname)
+          xvarlabel(output_file)
+  	xbutton("Init", "stdinit()")
+  	xbutton("Init & Run", "run()")
+  	xbutton("Stop", "stoprun=1")
+  	xbutton("Continue till Tstop", "continueRun(tstop)")
+  	xvalue("Continue till", "runStopAt", 1, "{continueRun(runStopAt) stoprun=1}", 1, 1)
+  	xvalue("Continue for", "runStopIn", 1, "{continueRun(t + runStopIn) stoprun=1}", 1,1)
+  	xbutton("Single Step", "steprun()")
+  	xvalue("Tstop", "tstop", 1, "tstop_changed()", 0, 1)
+  	graphmenu()
+  	sim_menu_bar()
+  	misc_menu_bar()
+    xpanel()
+  }
+
+proc misc_menu_bar() {
+    xmenu("Miscellaneous")
+      xbutton("Label Graphs", "labelgrs()")
+      xbutton("Label With String", "labelwith()")
+      xbutton("Label Panel", "labelpanel()")
+  	xbutton("Parameterized Function", "load_template(\"FunctionFitter\") makefitter()")
+    xmenu()
+  }
+
+proc sim_menu_bar() {
+    xmenu("Simulation Control")
+      xbutton("File Vers", "elisp(\"sim-current-files\")")
+      xbutton("File Status...", "elisp(\"sim-rcs-status\")")
+      xbutton("Sim Status", "elisp(\"sim-portrait\")")
+      xbutton("Load Current Files", "elisp(\"sim-load-sim\")")
+      xbutton("Load Templates", "elisp(\"sim-load-templates\")") 
+      xbutton("Load File...", "elisp(\"sim-load-file\")") 
+      xbutton("Save Sim...", "elisp(\"sim-save-sim\")")
+      xbutton("Set File Vers...", "elisp(\"sim-set-file-ver\")")
+      xbutton("Read Current Vers From Index", "elisp(\"sim-read-index-file\")")
+      xbutton("Read Last Saved Vers", "elisp(\"sim-read-recent-versions\")")
+      xbutton("Output to sim buffer", "elisp(\"sim-direct-output\")")
+    xmenu()
+  }
+
+proc labelpanel() {
+    xpanel(simname,1)
+  	xvarlabel(output_file)
+    xpanel()
+  }
+
+proc labels () {
+    labelwith($s1)
+    labelgrs()
+  }
+
+proc labelgrs () { local i, j, cnt
+    for j=0,n_graph_lists-1 {
+        cnt = graphList[j].count() - 1
+        for i=0,cnt labelgr(graphList[j].object(i))
+      }
+  }
+
+proc labelwith () { local i, j, cnt
+    temp_string_ = user_string_  // save the old one
+    if (numarg() == 1) { /* interactive mode */  
+        user_string_ = $s1
+      } else {
+        string_dialog("write what?", user_string_)
+      }
+    for j=0,n_graph_lists-1 {
+        cnt = graphList[j].count() - 1
+        for i=0,cnt {
+            graphList[j].object(i).color(0)
+            graphList[j].object(i).label(0.5,0.9,temp_string_)
+            graphList[j].object(i).color(1)
+            graphList[j].object(i).label(0.5,0.9,user_string_)
+          }
+      }
+  }
+
+proc labelgr () { local i
+    $o1.color(0)  // white overwrite
+    for (i=0;i<10;i=i+1) { // erase every possible runnum for this date
+        sprint(temp_string_,"%s %d%d",datestr,i,i)
+        $o1.label(0.1,0.7,temp_string_) }
+    $o1.color(1) // back to basic black
+    sprint(temp_string_,"%s %02d",datestr,runnum)
+    $o1.label(0.1,0.7,temp_string_)
+  }
+
+// END /usr/site/nrniv/simctrl/hoc/simctrl.hoc
+//================================================================
+
+proc run () {
+  
+    stdinit()
+  
+    if (batch_flag == 1) {
+        cvode.solve(tstop)
+      } else {
+        continueRun(tstop)
+      }
+    finish()
+  }
+
+proc continueRun () { local eventCount
+    eventCount=0
+    eventslow=1
+    stoprun = 0
+  
+    if (cvode_active()) cvode.event($1)
+  
+    while (t < $1 && stoprun == 0) { 
+        advance()
+        outputData()
+        if (graph_flag) { fastflushPlot() doEvents() }
+      }
+  }
+
+proc advance () { fadvance() }
+
+proc stdinit() {
+    realtime=0 startsw()
+    t = 0
+    stoprun = 0
+  
+    if (batch_flag == 1) {
+      }
+  
+    init()
+  
+    if (graph_flag == 1) { 
+        if (iv_flag == 1) {
+            initPlot()
+          } else {
+            initGraph() 
+          }
+      }
+  
+    if (print_flag == 1) { initPrint() }
+  }
+
+
+proc init () {
+    initMech()
+    initMisc1()
+  
+    // Initialize state vars then calculate currents
+    // If user hand-set v in initMisc1() then v_init should be > 1000,
+    // else all compartments will be set to v_init
+    if (v_init < 1000) {
+        finitialize(v_init)
+      } else {
+        finitialize()
+      }
+    fcurrent()
+  
+    // Set ca pump and leak channel for steady state
+    setMemb()
+  
+    // Recalculate currents with new pump and leak kinetics
+    fcurrent()
+  
+    initMisc2()
+    if (cvode_active()) cvode.re_init()
+  }
+
+// Initialization of mechanism variables
+// NOTE: if any changes are made to the NEURON block of any local mod
+// file, the user must add the necessary inits to initMisc1()
+proc initMech () { 
+    forall {
+        if ((!ismembrane("pas")) && (!ismembrane("Passive"))) { 
+            // Allow for either pas or Passive mod file usage
+            // errorMsg("passive not inserted") 
+          }
+    
+        if (ismembrane("na_ion")) { 
+            nai = na_init
+            nai0_na_ion = na_init
+          }
+        
+        if (ismembrane("k_ion")) {
+            ki = k_init
+            ki0_k_ion = k_init
+          }
+        
+        if (ismembrane("ca_ion")) { 
+            cai = ca_init
+            cai0_ca_ion = ca_init
+          }
+      }
+  }
+
+//* setMemb complex -- multiple names for passive mech
+//** declarations
+iterator scase() { local i
+    for i = 1, numarg() { temp_string_ = $si iterator_statement }}
+objref paslist,pasvars[3],XO
+double pasvals[2],x[1]
+paslist = new List()
+for ii=0,2 pasvars[ii]= new String()
+for scase("pas","Pass","Passive") paslist.append(new String(temp_string_))
+
+//** getval(),setval() -- return/set the hoc value of a string
+func retval () { return getval($s1) }
+func getval () { 
+    sprint(temp_string2_,"x=%s",$s1)
+    execute(temp_string2_)
+    return x
+  }
+proc setval () { 
+    sprint(temp_string2_,"%s=%g",$s1,$2)
+    execute(temp_string2_)
+  }
+
+//** findpas()
+// assumes that we are starting in a live section since looks for pass mech there
+qx_=0
+proc findpas () {
+    for ii=0,paslist.count-1 {
+        XO=paslist.object(ii)
+        if (ismembrane(XO.s)) {
+            // print XO.s,"found"
+            pasvars[2].s=XO.s
+            sprint(pasvars[0].s,"g_%s(qx_)",XO.s)
+            for scase("e","erev","XXXX") {  // look for the proper prefix
+                sprint(temp_string_,"%s_%s",temp_string_,XO.s)
+                if (name_declared(temp_string_)==1) break
+              }
+            if (name_declared(temp_string_)==0) { // not found
+                printf("SetMemb() in nrnoc.hoc: Can't find proper 'erev' prefix for %s\n",XO.s)
+              } else {
+                sprint(pasvars[1].s,"%s(qx_)",temp_string_)
+              }
+          }
+      }
+  }
+
+proc setMemb () {
+    findpas() // assume that passive name is the same in all sections
+    forall for (qx_) {  // will eventually want 'for (x)' to handle all the segments
+        if (ismembrane(pasvars[2].s)) {
+              for ii=0,1 pasvals[ii]=getval(pasvars[ii].s)
+              setmemb2()
+              for ii=0,1 setval(pasvars[ii].s,pasvals[ii])
+          }
+      }
+  }
+
+func setother () {return 0} // callback stub
+proc setmemb2 () { local iSum, ii, epas, gpas
+    gpas=pasvals[0] epas=pasvals[1]
+    // Setup steady state voltage using leak channel
+    iSum = 0.0
+    if (ismembrane("na_ion")) { iSum += ina(qx_) }
+    if (ismembrane("k_ion"))  { iSum += ik(qx_)  }
+    if (ismembrane("ca_ion")) { iSum += ica(qx_) }
+    iSum += setother()
+    // print iSum
+  
+    if (iSum == 0) {        // Passive cmp so set e_pas = v
+        epas = v
+      } else {
+        if (gpas > 0) {    // Assume g set by user, calc e
+            epas = v + iSum/gpas
+      
+          } else {            // Assume e set by user, calc g
+            if (epas != v) {
+                gpas = iSum/(epas - v)
+              } else { gpas=0 }
+          }
+        if (gpas < 0) errorMsg("bad g", gpas)
+        if (epas < -100 || epas > 0) {
+            printf(".")
+            // printf("%s erev: %g %g %g\n",secname(),e_pas,ina,ik)
+          }
+      }
+    pasvals[0]=gpas pasvals[1]=epas
+  }
+
+proc finish() {
+    /* Called following completion of continueRun() */
+  
+  finishMisc()
+  
+  if (graph_flag == 1) {
+      if (iv_flag == 1) {
+          flushPlot()
+          doEvents()
+        } else {
+          graphmode(-1)
+          plt(-1)
+        }
+    }
+  
+  if (print_flag == 1) {
+      wopen("")
+    }
+  }
+
+/*------------------------------------------------------------
+User definable GRAPHICS and PRINTING routines
+------------------------------------------------------------*/
+
+proc outputData() {
+    // Default procedure - if outputData() doesn't exist in the run file
+  
+    if (graph_flag == 1) {
+        if (iv_flag == 1) {
+            Plot()
+            rt = stopsw()
+            if (rt > realtime) {
+                realtime = rt
+                fastflushPlot()
+                doNotify()
+                if (realtime == 2 && eventcount > 50) {
+                    eventslow = int(eventcount/50) + 1
+                  }
+                eventcount = 0
+              }else{
+                eventcount = eventcount + 1
+                if ((eventcount%eventslow) == 0) {
+                    doEvents()
+                  }
+              }
+      
+          } else {
+            graph(t)
+          }
+      }
+  
+    if (print_flag == 1) { 
+        if (t%printStep <= printStep) { printOut() }
+      }
+  }
+
+proc printOut() {
+    /* Default procedure - if printOut() doesn't exist in the run file */
+  }
+
+proc initGraph() {
+    /* Default procedure - if initGraph() doesn't exist in the run file */
+  
+  graph()
+  }
+
+proc initPrint() {
+    /* Default procedure - if initPrint() doesn't exist in the run file */
+  
+  wopen(output_file)
+  }
+
+/*------------------------------------------------------------
+User definable BATCH RUN routines
+------------------------------------------------------------*/
+
+proc nextrun() {
+    // Called from finishmisc() following completion of batch in an autorun
+    wopen("")   
+    runnum = runnum + 1
+    sprint(output_file,"data/b%s.%02d", datestr, runnum)
+  }                       
+
+// commands for emacs
+proc update_runnum() { 
+    runnum = $1
+    sprint(output_file,"data/%s.%02d", datestr, runnum)
+    print "^&^ (progn (sim-index-revert)(setq sim-runnum ",runnum,"))" }
+proc nrn_write_index() { printf("&INDEX& %s\n",$s1) }
+proc nrn_update () { elisp("nrn-update") }
+proc nrn_message () { printf("!&! %s\n",$s1) } 
+
+/*------------------------------------------------------------
+User definable INITIALIZATION and FINISH routines
+------------------------------------------------------------*/
+
+// Default procedure - if initMisc1() doesn't exist in the run file 
+// Initializations performed prior to finitialize() 
+// This should contain point process inits and inits for any changes 
+//        made to the NEURON block of any local mod file 
+proc initMisc1() { }
+
+// Default procedure - if initMisc2() doesn't exist in the run file 
+// Initializations performed after finitialize() 
+proc initMisc2() { }
+
+// Default procedure - if finishMisc() doesn't exist in the run file 
+proc finishMisc() { }
+
+/*------------------------------------------------------------
+Miscellaneous routines
+------------------------------------------------------------*/
+
+proc errorMsg() {
+    /* Print warning, assumes arg1 is string and arg2 if present is a
+    variable value */
+  
+  sectionname(section)
+  
+  if (numarg() == 0) {
+      printf("ERROR in errorMsg(): Needs at least 1 argument.\n")
+    } else if (numarg() == 1) {
+      printf("ERROR: %s in section %s.\n", $s1, section)
+    } else {
+      printf("ERROR: %s in section %s (var=%g).\n", $s1, section, $2)
+    }
+  }
+
+proc clear() {
+    /* Clear non-interviews plot window */
+  plt(-3)
+  }
+
+func mod() { local x, y
+    /* Mod function for non-integers */
+  
+  x=$1
+  y=$2
+  
+  return (x/y - int(x/y))
+  }
+
+proc whatSection() { print secname() }
+
+proc print_pp_location() { local x //arg1 must be a point process
+     x = $o1.get_loc()
+     sectionname(temp_string_)
+     printf("%s located at %s(%g)\n", $o1, temp_string_, x)
+     pop_section()
+  }
+
+//* set method with method()
+proc method () {
+    if (strcmp($s1,"global")==0) {
+        cvode_active(1)
+      } else if (strcmp($s1,"local")==0) {
+        cvode_local(1)
+      } else if (strcmp($s1,"implicit")==0) {
+        secondorder=0
+        cvode_active(0)
+      } else if (strcmp($s1,"CN")==0) {
+        secondorder=2
+        cvode_active(1) // this turns off local
+        cvode_active(0)
+      } else {
+        printf("Integration method %s not recognized\n",$s1)
+      }
+  }
+
+//* Load local modifications to nrnoc.hoc and default.hoc
+//================================================================
+// INSERTED /usr/site/nrniv/simctrl/hoc/local.hoc
+//  $Header: /usr/site/nrniv/simctrl/hoc/RCS/local.hoc,v 1.15 2003/02/13 15:32:06 billl Exp $
+//
+//  This file contains local modifications to nrnoc.hoc and default.hoc
+//
+//  Users should not edit nrnoc.hoc or default.hoc.  Any local 
+//  changes to these files should be made in this file.
+
+// ------------------------------------------------------------
+//* MODIFICATIONS TO NRNOC.HOC
+// The procedures declared here will overwrite any duplicate
+// procedures in nrnoc.hoc.
+// ------------------------------------------------------------
+
+//*MODIFICATIONS TO DEFAULT.HOC
+//
+// Vars added here may not be handled properly within nrnoc.hoc
+//------------------------------------------------------------
+
+//** String defaults
+
+//** Simulation defaults
+
+long_dt     = .001      // msec 
+
+objref sfunc,tmpfile
+sfunc = hoc_sf_   // needed to use is_name()
+tmpfile = new File()  // check for existence before opening a user's local.hoc file
+
+proc write_comment () {
+    tmpfile.aopen("index")
+    tmpfile.printf("%s\n",$s1)
+    tmpfile.close()  
+  }
+
+func asin () { return atan($1/sqrt(1-$1*$1)) }
+func acos () { return atan(sqrt(1-$1*$1)/$1) }
+
+objref mt[2]
+mt = new MechanismType(0)
+proc uninsert_all () { local ii
+    forall for ii=0,mt.count()-1 {
+        mt.select(ii)
+        mt.selected(temp_string_)
+        if (strcmp(temp_string_,"morphology")==0) continue
+        if (strcmp(temp_string_,"capacitance")==0) continue
+        if (strcmp(temp_string_,"extracellular")==0) continue
+        if (sfunc.substr(temp_string_,"_ion")!=-1) continue
+        mt.remove()
+        // print ii,temp_string_
+      }
+  }
+
+condor_run = 0  // define for compatability
+// END /usr/site/nrniv/simctrl/hoc/local.hoc
+//================================================================
+
+if (xwindows && graph_flag) { nrnmainmenu() } // pwman_place(50,50)
+
+print "Init complete.\n"
+// END /usr/site/nrniv/simctrl/hoc/nrnoc.hoc
+//================================================================
+
+//================================================================
+// INSERTED init.hoc
+// $Id: init.hoc,v 1.1 2004/01/27 19:31:17 billl Exp $
+
+//================================================================
+// INSERTED /usr/site/nrniv/local/hoc/grvec.hoc
+// $Id: grvec.hoc,v 1.367 2004/02/09 23:05:17 billl Exp $
+
+// 0 -> double, ie $1
+// 1 -> object, ie $o1
+// 2 -> string, ie $s1
+// 3 -> address,ie $&1
+
+// main panel is 'vecpanel()'
+proc grvec () {}
+//================================================================
+// INSERTED /usr/site/nrniv/local/hoc/decvec.hoc
+// $Id: decvec.hoc,v 1.208 2004/02/05 22:26:31 billl Exp $
+
+proc decvec() {}
+
+//* Declarations
+objref ind, tvec, vec, vec0, vec1, tmpvec, vrtmp, veclist, veccollect
+objref tmpobj, XO, YO, rdm, dir
+dir = new List()
+//================================================================
+// INSERTED /usr/site/nrniv/local/hoc/declist.hoc
+// $Id: declist.hoc,v 1.58 2003/12/19 14:37:37 billl Exp $
+
+strdef mchnms
+objref tmplist,tmplist2,tmpobj,stack,SO,aa
+tmplist = new List()
+stack = new List()
+proc declist() {}
+
+//* Declarations
+
+begintemplate String2
+public s,t,append,prepend,exec
+strdef s,t
+proc init() {
+    if (numarg() == 1) { s=$s1 }
+    if (numarg() == 2) { s=$s1 t=$s2 }
+  }
+proc append () { local i
+    if (argtype(1)==2) sprint(t,"%s%s",s,$s1)
+    for i=2,numarg() sprint(t,"%s%s",t,$si)
+  }
+proc prepend () { local i
+    if (argtype(1)==2) sprint(t,"%s%s",$s1,s)
+    for i=2,numarg() sprint(t,"%s%s",$si,t)
+  }
+proc exec () {
+    if (numarg()==1) sprint(t,"%s%s",$s1,s)
+    execute(t)
+  }
+endtemplate String2
+
+//* SNO: generic template to store strings numbers and objects
+begintemplate SNO
+public s,t,u,n,o,set
+public ov,ol,set,get,pr,init
+strdef s,t,u,tstr
+objref o[3],this
+double n[3]
+
+proc init() {
+    if (numarg() >= 2) {s=$s1 n[0]=$2}
+    if (numarg() >= 4) {t=$s3 n[1]=$4}
+    if (numarg() == 6) {u=$s5 n[2]=$6}
+  }
+
+proc ov () { local a,sz
+    if (numarg()>=1) a=$1 else a=0
+    if (numarg()==1) sz=$2 else sz=100
+    o[a]=new Vector(sz)
+  }
+proc ol () { 
+    if (numarg()==1) a=$1 else a=0
+    o[a]=new List() 
+  }
+proc set () { local ii
+    if (numarg()==1) ii=$1 else ii=0
+    if (ii==0) tstr=s else if (ii==1) tstr=t else if (ii==2) tstr=u else {
+        printf("ERROR: only 3 items in SNO: %s\n",this) return } 
+    sprint(tstr,"%s = %s.n[%d]",tstr,this,ii)
+    execute(tstr)
+  }
+proc get () { local ii
+    if (numarg()==1) ii=$1 else ii=0
+    if (ii==0) {
+        sprint(tstr,"%s.n[%d] = %s",this,ii,this.s)
+      } else   if (ii==1) {
+        sprint(tstr,"%s.n[%d] = %s",this,ii,this.t)
+      } else   if (ii==2) {
+        sprint(tstr,"%s.n[%d] = %s",this,ii,this.u)
+      } else { printf("ERROR: only 3 items in SNO: %s\n",this) return } 
+    execute(tstr)
+  }
+proc pr () { local ii
+    if (numarg()==1) ii=$1 else ii=0
+    if (ii==0) {
+        sprint(tstr,"print %s.s,\" \",%s,\" \",%s.n[%d]",this,s,this,ii)
+      } else   if (ii==1) {
+        sprint(tstr,"print %s.t,\" \",%s,\" \",%s.n[%d]",this,t,this,ii)
+      } else   if (ii==2) {
+        sprint(tstr,"print %s.u,\" \",%s,\" \",%s.n[%d]",this,u,this,ii)
+      } else { printf("ERROR: only 3 items in SNO: %s\n",this) return } 
+    execute(tstr)
+  }
+endtemplate SNO
+
+//* list iterator ltr
+// usage 'for ltr(tmplist) { print XO }' :: 1 arg, assumes XO as dummy
+// usage 'for ltr(YO, tmplist) { print YO }' 2 arg, specify dummy
+// usage 'for ltr(XO, tmplist, &x) { print XO,x }' :: 3 args, define counter (else i1 default)
+//                                                 :: note that x, i1 must be defined
+iterator ltr () { local i
+    if (numarg()==3) {$&3=0} else {i1 = 0}
+    if (numarg()==1) {
+        for i = 0, $o1.count() - 1 {
+            XO = $o1.object(i)
+            iterator_statement
+            i1+=1
+          }
+        tmpobj=$o1
+      } else {
+        for i = 0, $o2.count() - 1 {
+            $o1 = $o2.object(i)
+            iterator_statement
+            if (numarg()==3) { $&3+=1 } else { i1+=1 }
+          }
+        tmpobj=$o2
+        $o1 = nil
+      }
+  }
+
+//* list iterator ltrb -- backwards list iterator
+// usage 'for ltrb(tmplist) { print XO }' :: 1 arg, assumes XO as dummy
+// usage 'for ltrb(YO, tmplist) { print YO }' 2 arg, specify dummy
+// usage 'for ltrb(XO, tmplist, &x) { print XO,x }' :: 3 args, define counter (else i1 default)
+//                                                 :: note that x, i1 must be defined
+iterator ltrb () { local i
+    if (numarg()==3) {$&3=$o2.count-1} else {i1 = $o2.count-1}
+    if (numarg()==1) {
+        for (i=$o1.count()-1;i>=0;i-=1) {
+            XO = $o1.object(i)
+            iterator_statement
+            i1-=1
+          }
+        tmpobj=$o1
+      } else {
+        for (i=$o2.count()-1;i>=0;i-=1) {
+            $o1 = $o2.object(i)
+            iterator_statement
+            if (numarg()==3) { $&3-=1 } else { i1-=1 }
+          }
+        tmpobj=$o2
+        $o1 = nil
+      }
+  }
+
+// lrm(LIST,STR) will remove item with string from LIST
+proc lrm () { local cnt
+    cnt=0
+    for ltrb(XO,$o1) if (strm(XO.s,$s2)) { $o1.remove(i1) cnt+=1 }
+    printf("%s found %d time\n",$s2,cnt)
+  }
+
+// lswap(list,#1,#2) swap items on a list
+proc lswap () { local a,b
+    if ($2<$3) {a=$2 b=$3} else {a=$3 b=$2}
+    $o1.insrt(a,$o1.object(b))
+    $o1.remove(b+1)
+    $o1.insrt(b+1,$o1.object(a+1))
+    $o1.remove(a+1)
+  }
+
+// proc shl() show a list
+proc shl () { 
+    if (numarg()==1) tmpobj=$o1 else tmpobj=tmplist 
+    if (tmpobj.count==0) return
+    if (isstring(tmpobj.object(0),tstr)) {
+        for ltr(XO,tmpobj) print XO.s
+      } else for ltr(XO,tmpobj) print XO
+  }
+// lfu() = ltr follow-up, pick out a single item from the last ltr request
+// lfu(list,num[,obj])
+proc lfu () { 
+    if (numarg()==1) { 
+        if (argtype(1)==0) XO=tmpobj.object($1)
+        if (argtype(1)==1) tmpobj=$o1
+      }
+    if (numarg()==2) {
+        if (argtype(1)==1 && argtype(2)==0) {tmpobj=$o1 XO=$o1.object($2)}
+        if (argtype(1)==0 && argtype(2)==1) {$o2=tmpobj.object($1)}
+      }
+    if (numarg()==3) {
+        if (argtype(1)==1 && argtype(2)==0 && argtype(3)==1) { tmpobj=$o1 $o3=$o1.object($2) }
+      }
+    if (numarg()==4) {
+        $o2=tmpobj.object($1)  $o4=tmpobj.object($3) 
+      }
+  }
+  
+//* list iterator ltr2
+// usage 'for ltr2(XO, YO, list1, list2) { print XO,YO }'
+iterator ltr2() { local i
+    if (numarg()==5) $&5=0 else i1=0
+    if ($o3.count != $o4.count) { print "ltr2 ERROR: lists have different lengths" return }
+    for i = 0, $o3.count() - 1 {
+        $o1 = $o3.object(i)
+        $o2 = $o4.object(i)
+        iterator_statement
+        if (numarg()==5) { $&5+=1 } else { i1+=1 }
+      }
+    $o1=nil $o2=nil
+  }
+
+//* list pairwise iterator ltrp
+// usage 'for ltrp(XO, YO, list) { print XO,YO }' takes them pairwise
+iterator ltrp() { local i
+    if (numarg()==4) {$&4=0} else {i1 = 0}
+    for (i=0;i<$o3.count()-1;i+=2) {
+        $o1 = $o3.object(i) $o2 = $o3.object(i+1)
+        iterator_statement
+        if (numarg()==4) { $&4+=1 } else { i1+=1 }
+      }
+    $o1=nil $o2=nil
+  }
+
+//* list iterator sltr
+// usage 'for sltr(XO, string) { print XO }'
+iterator sltr() { local i
+    tmplist = new List($s2)
+    if (numarg()==3) {$&3=0} else {i1=0}
+    for i = 0, tmplist.count() - 1 {
+        $o1 = tmplist.object(i)
+        iterator_statement
+        if (numarg()==3) { $&3+=1 } else { i1+=1 }
+      }
+    $o1 = nil
+  }
+
+//* listedit() allows you to remove things by clicking
+proc listedit () {
+    if (numarg()==0) { print "listedit(list,str) gives browser(list,str) for removing items" return}
+    if (numarg()==1) {
+      if (! isstring($o1.object(0),temp_string_)) {print "Give name for string of object?" return }
+        sprint(temp_string_,"proc ledt1 () {sprint(temp_string_,%s,hoc_ac_,%s.object(hoc_ac_).%s)}","\"%d:%s\"",$o1,"s")
+      } else {
+        sprint(temp_string_,"proc ledt1 () {sprint(temp_string_,%s,hoc_ac_,%s.object(hoc_ac_).%s)}","\"%d:%s\"",$o1,$s2)
+      }
+    execute1(temp_string_)
+    $o1.browser("Double click on item to remove",temp_string_,"ledt1()")
+    sprint(temp_string_,"%s.remove(hoc_ac_)",$o1)
+    $o1.accept_action(temp_string_)
+  }
+
+
+//* listXO() connects stuff to XO from a list
+proc listXO () {
+    if (numarg()==1) {
+        $o1.browser("Double click")
+        sprint(temp_string_,"print hoc_ac_,\":XO -> \",%s.object(hoc_ac_) XO = %s.object(hoc_ac_)",$o1,$o1)
+        $o1.accept_action(temp_string_)
+      } else if (numarg()==2) {
+        $o1.browser($s2)
+        sprint(temp_string_,"XO = %s.object(hoc_ac_) print %s.object(hoc_ac_).%s",$o1,$o1,$s2)
+        $o1.accept_action(temp_string_)
+      } else if (numarg()==3) {
+        $o1.browser($s2)
+        sprint(temp_string_,"XO = %s.object(hoc_ac_) print %s.object(hoc_ac_).%s,%s.object(hoc_ac_).%s",$o1,$o1,$s2,$o1,$s3)
+        $o1.accept_action(temp_string_)
+      }
+  }
+
+//* lcatstr(list,s1,s2,...) make new List("s1") new List("s2") ... in one list
+proc lcatstr() { local i
+    if (numarg()<3) { print "lcatstr(l1,s1,s2,...) puts new Lists into l1" return }
+    $o1 = new List($s2)
+    for i=3,numarg() {
+        tmplist2 = new List($si)
+        for ltr(XO,tmplist2) { $o1.append(XO) }  
+      }
+  }
+
+//* sublist() places a sublist in LIST0 from LIST1 index BEGIN to END inclusive
+proc sublist () { local ii
+    $o1.remove_all
+    for ii=$3,$4 {
+        $o1.append($o2.object(ii))
+      }
+  }
+
+//* catlist() concats LIST2...LISTN on end of LIST1
+proc catlist () { local i
+    for i = 2, numarg() {
+        for ltr(YO,$oi) {
+            $o1.append(YO)
+          }
+      }
+  }  
+
+//* mechlist() creates a LIST of all this CELL type's TEMPLATE type
+// list, cell, template
+// make a list of mechanisms belonging to a certain template
+proc mechlist () { local num,ii
+  //  mchnms = ""  // not a good storage since runs out of room
+    if (numarg()==0) { print "mechlist(list, cell, template)" return}
+    $o1 = new List($s2)
+    num = $o1.count
+    for ii=0,num-1 {
+        sprint(temp_string_,"%s.append(%s.%s)",$o1,$o1.object(ii),$s3)
+        execute(temp_string_)
+        sprint(mchnms,"%s/%d/%s.%s",mchnms,ii,$o1.object(ii),$s3)
+      }
+    for (ii=num-1;ii>=0;ii=ii-1) { $o1.remove(ii) }
+  }
+
+//* lp() loop through a list running command in object's context
+// assumes list in tmplist
+// with 1 args run $o1.object().obj_elem
+// with 2 args run comm($o1.object().obj_elem)
+proc lp () {
+    for ii=0,tmplist.count-1 {
+        printf("%s ",tmplist.object(ii))
+        if (numarg()==2) {
+            sprint(temp_string_,"%s(%s.%s)",$s2,tmplist.object(ii),$s1)
+          } else {
+            sprint(temp_string_,"%s.%s",tmplist.object(ii),$s1)
+          }
+        execute(temp_string_)
+      }
+  }
+
+//* prlp() loop through a list printing object name and result of command
+proc prlp () {
+    for ii=0,tmplist.count-1 {
+        printf("%s ",tmplist.object(ii))
+        if (numarg()==1) {
+            sprint(temp_string_,"print %s.%s",tmplist.object(ii),$s1)
+            execute(temp_string_)
+          } else { print "" }
+      }
+  }
+
+//** repl_str(str,stra,strb,scratch): replace stra with strb in string
+// will only replace first string match
+proc repl_str() {
+    if (sfunc.head($s1,$s2,$s4) == -1) { print $s2," not in ",$s1  return }
+    sfunc.tail($s1,$s2,$s4)
+    sprint($s4,"%s%s",$s3,$s4)
+    sfunc.head($s1,$s2,$s1)
+    sprint($s1,"%s%s",$s1,$s4)
+  }
+
+//** repl_mstr(str,stra,strb,scratch): replace stra with strb in string
+// multiple replace
+proc repl_mstr() {
+    while (sfunc.head($s1,$s2,$s4) != -1) {
+        sfunc.tail($s1,$s2,$s4)
+        sprint($s4,"%s%s",$s3,$s4)
+        sfunc.head($s1,$s2,$s1)
+        sprint($s1,"%s%s",$s1,$s4)
+      }
+  }
+
+//** clean_str(str,scratch,s1,s2,s3,...)
+// remove serial $si from string
+proc clean_str () { local i
+    for i=3,numarg() {
+        while (sfunc.head($s1,$si,$s2) != -1) { 
+            sfunc.tail($s1,$si,$s2)
+            sfunc.head($s1,$si,$s1)
+            sprint($s1,"%s%s",$s1,$s2)      
+          }
+      }
+  }
+
+// aa (or $o2) becomes a list of strings from file $s1
+proc aaaa () { local flag
+    if (numarg()==2) { tmpfile.ropen($s1) aa=$o2 flag=0
+      } else if (numarg()==1) { tmpfile.ropen($s1) flag=1
+      } else { tmpfile.ropen("aa") flag=1 }
+    if (flag==1) if (isobj(aa,"List")) { aa.remove_all() } else { aa=new List() }
+    while (tmpfile.gets(temp_string_)>0) {
+        chop(temp_string_)
+        tmpobj=new String(temp_string_)
+        aa.append(tmpobj)
+      }
+    tmpobj=nil
+  }
+
+//* var2obj() and canobj() -- find true object names
+// var2obj("tstr"[,"objvar"]) replaces variable name with actual name of the object
+// default into XO; optional second arg allows to place somewhere else
+// eg tstr="TC[0].ampa" var2obj(tstr) -> AMPA[0]
+proc var2obj () { local flag
+    if (numarg()==1) flag=1 else flag=0
+    if (flag) sprint($s1,"XO=%s",$s1) else sprint($s1,"%s=%s",$s2,$s1)
+    execute($s1) // change variable name to object name
+    if (flag) sprint($s1,"%s",XO) else sprint($s1,"%s",$s2)
+  }
+
+//** objnum(OBJ) -- find object number
+func objnum () {
+    sprint(temp_string_,"%s",$o1)
+    if (sscanf(temp_string_,"%*[^[][%d]",&x) != 1) x=-1
+    return x
+  }
+
+//** canobj(obj[,"OBJVAR"]) -- default will assign to XO
+// canonical object -- return canonical identity for an object
+// eg canobj(tc,"YO") -- figure out what tc is and assign it to YO
+proc canobj () { local flag
+    if (numarg()==1) flag=1 else flag=0
+    if (flag) sprint(tstr,"XO=%s",$o1) else sprint(tstr,"%s=%s",$s2,$o1)
+    execute(tstr) // change variable name to object name
+    sprint(tstr,"%s",$o1)
+  }
+
+//* push() and pop() for objects -- returns
+proc push () { local i
+    for i=1,numarg() stack.append($oi)
+  }
+
+proc pop () { local i
+    if ((numarg()>0 && stack.count<numarg()) || stack.count==0) {
+        print "ERR: stack underflow" return
+      } 
+    if (numarg()>=1) {
+        for i=1,numarg() {
+            $oi=stack.object(stack.count-1)
+            stack.remove(stack.count-1) 
+          }
+      } else { 
+        SO=stack.object(stack.count-1) 
+        stack.remove(stack.count-1) 
+      }
+  }
+
+proc time () { local tti
+    prtime()
+    if (numarg()==1) execute1($s1) else execute1("run()")
+    tti=prtime()
+    if (tti<60) print tti,"s" else print tti/60,"m"
+  }
+// END /usr/site/nrniv/local/hoc/declist.hoc
+//================================================================
+print "Loading decvec"
+
+{ MSONUM=100 MSOSIZ=100 msomax=0 msoptr=0 objref mso[MSONUM] }
+double x[4],y[4]
+xx=0 // declare a scalar 
+ind = new Vector(100)
+tvec = new Vector(100)
+vec = new Vector(100)
+vec0 = new Vector()
+vec1 = new Vector()
+vrtmp = new Vector()
+veclist = new List()
+veccollect = new List()
+rdm = new Random()
+
+if (!(xwindows && name_declared("xwindows"))) {
+    xwindows=0
+    objref graphItem
+    strdef temp_string_, temp_string2_
+  }
+strdef xtmp,space
+if (wopen("xtmp")) xtmp = "xtmp" else xtmp="/tmp/xtmp"  // scratch file to save system output to
+
+//* stuff that doesn't belong here
+//** dired([list,]file) - put together list of files matching 'file', calls 'ls -1 file'
+//   dired([list,]file,1) file name to read for list of files
+//   dired([list,]file,2) clear dir first; if list isn't present assume 'dir'
+proc dired () { local f,fs1
+    f=fs1=0
+    if (numarg()==0) { print "dired([list,]filename[,flag])\t\
+        adds the filename to list (use wildcards) (flag:1 read file;flag:2 clear list)"
+        return }
+    if (argtype(1)==2) fs1=1 // list name not give, assume 'dir'
+    if (fs1 && numarg()==2) {
+        if ($2==2) dir.remove_all
+        if ($2==1) { tmpfile.ropen($s1) f=1 }
+      }
+    if (numarg()==3) {
+        if ($3==2) $o1.remove_all
+        if ($3==1) { tmpfile.ropen($s2) f=1 }
+      }
+    if (!f) {
+        if (fs1) {
+            sprint(temp_string_,"ls -1R %s > %s",$s1,xtmp) // list in order of creation time
+          } else {
+            sprint(temp_string_,"ls -1R %s > %s",$s2,xtmp) // list in order of creation time
+          }
+        system(temp_string_)
+        tmpfile.ropen(xtmp)
+      }
+    while (tmpfile.scanstr(temp_string_) != -1) {
+        tmpobj=new String()
+        tmpobj.s=temp_string_
+        if (fs1) dir.append(tmpobj) else $o1.append(tmpobj)
+        tmpfile.gets(temp_string_)  // get rid of the rest of the line
+      }
+    if (fs1) printf("%d files in dir\n",dir.count) else printf("%d files in %s\n",$o1.count,$o1)
+  }
+// lsdir([dir])
+proc lsdir () { 
+    if (numarg()==1) {
+        for ltr($o1) {sprint(tstr,"ls -l %s",XO.s) system(tstr)}
+      } else for ltr(dir) {sprint(tstr,"ls -l %s",XO.s) system(tstr)}
+  }
+
+//** lbrw(list,action) is used to put up a browser
+// note action given without '()'
+proc lbrw () {
+    $o1.browser($s2,"s")
+    sprint($s2,"%s()",$s2)
+    $o1.accept_action($s2)
+  }
+
+//** l2v(S1,S2) makes a list(S1) and puts all the XO.S2 into vec
+// eg l2v("IClamp","amp")
+proc l2v () {
+    tmpobj=new List($s1)
+    if (numarg()==3) YO=$o3 else YO=vec
+    YO.resize(tmpobj.count) YO.resize(0)
+    for ltr(tmpobj) {
+        sprint(tstr,"YO.append(%s.%s)",XO,$s2)
+        execute(tstr)
+      }
+  }
+
+//* vector iterator vtr
+// usage 'for vtr(&x, vec) { print x }'
+iterator vtr() { local i
+    if (numarg()==3) {$&3=0} else {i1 = 0}
+    if (numarg()==1) {
+        for i = 0,$o1.size()-1 {  
+            x  = $o1.x[i]  
+            iterator_statement 
+            i1+=1
+          }
+      } else {
+        for i = 0,$o2.size()-1 { 
+            $&1 = $o2.x[i]  
+            iterator_statement 
+            if (numarg()==3) { $&3+=1 } else { i1+=1 }
+          }
+      }
+  }
+
+//* vector iterator vtr2, treat two vectors as pairs
+// usage 'for vtr2(&x, &y, vec1, vec2) { print x,y }'
+iterator vtr2() { local i,pairwise,noi1
+    noi1=pairwise=0
+    if (numarg()==3) { pairwise=1 i1=0 }
+    if (numarg()==4) if (argtype(4)==3) { pairwise=1 $&4=0 noi1=1}
+    if (pairwise) if ($o3.size%2!=0) { print "vtr2 ERROR: vec not even sized." return }
+    if (! pairwise) {
+        if ($o3.size != $o4.size) { print "vtr2 ERROR: sizes differ." return }
+        if (numarg()==5) {$&5=0 noi1=1} else {i1 = 0}
+      }
+    for i = 0,$o3.size()-1 {
+        $&1 = $o3.x[i]
+        if (pairwise) $&2=$o3.x[i+=1] else $&2=$o4.x[i]
+        iterator_statement
+        if (noi1) { if (pairwise) $&4+=1 else $&5+=1 } else i1+=1
+      }
+  }
+
+//* iterator lvtr, step through a list and a vector together
+// usage 'for lvtr(XO, &x, list, vec) { print XO,x }'
+iterator lvtr() { local i
+    if ($o3.count <  $o4.size) { printf("lvtr ERROR: vecsize > listsize: list %d,vec %d.\n",$o3.count,$o4.size) return }
+    if ($o3.count != $o4.size) { printf("lvtr WARNING: sizes differ: list %d,vec %d.\n",$o3.count,$o4.size) }
+    if (numarg()==5) {$&5=0} else {i1 = 0}
+    for i = 0, $o4.size()-1 {
+        $o1 = $o3.object(i)
+        $&2 = $o4.x[i]
+        iterator_statement
+        if (numarg()==5) { $&5+=1 } else { i1+=1 }
+      }
+  }
+
+//* other iterators: case, scase, ocase
+iterator case() { local i
+    i1 = 0
+    for i = 2, numarg() {
+        $&1 = $i
+        iterator_statement
+        i1+=1
+      }
+  }
+
+iterator scase() { local i
+    i1 = 0
+    for i = 1, numarg() {
+        temp_string_ = $si
+        iterator_statement
+        i1+=1
+      }
+  }
+
+// scasf() allows choice of string for saving
+iterator scasf() { local i
+    i1 = 0
+    for i = 2, numarg() {
+        $s1 = $si
+        iterator_statement
+        i1+=1
+      }
+  }
+
+// eg for scase2("a","b","c","d","e","f") print tmpobj.s,tmpobj.t
+iterator scase2() { local i
+    i1 = 0
+    if (numarg()%2==1) {print "ERROR: scase2 needs even number of args" return }
+    for i = 1, numarg() {
+        tmpobj=new String2()
+        tmpobj.s=$si i+=1  tmpobj.t=$si
+        iterator_statement
+        i1+=1
+      }
+  }
+
+iterator ocase() { local i
+    i1 = 0
+    for i = 1, numarg() {
+        XO = $oi
+        iterator_statement
+      }
+    i1+=1
+  }
+
+//* strm(STR,REGEXP) == regexp string match 
+func strm () { return sfunc.head($s1,$s2,"")!=-1 }
+
+//* nind(targ,data,ind) fill the target vector with data NOT index by ind (opposite of v.index)
+proc nind () { 
+    if (! eqobj($o1,$o2)) $o1.copy($o2)
+    $o1.indset($o3,-1e20)
+    $o1.where($o1,">",-1e20)
+  }
+
+//* vlk(vec)
+// vlk(vec,max)
+// vlk(vec,min,max)
+// prints out a segment of a vector
+vlk_width=20
+space=" "
+proc vlk () { local i,j,min,max,dual,wdh,nonl
+    j=dual=0 nl=1 wdh=vlk_width
+    if (numarg()==1) { min=0 max=$o1.size-1 }
+    if (numarg()==2) {
+        if (argtype(2)==0) {
+            if ($2==0) { 
+                nl=min=0 max=$o1.size-1 // vlk(vec,0) flag to suppress new lines
+              } else if ($2>0) { min=0 max=$2-1 } else { min=$o1.size+$2 max=$o1.size-1 }
+          } else { dual=1 min=0 max=$o1.size-1 }
+      }
+    if (numarg()==3) {
+        if (argtype(2)==0) if ($3>-1) { min=$2 max=$3 }
+        if (argtype(2)==1) { dual=1
+            if ($3>=0) { min=0 max=$3 } else { min=$o1.size+$3 max=$o1.size-1 }
+          }
+      }
+    if (numarg()==4) { min=$3 max=$4 dual=1 }
+    if (min<0) min=0
+    if (max>$o1.size-1) { max=$o1.size-1 printf("vlk: max beyond $o1 size\n") }
+    if (dual) if (max>$o2.size-1) { max=$o2.size-1 printf("vlk: max beyond $o2 size\n") }
+    for i=min,max { 
+        if (dual) printf("%g:%g%s",$o1.x[i],$o2.x[i],"\n") else printf("%g%s",$o1.x[i],space)
+        if ((j=j+1)%vlk_width==0 && nl && strcmp(space," ")==0) { print "" }
+      }
+    if (nl) print ""
+  }
+
+//** vlkp(SRC,PVEC) uses indices in PVEC to print out values in SRC
+proc vlkp () { local i,j,wdh
+    j=0 nl=1 wdh=vlk_width
+    if (numarg()==2) {
+        for vtr(&x,$o1) {
+            printf("%g%s",$o2.x[x],space)
+            if ((j=j+1)%vlk_width==0 && nl && strcmp(space," ")==0) { print "" }
+          }
+      } else {
+        for vtr(&x,$o1) { for i=2,numarg() printf("%g%s",$oi.x[x],space) 
+            print "" }
+      }
+    if (nl) print ""
+  }
+
+//* vprf() prints 1,2 or 3 vectors in parallel to output file
+proc vprf () { local x2
+    if (! tmpfile.isopen()) {
+        print "Writing to temp file 'temp'"
+        tmpfile.wopen("temp")
+      }
+    if (numarg()==1) { 
+        for vtr(&x,$o1) { tmpfile.printf("%g\n",x) }
+      } else if (numarg()==2) { 
+        for vtr2(&x,&y,$o1,$o2) { tmpfile.printf("%g %g\n",x,y) }
+      } else if (numarg()==3) { 
+        for vtr2(&x,&y,$o1,$o2,&ii) { x2=$o3.x[ii] tmpfile.printf("%g %g %g\n",x,y,x2) }
+      }
+    tmpfile.close
+  }
+
+//* vpr() prints 1,2 or 3 vectors in parallel to STDOUT
+proc vpr () { local x2
+    if (numarg()==1) { 
+        for vtr(&x,$o1) { printf("%g ",x) }
+      } else if (numarg()==2) { 
+        for vtr2(&x,&y,$o1,$o2) { printf("%g:%g ",x,y) }
+      } else if (numarg()==3) { 
+        for vtr2(&x,&y,$o1,$o2,&ii) { x2=$o3.x[ii] printf("%g:%g:%g ",x,y,x2) }
+      }
+    print ""
+  }
+
+//* readvec(vec) read from line
+proc readvec () { 
+    $o1.resize(0)
+    while (read(xx)) $o1.append(xx)
+    vlk($o1)
+  }
+  
+//* popvec(), savenums, readnums, vecsprint, savevec, savestr
+//  vrsz(), vcp(), zvec(), resize, copy, empty
+proc pushvec () { local i // same as .append, retained for compatability
+    for i=2, numarg() $o1.append($i)
+  }
+
+proc insvec () { local i // insert a value into the vector
+    for i=2, numarg() $o1.append($i)
+  }
+
+proc revec () { local i // clear vector then append
+    if (! isobj($o1,"Vector")) $o1 = new Vector()
+    $o1.resize(0)
+    if (numarg()>1) if (argtype(2)==1) { 
+        for i=2, numarg() $oi.resize(0) 
+      } else {
+        for i=2, numarg() $o1.append($i)
+      }
+  }
+
+// vrsz(VEC or NUM,VEC1,VEC2...,VECn or NUM)  -- vector resize -- to size of first arg
+// optional final number is fill
+proc vrsz () { local i,sz,max,fill
+    max=numarg()
+    if (argtype(1)==1) sz=$o1.size else sz=$1
+    if (argtype(max)==0) {i=max max-=1 fill=$i} else fill=0
+    for i=2, max { $oi.resize(sz)  $oi.fill(fill) }
+  }
+
+// vcp() -- copy vector segment with resizing
+proc vcp () { local i,sz
+    $o1.resize($4-$3+1) $o1.copy($o2,$3,$4)
+  }
+
+proc zvec () { local i // make vectors zero size
+    for i=1, numarg() $oi.resize(0)
+  }
+
+// savenums(x[,y,...]) save numbers to tmpfile via a vector
+proc savenums () { local vv,i
+    vv=allocvecs(1)
+    for i=1, numarg() mso[vv].append($i)
+    mso[vv].vwrite(tmpfile)
+    dealloc(vv)
+  }
+
+// savedbls(&x,sz) save a double array of size sz
+proc savedbls () { local vv,i
+    vv=allocvecs(1)
+    mso[vv].from_double($2,&$&1)
+    mso[vv].vwrite(tmpfile)
+    dealloc(vv)
+  }
+
+// readnums(&x[,&y...]) recover nums from tmpfile via a vector
+func readnums () { local vv,i,flag
+    vv=allocvecs(1) flag=1
+    if (mso[vv].vread(tmpfile)) {
+        if (numarg()!=mso[vv].size) printf("readnums WARNING: args=%d;vec.size=%d\n",numarg(),mso[vv].size)
+        for i=1,numarg() if (i<=mso[vv].size) $&i = mso[vv].x[i-1]
+      } else flag=0
+    dealloc(vv)
+    return flag
+  }
+
+// readdbls(&x,sz) read a double array of size sz
+func readdbls () { local vv,i,flag
+    vv=allocvecs(1) flag=1
+    if (mso[vv].vread(tmpfile)) {
+        mso[vv].v2d(&$&1)   // seg error risk
+      } else flag=0
+    dealloc(vv)
+    return flag
+  }
+
+//** wrvstr(str) save string to a file by converting to ascii
+proc wrvstr () { local vv,i
+    vv=allocvecs(1)
+    str2v($s1,mso[vv])
+    mso[vv].vwrite(tmpfile)
+    dealloc(vv)
+  }
+
+// rdvstr(str) read string from a file via vread and conversion
+func rdvstr () { local vv,i,flag
+    flag=1
+    vv=allocvecs(1)
+    if (mso[vv].vread(tmpfile)) {
+        if (numarg()==1) v2str(mso[vv],$s1) else v2str(mso[vv],tstr)
+      } else flag=0
+    dealloc(vv)
+    return flag
+  }
+
+// str2v() overwrites temp_string2_
+proc str2v () { 
+    $o2.resize(0)
+    temp_string2_=$s1
+    while (sfunc.len(temp_string2_)>0) {
+        sscanf(temp_string2_,"%c%*s",&x)
+        sfunc.right(temp_string2_,1)
+        $o2.append(x)
+      }
+  }
+    
+proc v2str () { local ii,x
+    $s2=""
+    for ii=0,$o1.size-1 { x=$o1.x[ii] sprint($s2,"%s%c",$s2,x) }
+  }
+
+//* remove last entry
+func popvec () { local sz, ret
+    sz = $o1.size-1
+    ret = $o1.x[sz]
+    $o1.resize[sz]
+    return ret
+  }
+
+//* chkvec (look at last entry)
+func chkvec () { if ($o1.size>0) return $o1.x[$o1.size-1] else return -1e10 }
+
+// vecsprint(strdef,vec)
+proc vecsprint () { local ii
+    if ($o2.size>100) { return }
+    for ii=0,$o2.size-1 { sprint($s1,"%s %g ",$s1,$o2.x[ii]) }
+  }
+
+// savevec([list,]vec1[,vec2,...]) add vector onto veclist or other list if given as 1st arg
+// don't throw out vectors
+proc savevec () { local i,flag,beg
+    if (isobj($o1,"List")) beg=2 else beg=1
+    for i=beg, numarg() { 
+        if (veccollect.count>0) { // grab a vector from garbage collection
+            tmpvec=veccollect.object(veccollect.count-1)
+            veccollect.remove(veccollect.count-1)
+          } else tmpvec = new Vector($oi.size)
+        tmpvec.copy($oi)
+        if (beg==2) $o1.append(tmpvec) else veclist.append(tmpvec)
+        tmpvec = nil
+      }
+  }
+
+proc prveclist () {
+    if (tmpfile.ropen($s1)) {
+        printf("%s exists; save anyway? (y/n) ",$s1)
+        getstr(temp_string_) chop(temp_string_)
+        if (strcmp(temp_string_,"y")!=0) return
+      }
+    if (! tmpfile.wopen($s1)) { print "Can't open ",$s1  return }
+    if (numarg()==2) {
+        for ltr(XO,$o2) XO.vwrite(tmpfile)
+      } else {
+        for ltr(XO,veclist) XO.vwrite(tmpfile)
+      }
+    tmpfile.close()
+  }
+
+proc rdveclist () { local flag,a
+    flag=0
+    a=allocvecs(1)
+    if (numarg()==1) { flag=1 clrveclist() } else $o2.remove_all
+    if (! tmpfile.ropen($s1)) { print "Can't open ",$s1  return }
+    while (mso[a].vread(tmpfile)) {
+        if (flag) savevec(mso[a]) else savevec($o2,mso[a])
+      }
+    tmpfile.close()
+    tmpobj=veclist
+    dealloc(a)
+  }
+  
+proc rdxy () { local a
+    a = allocvecs(1)
+    revec(ind,vec)
+    tmpfile.ropen("aa")
+    mso[a].scanf(tmpfile)
+    if (mso[a].size%2!=0) {print "rdxy ERR1 ",mso[a].size return}
+    for vtr2(&x,&y,mso[a]) {ind.append(x) vec.append(y)}
+    print ind.size," points read from aa into ind and vec"
+    dealloc(a)
+  }
+
+// closest(vec,num) -- return ind for vec member closest to num
+func closest () { local a,ret
+    a=allocvecs(1)
+    mso[a].copy($o1) mso[a].sub($2) mso[a].abs
+    ret=mso[a].min_ind
+    dealloc(a)
+    return ret
+  }
+
+proc clrveclist () { 
+    for ltr(XO,veclist) { XO.resize(0) veccollect.append(XO) }
+    veclist.remove_all()
+  }
+
+// savestr(str1...) add string obj onto tmplist
+proc savestr () { local i
+    if (argtype(1)==1) for i=2, numarg() $o1.append(new String($si)) else {
+        for i=1, numarg() tmplist.append(new String($si))
+      }
+  }
+
+// redund with v.count in vecst.mod
+func vcount () { local val,sum
+    val=$2 sum=0
+    for vtr(&x,$o1) if (x==val) sum+=1
+    return sum
+  }
+
+// tvecl() -- transpose veclist
+proc tvecl () { local cnt,sz,err,ii,p
+    err = 0
+    cnt = veclist.count
+    sz = veclist.object(0).size
+    for ltr(XO,veclist) if (XO.size!=sz) err=i1
+    if (err) { print "Wrong size vector is #",i1 return }
+    p = allocvecs(1,cnt)  mso[p].resize(cnt)
+    for ii=0,sz-1 {
+        for jj=0,cnt-1 {
+            XO=veclist.object(jj)
+            mso[p].x[jj] = XO.x[ii]
+          }
+        savevec(mso[p])
+      }
+    for (jj=cnt-1;jj>=0;jj-=1) { veccollect.append(veclist.object(jj)) veclist.remove(jj) }
+  }  
+
+//* vinsect(v1,v2,v3) -- v1 gets intersection (common members) of v2,v3
+//  replaced by v.insct() in vecst.mod
+proc vinsect () {
+    $o1.resize(0)
+    for vtr(&x,$o2) for vtr(&y,$o3) if (x==y) $o1.append(x)
+  }
+
+//* vecsplit(vec,vec1,vec2[,vec3,...])
+// splits vec into other vecs given
+proc vecsplit () { local num,ii,i
+    num = numarg()-1 // how many
+    for i=2,numarg() $oi.resize(0)
+    for (ii=0;ii<$o1.size;ii+=num) {
+        for i=2,numarg() if (ii+i-2<$o1.size) $oi.append($o1.x[ii+i-2])
+      }
+  }
+
+//* vecsort(vec,vec1,vec2[,vec3,...])
+// sorts n vecs including first vec by first one
+proc vecsort () { local i,inv,scr,narg
+    narg=numarg()
+    if (narg<2 || narg>10) {print "Wrong #args in decvec.hoc:vecsort" return}
+    scr=inv=allocvecs(2) scr+=1
+    $o1.sortindex(mso[inv])
+    mso[scr].resize(mso[inv].size)
+    sprint(temp_string_,"%s.fewind(%s,%s,%s",mso[scr],mso[inv],$o1,$o2)
+    for i=3,narg sprint(temp_string_,"%s,%s",temp_string_,$oi)
+    sprint(temp_string_,"%s)",temp_string_)
+    execute(temp_string_)
+    dealloc(inv)
+  }
+
+//* vdelind()  -- delete a single index
+proc vdelind () { local i,iin
+    iin = $2
+    if (iin<0) iin=$o1.size+iin
+    if (iin>$o1.size-1 || iin<0) {
+        printf("vdelind Error: index %d doesn't exist.\n",iin) return }
+    if (iin<$o1.size-1) $o1.copy($o1,iin,iin+1,$o1.size-1)
+    $o1.resize($o1.size-1)
+  }
+
+//* mkveclist(num[,sz]) recreate veclist to have NUM vecs each of size SZ (or MSOSIZ)
+proc mkveclist () { local ii,num,sz,diff
+    num=$1 
+    diff = num-veclist.count
+    if (numarg()==2) { sz=$2 } else { sz = MSOSIZ }
+    if (diff>0) {
+        for ii=0,diff-1 {
+          tmpvec = new Vector(sz)
+          veclist.append(tmpvec)
+          }
+      } else if (diff<0) {
+        for (ii=veclist.count-1;ii>=num;ii=ii-1) { veclist.remove(ii) }
+      }
+    for ltr(XO,veclist) { XO.resize(sz) }
+  }
+
+//* allocvecs
+// create temp set of vectors on mso
+// returns starting point on mso 
+// eg p = allocvecs(3)
+// access these vectors by mso[p+0] ... [p+2]
+func allocvecs () { local ii, llen, sz, newv
+    if (numarg()==0) { print "p=allocvecs(#), access with mso[p], mso[p+1]..." return 0}
+    newv = $1
+    if (numarg()==2) { sz=$2 } else { sz=MSOSIZ }
+    llen = msoptr
+    for ii=msomax,msoptr+newv-1 { // may need new vectors
+        if (ii>=MSONUM) { print "alloc ERROR: MSONUM exceeded." return 0 }
+        mso[ii] = new Vector(sz)
+      }
+    for ii=0,newv-1 {
+        mso[msoptr].resize(0)
+        msoptr = msoptr+1
+      }
+    if (msomax<msoptr) msomax = msoptr
+    return llen
+  }
+
+//** dealloc(start)
+// remove temp set of vectors from mso
+proc dealloc () { local ii,min
+    if (numarg()==0) { min = 0 } else { min = $1 }
+    msomax = msoptr
+    msoptr = min
+  }
+
+//* indvwhere family
+//** vwh(VEC,VAL) returns index where VEC.x[i]==VAL
+func vwh () { return $o1.indwhere("==",$2) }
+//** vval(VEC,STR,NUM) uses indwhere to return first value that qualifies
+func vval () { return $o1.x[$o1.indwhere($s2,$3)] }
+//** vcnt(VEC,STR,x[,y]) uses indvwhere and returns # of values that qualify
+func vcnt () { local a,ret
+    a=allocvecs(1) 
+    if (numarg()==3) mso[a].indvwhere($o1,$s2,$3)
+    if (numarg()==4) mso[a].indvwhere($o1,$s2,$3,$4)
+    ret = mso[a].size
+    printf("%d/%d (%g)\n",ret,$o1.size,ret/$o1.size*100)
+    dealloc(a)
+    return ret
+  }
+//** civw(DEST,SRC1,STR1,x1[,y1]...) does compound indvwhere
+// overwrites tstr; DEST should be size 0 unless to be compounded
+// civw(DEST,0,...) will resize DEST to 0
+func civw () { local i,a,b,c,f2,x,y,sz,min
+    a=b=c=allocvecs(3) b+=1 c+=2
+    min=2
+    // if ($o1.size>0) print "Starting with previously set index vector"
+    if (argtype(2)==0) {
+        if ($2==0) { $o1.resize(0) min=3
+            if (argtype(3)==1) sz=$o3.size else {
+                printf("ERR0: arg 3 should be obj when $2==0\n",i) return -1 }
+          } else {
+            printf("ERR0a: arg 2 should be 0 if a number -- zero sizes ind vector\n") 
+            return -1
+          }
+      } else if (argtype(2)==1) sz=$o2.size else {
+        printf("ERR0b: arg 2 should be obj\n",i) return -1 }
+    for (i=min;i<=numarg();) {
+        mso[c].copy($o1) 
+        if (argtype(i)!=1) { printf("ERR1: arg %d should be obj\n",i) return -1}
+        if ($oi.size!=sz)  { printf("ERR1a: all vecs should be size %d\n",sz) return -1}
+        mso[a].copy($oi)  i+=1   // look in a
+        if (argtype(i)!=2) { printf("ERR2: arg %d should be str\n",i) return -1}
+        tstr=$si          i+=1
+        if (strm(tstr,"[[(]")) f2=1 else f2=0 // opstring2 needs 2 args
+        if (argtype(i)!=0) { printf("ERR3: arg %d should be dbl\n",i) return -1}
+        x=$i              i+=1 
+        if (f2) {
+            if (argtype(i)!=0) { printf("ERR4: arg %d should be dbl\n",i) return -1}
+            y=$i            i+=1
+          }
+        if (f2) mso[b].indvwhere(mso[a],tstr,x,y) else { // the engine
+                  mso[b].indvwhere(mso[a],tstr,x)   }
+        $o1.resize(sz) // make sure it's big enough for insct -- shouldn't need
+        if (mso[c].size>0) $o1.insct(mso[b],mso[c]) else $o1.copy(mso[b])
+        if ($o1.size==0) break
+      }
+    dealloc(a)
+    return $o1.size
+  }
+
+//* vecconcat(vec1,vec2,...)
+// destructive: concatenates all vecs onto vec1
+proc vecconcat () { local i
+    if (numarg()<2) { print "vecconcat(v1,v2,...) puts all into v1" return }
+    for i=2,numarg() {
+        $o1.copy($oi,$o1.size)
+      }
+  }
+  
+//** vecelim(v1,v2)  eliminates items in v1 given by index vec v2
+proc vecelim () {
+    for vtr(&x,$o2) { $o1.x[x]= -1e20 }
+    $o1.where($o1,"!=",-1e20)
+  }
+
+//** redundout(vec) eliminates sequential redundent entries
+// destructive
+proc redundout () { local x,ii,p1
+    p1=allocvecs(1)
+    $o1.sort
+    x = $o1.x[0]
+    for ii=1,$o1.size-1 {
+        if ($o1.x[ii]==x) { $o1.x[ii]=-1e20 } else { x=$o1.x[ii] }
+      }
+    mso[p1].where($o1,">",-1e20)
+    $o1.copy(mso[p1])
+    dealloc(p1)
+  }
+
+// vecconv() convert $o1 by replacing instances in $o2 by corresponding instances in $o3
+proc vecconv () { local a,b
+    a=b=allocvecs(2) b+=1
+    vrsz($o1,mso[b])
+    for vtr2(&x,&y,$o2,$o3) { // x -> y
+        mso[a].indvwhere($o1,"==",x)
+        mso[b].indset(mso[a],y)
+      }
+    $o1.copy(mso[b])
+  }
+
+//** veceq()  like vec.eq but don't have to be same size and shows discrepency
+func veceq () { local sz1,sz2,eq,beg,ii,jj,kk
+    sz1=$o1.size sz2=$o2.size
+    if (numarg()==3) beg=$3 else beg=0
+    if (sz1!=sz2) printf("%s %d; %s %d\n",$o1,sz1,$o2,sz2)
+    ii=0 jj=beg
+    while (ii<sz1 && jj<sz2) {
+        if ($o1.x[ii]!=$o2.x[jj]) { 
+            eq=0
+            printf("Differ at %d %d\n",ii,jj) 
+            for kk=-10,10 if ((ii+kk)>=0 && (ii+kk)<sz1 && (jj+kk)>=0 && (jj+kk)<sz2) {
+                printf("(%d)%g:(%d)%g ",(ii+kk),$o1.x[ii+kk],(jj+kk),$o2.x[jj+kk])  }
+            print ""
+            break 
+          } else eq=1
+        ii+=1 jj=ii+beg
+      }
+    return eq
+  }
+
+//* isstring() determine if object $o1 is of type string, if so return the string in [$s2]
+func isstring () {
+    sprint(tstr,"%s",$o1)
+    if (sfunc.substr(tstr,"String")==0) {
+        if (numarg()==2) sprint($s2,"%s",$o1.s)
+        return 1
+      } else {
+        if (numarg()==2) sprint($s2,"%s",$o1)
+        return 0
+      }
+  }
+
+//** isassigned() checks whether an object is Null
+func isassigned () {
+    sprint(temp_string_,"%s",$o1)
+    if (sfunc.substr(temp_string_,"NULLobject")==0) {
+        return 0
+      } else {
+        return 1
+      }
+  }
+
+//** isit() like isassigned() but takes a string instead
+func isit () {
+    sprint(temp_string_,"XO=%s",$s1)
+    execute(temp_string_) // XO points to the thing
+    sprint(temp_string_,"%s",XO) // what is XO
+    if (sfunc.substr(temp_string_,"NULLobject")==0) {
+        return 0
+      } else {
+        return 1
+      }
+  }
+
+//** isob(s1,s2) like isobj but takes string statt obj
+func isob () {
+    sprint(temp_string_,"XO=%s",$s1)
+    execute(temp_string_) // XO points to the thing
+    sprint(temp_string_,"%s",XO)
+    if (sfunc.substr(temp_string_,$s2)==0) {
+        return 1
+      } else {
+        return 0
+      }
+  }
+
+//** eqobj(o1,o2) checks whether 2 objects are the same
+func eqobj () {	return object_id($o1) == object_id($o2) }
+
+//** isobj(o1,s2) checks whether object $o1 is of type $s2
+func isobj () {
+    sprint(temp_string_,"%s",$o1)
+    if (sfunc.substr(temp_string_,$s2)==0) {
+        return 1
+      } else {
+        return 0
+      }
+  }
+
+// destructive of $s1
+func str2num () { local ii
+    sscanf($s1,"%d",&x)
+    return x
+  }
+
+func isnum () { return strm($s1,"^[-+0-9.][-+0-9.eE]+$") }
+
+// like perl chop -- removes the last character
+// chop(STR[,TERM]) with TERM only chop if TERM
+proc chop () { 
+    if (numarg()==2) { 
+        sprint($s2,"%s$",$s2) // just look for terminal character
+        if (sfunc.tail($s1,$s2,temp_string2_)!=sfunc.len($s1)) return
+      }
+    if (sfunc.len($s1)>=1) sfunc.left($s1,sfunc.len($s1)-1) else {
+        print "ERR: chop called on empty string" }
+  }
+proc concat () { local i
+    for i=2,numarg() sprint($s1,"%s%s",$s1,$si)
+  }
+proc concat () { local i
+    for i=2,numarg() sprint($s1,"%s%s",$s1,$si)
+  }
+
+// eg split("534,  43 , 2, 1.4, 34",vec[,"/"])
+//    optional 3rd str is what to split on; default is comma
+proc split () { local vf
+    if (isobj($o2,"Vector")) vf=1 else vf=0
+    if (vf) revec($o2) else $o2.remove_all
+    temp_string2_=$s1
+    while (sfunc.len(temp_string2_)>0) {
+        if (vf) {
+            if (sscanf(temp_string2_,"%lf",&x)) $o2.append(x) // throw out non-numbers
+          } else {
+            if (numarg()==3) sfunc.head(temp_string2_,$s3,temp_string_) else {
+                               sfunc.head(temp_string2_,",",temp_string_) }
+            if (sfunc.len(temp_string_)==0) temp_string_=temp_string2_ // the end
+            $o2.append(new String(temp_string_))
+          }
+        if (numarg()==3) sfunc.tail(temp_string2_,$s3,temp_string2_) else {
+                           sfunc.tail(temp_string2_,",",temp_string2_) }
+      }
+  }
+
+// intervals(TRAIN,OUTPUT)
+proc intervals () { local a
+    if ($o1.size<=1) { printf("%s size <2 in intervals()\n",$o1) return }
+    $o2.deriv($o1,1,1)
+  }
+
+proc downcase () { local len,ii,let,diff,min,max
+    diff=32 min=65 max=90
+    if (numarg()==2) { diff=-diff min=97 max=122 } // if flag -> upcase
+    len = sfunc.len($s1)
+    for ii=1,len {
+        sscanf($s1,"%c%*s",&x)
+        sfunc.right($s1,1)
+        if (x>=min&&x<=max) {
+            sprint($s1,"%s%c",$s1,x+diff)
+          } else sprint($s1,"%s%c",$s1,x) // just rotate the letter
+      }
+  }
+
+// newlst() puts a newline in the middle of a string
+proc newlst () { local l
+    if (numarg()>1) l=$2 else l=int(sfunc.len($s1)/2)
+    temp_string_=$s1
+    temp_string2_=$s1
+    sfunc.left(temp_string_,l)
+    sfunc.right(temp_string2_,l)
+    sprint($s1,"%s\n%s",temp_string_,temp_string2_)
+  }
+
+//* hist(g,vec,max,bins)
+{clr=1 hflg=0} // clr:color, hflg=1 draw lines; 2 draw boxes; 3 fill in
+// style determined by hflg
+// hflg==0 lines with dots
+// hflg==0.x offset lines with dots
+// hflg==1 outlines but not down to zero
+// hflg==2 outlines with lines down to zero
+// hflg==3 just dots
+proc hist () { local a,b,c,min,max,wid,bins,ii,jj,offset
+    if (numarg()==5) {min=$3 max=$4 bins=$5 
+      } else if (numarg()==4) { min=0 max=$3 bins=$4 
+      } else if (numarg()==3) { min=$o2.min-.1 max=$o2.max+.1 bins=$3 }
+    wid=(max-min)/bins
+    a=b=c=allocvecs(3) b+=1 c+=2
+    // $o1.erase_all()
+    mso[c].hist($o2,round(min),bins,wid) // c has values
+    mso[a].resize(2*mso[c].size())
+    mso[a].indgen(0.5) 
+    mso[a].apply("int") 
+    mso[b].index(mso[c], mso[a]) 
+    mso[a].mul(wid) mso[a].add(min)
+    mso[b].rotate(1)
+    mso[b].x[0] = 0 
+    mso[b].append(mso[b].x[mso[b].size-1],0)
+    mso[a].append(max,max)
+    if (hflg==1 || hflg==2) { mso[b].line($o1, mso[a],clr,4)
+        if (hflg==2) for vtr(&x,mso[a]) drline(x,0,x,mso[b].x[i1],g,clr,4) }
+    mso[a].indgen(min,max-wid,wid)
+    if (int(hflg)==0 || hflg==3) { 
+        if (hflg%1!=0) offset=hflg // use eg -0.5+ii/8 to move back to integer
+        for jj=0,mso[a].size-1 { 
+            ii=mso[a].x[jj]
+            if (hflg!=3) drline(ii+wid/2+offset,0,ii+wid/2+offset,mso[c].x[jj],$o1,clr,4)
+            if (mso[c].x[jj]!=0) $o1.mark(ii+wid/2+offset,mso[c].x[jj],"O",6,clr,2) 
+          }
+      }
+    $o1.flush()
+    $o1.size(min,max,0,mso[b].max)
+    dealloc(a)
+  }
+// END /usr/site/nrniv/local/hoc/decvec.hoc
+//================================================================
+strdef grep // LINUX grep requires -a to handle a binary file 
+strdef ddir,symb
+if (sfunc.substr(osname,"inux")==1) grep="grep -a" else grep="grep"
+ddir = "data"
+symb = "O"
+gvmarkflag=gveraseflag=0
+
+//* templates
+//** attrpanl(attribute panel) template stores the information about
+// the attributes of a particular set of graphs including line colors,
+// world coordinates, ...
+// glist is a list of all graphs created from this panel
+// llist is a list of available names and associated vectors or locations
+begintemplate panattr
+  public color,line,super,curcol,graph,filename,comment
+  public glist,llist,tvec,size,shift,vsz,vjmp,tloc,vloc,remote
+  public printStep,entries,segments,bytes
+  public clear
+  double color[1],line[1],super[1],curcol[1],printStep[1],remote[1]
+  double size[4],entries[1],segments[1],bytes[1],shift[1]
+  double vsz[2],tloc[1],vloc[1],vjmp[1]
+  objref glist,llist,tvec
+  strdef filename,comment
+  proc init () {
+      if (numarg()==1) filename = $s1
+      color=1 line=1 curcol=1 tloc=-1 super=0 bytes=0 vjmp=50 entries=1 segments=1
+      vsz[0] = 300  vsz[1] = 200
+      glist = new List()
+      llist = new List()
+      tvec  = new Vector(0)
+    }
+  proc remgrs () {
+      glist.remove_all
+      glist = nil
+      glist = new List()
+    }
+  proc clear () {
+      bytes=0 entries=1 segments=1
+      comment = ""
+      llist.remove_all()
+    }
+endtemplate panattr
+
+//** vfile_line (vector file line) template gives information about a line
+//  in a file that gives a vector: name, size and location
+begintemplate vfile_line
+  public name, size, loc, num
+  strdef name
+  double size[1],loc[1],num[1],tvec[1]
+  proc init () { 
+      name=$s1 size=$2 num=$4
+      double loc[num],tvec[num]
+      loc[0] = $3
+    }
+endtemplate vfile_line
+
+//** vitem (vector item) is an internal vector used to store output from 
+// new vitem(var_name,vec_size,friendly_name)
+// new vitem(var_name,vec_size,1) -- force tvec creation even if not cvode_local
+// a simulation holds the name and the vector itself
+begintemplate vitem
+  external cvode_local
+  public tvec,vec,var
+  objref tvec,vec // vector
+  strdef var // variable name
+  proc init () { local tvflag
+      var=$s1  tvflag=0
+      if (cvode_local()==1) tvflag=1 else { 
+          // print "WARNING CVODE LOCAL IS NOT SET" 
+        }
+      vec=new Vector($2)
+      // NB label is labile
+      vec.label("") // use label for friendly name
+      if (numarg()==3) {
+          if (argtype(3)==2) vec.label($s3)
+          if (argtype(3)==0) if ($3==1) tvflag=1
+        }
+      if (tvflag=1) tvec=new Vector($2) 
+    }
+endtemplate vitem
+
+//* object declarations
+objref vite, scob, printlist, panobj, panobjl, szstr[4], g[10]
+panobj = new panattr(simname)
+panobjl = new List()
+proc pno () { panobj=panobjl.object($1) }
+printlist = new List()
+panobjl.append(panobj) // global graphing attributes
+panobj.llist = printlist 
+tmpfile = new File()
+strdef filename, recstr, grvecstr, readtag
+readtag = "^//[:pbCM ]"  // regexp used to identify header in mixed binary files
+for ii=0,3 { szstr[ii] = new String() }
+{ szstr[0].s="Set xmin" szstr[1].s="Set xmax" szstr[2].s="Set ymin" szstr[3].s="Set ymax" }
+multi_files = 1 // set 0 to show individual segments of multi-seg files
+dec_runnum = 1  // whether to decrement runnum when saving a new file
+byte_store = 4  // store as ascii (0), byte (1), int (2), float (3), double (4)
+tvec_bytesize = 4  // always store tvecs with more precision
+show_panel = 1  // whether or not to put a full panel up when a file is read
+outvecint = 0     // dump vectors every outvecint time if not 0
+outvect = 0     // time for next vec dump
+labelm = 1       // set to 0 to turn off labeling
+strdef rvvec_name
+rvvec_name = "vec"
+
+//* abbreviated proc alls
+proc pwpl () { pwman_place(500,500) }
+proc vp () { vecpanel() }
+proc ap () {if (numarg()==1) attrpanl($1) else attrpanl(0) }
+proc apo () { 
+    panobj=panobjl.object($1) XO=panobj
+    if (panobj.glist.count) {g=panobj.glist.object(0) graphItem=g}
+  }
+iterator apl () { local ii
+    for ii=1,panobjl.count-1 {
+        if (numarg()==1) {$&1=ii} else {i2=ii}
+        panobj=panobjl.object(ii) XO=panobj
+        if (panobj.glist.count) {g=panobj.glist.object(0) graphItem=g}
+        iterator_statement
+      }
+  }
+proc wp () {if (numarg()==1) wvpanl($1) else wvpanl(0) }
+proc gp () {if (numarg()==1) rpanel($1) else pbrgr("Graph","gv") }
+proc tog (){if (numarg()==0) print gvmarkflag=1-gvmarkflag else print $&1=1-$&1}
+
+//* store cvode state in a double in form active.local
+func cvode_status () { return cvode_active() + cvode_local()/10 }
+ulvflag=1
+proc ulv () { 
+    if (ulvflag || numarg()==1) { // else leave these other flags alone
+        using_cvode_ = cvode_active() 
+        use_lvardt_ = cvode_active() && cvode_local()
+      }
+  } 
+cvode_state = cvode_status()
+
+//** return true and update cvode_state if cvode state has changed
+func cvode_change () { 
+    if (cvode_state!=cvode_status()) {
+        cvode_state=cvode_status() return 1
+      } else { return 0 }
+  }
+
+//** verbose form of cvode_change
+func cvode_what () { local act,loc,newstat,newact,newloc
+    act=int(cvode_state)  loc=(cvode_state-act)*10
+    newstat = cvode_status()
+    if (cvode_state!=newstat) {
+        newact=int(newstat)  newloc=(newstat-newact)*10
+        printf("Updating active/local from %d/%d to %d/%d\n",act,loc,newact,newloc)
+        cvode_state=cvode_status() return 1
+      } else {
+        printf("cvode_state: active %d, local %d\n",act,loc)
+        return 0	
+      }
+  }
+
+if (xwindows) scob = new SymChooser()
+
+//* vecpanel() main panel
+proc vecpanel () {
+    fchooser_flag = 0  // used to initialize the file chooser
+    sprint(temp_string_,"%s Vectors",simname)
+    xpanel(temp_string_)
+    xbutton("Graph from file","fchooser(-1)")
+    xbutton("Graph vector","pbrgr(\"Graph\",\"gv\")")
+    xbutton("Archive to file:","pbrgr(\"Archive\",\"pv\")")
+    xbutton("Archive all to output_file","pvall()")
+    xstatebutton("Superimpose",&panobjl.object(0).super)
+    xbutton("Attributes","attrpanl(0)")
+    redo_printlist()
+    redo_attrlist()
+    xpanel()
+  }
+
+//* pbrgr(browser name,action) is used to put up a browser
+// note action given without '()'
+proc pbrgr () {
+    if (printlist.count == 1) {
+        gv(0)
+      } else if (printlist.count <= 8) {
+        mkpanel("Vector",$s1,$s2)
+      } else {
+        sprint(temp_string_,"%s:%s",simname,$s1)
+        printlist.browser(temp_string_,"var")
+        sprint(temp_string2_,"%s()",$s2)
+        printlist.accept_action(temp_string2_)
+      }
+  }
+
+//* record(list,what,vecptr) from items in $o1 object(ii).$s2 in vectors
+// $o1 is the list arg $s2 is the thing to be recorded [eg soma.v(0.5)]
+// optional $3 is the name of an object belonging to list items that will
+// serve as a pointer to the recording vector
+proc record () { local ii, dur, na3
+    for ltr(XO,$o1) {
+        sprint(recstr,"%s.%s",XO,$s2)
+        new_printlist_item(recstr) 
+        if (numarg()==3) { 
+            sprint(temp_string_,"%s.%s=printlist.object(printlist.count-1).vec",XO,$s3)
+            execute(temp_string_) // only way to get call by ref for object
+          }
+      }
+  }
+
+//* record_spks(list[,what]) takes a list of netcons and puts in printlist objects for them
+// assumes that the PP will be called pp
+proc record_spks () { local ii,flag
+    ulv(1)
+    for ltr(XO,$o1) {
+        flag=1
+        if (cvode.netconlist(XO, "", "").count>0) {
+            YO=cvode.netconlist(XO, "", "").object(0)
+            sprint(recstr,"%s%s",YO.precell,"_spks")
+          } else if (cvode.netconlist(XO.pp, "", "").count>0) {
+            YO=cvode.netconlist(XO.pp, "", "").object(0) 
+            sprint(recstr,"%s%s",YO.pre,"_spks")
+          } else { printf("%s not connected.\n",XO) flag=0 }
+        if (flag) {
+            vite = new vitem(recstr,100)
+            if (use_lvardt_) { YO.record(vite.tvec) vite.vec.resize(0) } else YO.record(vite.vec)
+            printlist.append(vite)
+          }
+      }
+    YO=nil
+  }
+
+//* redo_printlist() menu allows removal or addition of inidividual items
+proc redo_printlist() {
+    xmenu("Print list")
+    xbutton("Add var to printlist","redolist(0)")
+    xbutton("Clear printlist","printlist.remove_all()")
+    xbutton("Remove item from printlist","redolist(1)")
+    xbutton("Vector.op","redolist(2)")
+    xbutton("Proc(vector)","redolist(6)")
+    xbutton("Link XO->vec,YO->tvec","redolist(7)")
+    xbutton("Graph vector","redolist(4)")
+    xbutton("Save printlist","redolist(5)")
+    xbutton("Add all obj's of this type to printlist","redolist(3)")
+    xmenu()
+  }
+
+//* redolist() set of functions for altering the printlist called by redo_printlist()
+proc redolist () { local ii,flag
+    flag = $1  rdstr = 1
+    if (numarg()==2) { recstr=$s2  rdstr=0 }
+    if (flag==0) {
+        if (scob.run()) {
+            scob.text(temp_string_)
+            new_printlist_item(temp_string_)
+          }
+      } else if (flag==1) { // remove item
+        printlist.browser("Double click on item to remove","var")
+        printlist.accept_action("printlist.remove(hoc_ac_)")
+      } else if (flag==2) { // .op
+        if (rdstr) string_dialog("Enter operation to be run on vec",recstr)
+        temp_string_ = "\"%s.%s = %g\\n\""
+        sprint(temp_string_,"printf(%s,printlist.object(hoc_ac_).var,\"%s\",x=printlist.object(hoc_ac_).vec.%s)",temp_string_,recstr,recstr)
+        printlist.browser(recstr,"var")
+        printlist.accept_action(temp_string_)
+      } else if (flag==3) { // put another set of things on list
+        if (rdstr) string_dialog("String to be used as suffix for all items on list",recstr)
+        scob.run()
+        scob.text(temp_string_)
+        tmplist = new List(temp_string_)
+        record(tmplist,recstr)
+      } else if (flag==4) { // show it
+        pbrgr("Graph","gv")
+      } else if (flag==5) {
+        fchooser_flag = 0
+        tmpfile.chooser("a","Add printlist to file")
+        if (tmpfile.chooser()==1) {
+            tmpfile.printf("\nproc make_printlist() { \n")
+              tmpfile.printf("  printlist.remove_all()\n")
+              for ii=0,printlist.count-1 {
+                  tmpfile.printf("  new_printlist_item(\"%s\")\n",printlist.object(ii).var)
+                }
+              tmpfile.printf("}\nmake_printlist()\n")
+            tmpfile.close()
+          }
+      } else if (flag==6) { // proc(vec)
+        if (rdstr) string_dialog("Enter procedure name \"proc\",called as proc(vec,var,num)",recstr)
+        printlist.browser(recstr,"var")
+        sprint(temp_string_,"%s(printlist.object(hoc_ac_).vec,printlist.object(hoc_ac_).var,hoc_ac_)",recstr)
+        printlist.accept_action(temp_string_)
+      } else if (flag==7) { // XO is pointer to vec
+        printlist.browser("XO","var")
+        sprint(temp_string_,"{tmpobj=printlist.object(hoc_ac_) print hoc_ac_,tmpobj.var XO=tmpobj.vec YO=tmpobj.tvec}")
+        printlist.accept_action(temp_string_)
+      } 
+  }
+
+//** lkprl([num]) link X0 to vector in printlist, optional arg can be pos or neg
+proc lkprl () { local num,cnt
+    cnt = printlist.count
+    if (numarg()==1) {if ($1>=0) num=$1 else num=cnt+$1} else num=cnt-1
+    if (num>cnt-1 || num<0) {
+        printf("%d!: Only %d items (0-%d) in list.\n",num,cnt,cnt-1) return 
+      }
+    print num,":XO -> ",printlist.object(num).var
+    XO = printlist.object(num).vec
+    if (cvode_local()) YO = printlist.object(num).tvec else YO = panobj.tvec
+  }
+
+//** cpplitem([num]) copy X0 to new item in printlist, optional arg can be pos or neg
+proc cpplitem () { local num,cnt
+    cnt = printlist.count
+    if (numarg()>0) {if ($1>=0) num=$1 else num=cnt+$1} else num=cnt-1
+    if (num>cnt-1 || num<0) {
+        printf("%d!: Only %d items (0-%d) in list.\n",num,cnt,cnt-1) return 
+      }
+    if (numarg()>1) grvecstr=$s2 else sprint(grvecstr,"Copy_of_%s",printlist.object(num).var)
+    new_printlist_item(grvecstr,printlist.object(num).vec)
+    print printlist.count-1,":XO -> ",grvecstr
+    XO = printlist.object(printlist.count-1).vec
+  }
+
+
+//** cpplitem([num]) copy X0 to new item in printlist, optional arg can be pos or neg
+proc chgplname () { local num,cnt
+    cnt = printlist.count
+    if (numarg()>0) {if ($1>=0) num=$1 else num=cnt+$1} else num=cnt-1
+    if (num>cnt-1 || num<0) {
+        printf("%d!: Only %d items (0-%d) in list.\n",num,cnt,cnt-1) return 
+      }
+    printlist.object(num).var=$s2
+  }
+
+//* new_printlist_item(name) adds this item to the printlist
+//  new_printlist_item(name,vec) adds this vec to the printlist
+//  new_printlist_item(name,vec,tvec) adds this vec to the printlist
+//  new_printlist_item(name,num,vec) adds this vec to the printlist under name_num0,name_num1,...
+proc new_printlist_item () { local dur,pln
+    ulv(1)
+    panobj = panobjl.object(0)  
+    if (outvecint == 0) dur = tstop else dur = outvecint
+    grvecstr = $s1
+    remove_spaces(grvecstr,temp_string2_) // splits on '/'
+    // eg new_printlist_item(name,ii,vec)
+    if (numarg()>=3) { // allows formation of tags on the fly
+        if (argtype(2)==0) {
+            sprint(temp_string_,"%s%s",grvecstr,":%d")
+            sprint(temp_string_,temp_string_,$2)
+            vite = new vitem(temp_string_,$o3.size,temp_string2_)
+            vite.vec.copy($o3)
+            if (numarg()==4) vite.tvec.copy($o4)
+            printlist.append(vite)
+            return
+          } else if (argtype(2)==1) {
+            vite = new vitem(grvecstr,$o2.size,temp_string2_)
+            vite.vec.copy($o2) vite.tvec.copy($o3)
+            printlist.append(vite)
+            return
+          }
+      }
+    if (numarg()==2) { // second arg is a vector to store
+        if (argtype(2)==1) {
+            vite = new vitem(grvecstr,$o2.size,temp_string2_)
+            vite.vec.copy($o2)
+            printlist.append(vite)
+            return
+          } else if (argtype(2)==2) sprint(grvecstr,"%s%s",grvecstr,$s2)
+      }
+    if (use_lvardt_) { 
+        if (isobj(panobj.tvec,"Vector")) if (panobj.tvec.size!=0) { panobj.tvec.resize(0) panobj.tvec.play_remove() }
+        vite = new vitem(grvecstr,dur/printStep+10,temp_string2_)
+        panobj.printStep=-2
+      } else if (using_cvode_) { 
+        vite = new vitem(grvecstr,dur/printStep+10,temp_string2_)
+        panobj.printStep=-1
+        if (panobj.tvec.buffer_size==0) { 
+            panobj.tvec.resize(dur/printStep+10) panobj.tvec.resize(0)
+          }
+        panobj.tvec.record(&t) 
+      } else { 
+        if (panobj.tvec.size!=0) { panobj.tvec.resize(0) panobj.tvec.play_remove()}
+        panobj.printStep=printStep 
+        vite = new vitem(grvecstr,dur/printStep+10,temp_string2_)
+      }
+    printlist.append(vite)
+    pln = printlist.count-1 // current printlist number
+    if (numarg()==2) $o2=vite.vec // allow user to assign a pointer
+    vite = nil
+    if (use_lvardt_) {
+        printlist.object(pln).vec.resize(dur/printStep+10)
+        printlist.object(pln).tvec.resize(dur/printStep+10)
+        find_secname(grvecstr,temp_string_)
+        sprint(temp_string_,\
+               "%s {cvode.record(&%s,printlist.object(%d).vec,printlist.object(%d).tvec)}",\
+               temp_string_,grvecstr,pln,pln)
+      } else if (using_cvode_) { // don't give an explicit printStep
+        printlist.object(pln).vec.resize(dur/printStep+10)
+        sprint(temp_string_,\
+               "{printlist.object(%d).vec.record(&%s)}",pln,grvecstr)
+      } else {
+        sprint(temp_string_,\
+               "printlist.object(%d).vec.record(&%s,%g)",pln,grvecstr,printStep)
+      }
+    execute(temp_string_)
+  }
+
+// new_pri(NAME,TVEC,VEC) quick and dirty new_printlist_item
+proc new_pri () {
+    vite = new vitem($s1,$o2.size)
+    if (numarg()==3) { vite.tvec.copy($o2) vite.vec.copy($o3) } else vite.vec.copy($o2)
+    printlist.append(vite)
+    vite=nil
+  }
+
+//* prlexp(sz) expands all the vectors in printlist to size sz
+proc prlexp () { 
+    sz = $1
+    tvec.resize(sz)
+    for ltr(XO,printlist) { XO.vec.resize(sz) }
+  }
+
+
+//* redo_attrlist() menu allows removal or addition of inidividual items
+proc redo_attrlist() {
+    xmenu("Attribute panels")
+    xbutton("Read file","attrlist(0)")
+    xbutton("Remove","attrlist(1)")
+    xbutton("Show","attrlist(2)")
+    xbutton("Clear list","attrlist(3)")
+    xbutton("New","attrlist(4)")
+    xmenu()
+  }
+
+//* attrlist() set of functions for altering panobjl (list of graph attributes)
+proc attrlist () { local ii
+    if ($1==0) {
+        fchooser(-1)
+      } else if ($1==1) { // remove item
+        panobjl.browser("Double click on item to remove","filename")
+        panobjl.accept_action("panobjl.remove(hoc_ac_)")
+      } else if ($1==2) {
+        panobjl.browser("Double click on item",temp_string_,"numovecs()")
+        panobjl.accept_action("attrpanl(hoc_ac_)")    
+      } else if ($1==3) { // clear but leave #0
+        for (ii=panobjl.count-1;ii>0;ii=ii-1) { panobjl.remove(ii) }
+      } else if ($1==4) { // create a new one without reading a file in
+        panobj = new panattr()
+        panobj.filename = "EMPTY"
+        panobjl.append(panobj)
+        panobj.remote = panobjl.count()-1
+        attrpanl(panobjl.count()-1)
+      } else if ($1==5) { // create one with given num and name
+        for ii=panobjl.count,$2 { // create more if needed
+            panobj = new panattr()
+            panobjl.append(panobj)
+            panobj.remote = ii
+          }
+        panobj = panobjl.object($2)
+        panobj.filename = $s3
+        panobj.comment = $s4
+        panobj.printStep = $5
+      }
+  }
+
+// show the number of vectors as well as the name of the file
+proc numovecs () { local num
+    if (hoc_ac_==0) num=printlist.count() else num=panobjl.object(hoc_ac_).llist.count() 
+    sprint(temp_string_,"#%d %s: %d",hoc_ac_,panobjl.object(hoc_ac_).filename,num)
+  }
+
+//* fchooser(attrnum) finds file and then create panel from it using rpanel
+proc fchooser () { local attr0
+    attr0=$1
+    if (fchooser_flag == 0) {  // create panel first time only
+        sprint(temp_string_,"v0*")
+        tmpfile.chooser("","Read from a file",temp_string_)
+      }
+    fchooser_flag = 1
+    if (tmpfile.chooser() == 1) {
+        // find out whether this is a vector file or not
+        tmpfile.getname(filename)
+        sfunc.tail(filename,"/data.*/",grvecstr) // just take the file name without the leading stuff
+        attrnum = read_vfile(attr0)
+        if (attrnum == 0) {print "ERROR in fchooser" return }// error
+        // a new one so should show something
+        if (attr0==-1) if (show_panel) rpanel(attrnum) else attrpanl(attrnum)
+      }
+  }
+
+//* routines for reading in a vector file
+
+//** read_vfile(attrnum) creates a panattr object from information in a file
+// (uses grep to avoid loading big file)
+// assumes file in tmpfile
+func read_vfile () { local flag, ii, sz, loc, mult, sze, cloc, segs
+    if (numarg()==0) { print "read_vfile(attrnum,filename)" return 0 }
+    if (numarg()==2) filename = $s2
+    read_findattr($1) // set panobj and attrnum
+    // grab hold of the different lines using grep
+    file_with_dot(filename,temp_string_,temp_string2_) // put .filename into temp_string_
+    if (!tmpfile.ropen(temp_string_)) {
+        if (! tmpfile.ropen(filename)) { print "E1: Can't open ",filename // avoid grep error
+            return 0 }
+        sprint(temp_string2_,"%s '%s' %s > %s",grep,readtag,filename,temp_string_)
+        system(temp_string2_)
+        tmpfile.close()
+        if (! tmpfile.ropen(temp_string_)) { print "E2: Can't open ",temp_string_," (",filename,")" 
+            return 0 }
+        flag = 0
+      } else flag = 1 // signifies that .file exists to use as key
+    while ((numr = tmpfile.scanstr(temp_string_)) != -1) {  // throw out the leading '//'
+        // read the line
+        cloc = tmpfile.tell - numr // location of the beginning of this line
+        if (sfunc.head(temp_string_,"//[^b]",temp_string2_)==0) {
+            read_vinfo()  // a line giving info about the file (eg comment)
+          } else {   // NB: code in v60:516 to pickup byte_store value
+            if (panobj.bytes==0 && \
+                sfunc.head(temp_string_,"//b[1-9]",temp_string2_)==0) { panobj.bytes = 1 }
+            if (flag && panobj.entries>1) { // a .file with MULTI segs
+                tmpfile.seek(-numr,1) // backup to beginning of line
+                read_vdotfile()
+              } else if (panobj.segments > 1) { // mult segs: different times for same var
+                tmpfile.seek(-numr,1) // backup to beginning of line
+                panobj.segments = read_vsegs()
+              } else {  // read each line in for itself
+                tmpfile.scanstr(temp_string_) // name of a var
+                sze = tmpfile.scanvar()   // size of the vector or time it was dumped
+                loc = tmpfile.scanvar()   // location of the vector
+                if (panobj.bytes) { tmpfile.seek(cloc) // go back and measure the line length
+                    loc = loc + tmpfile.gets(temp_string2_) }
+                // create the item
+                if (! strcmp(temp_string_,"tvec")==0) {
+                    tmpobj = new vfile_line(temp_string_,sze,loc,1)
+                    panobjl.object(attrnum).llist.append(tmpobj)
+                    tmpobj = nil
+                  } else {
+                    panobj.tvec.resize(0)
+                    panobj.printStep=-1
+                    panobj.tloc = loc // where to find tvec later
+                  }
+              }
+          }
+      }
+    if (panobj.entries==1) panobj.entries = panobj.llist.count
+    if (! flag && panobj.segments>1) write_vsegs()  // create key .file
+    if (! tmpfile.ropen(panobj.filename)) { print "E3: Can't open ",panobj.filename
+        return 0 }
+    if (panobj.printStep==-1) { rtvec(attrnum) // code for cvode_active()
+      } else if (panobj.printStep==0) panobj.printStep = printStep
+    return attrnum
+  }
+
+//** read_findattr()
+// see if want to use old attributes or start new ones
+proc read_findattr () { 
+    if ($1 > -1 && $1 < panobjl.count()) {
+        attrnum = $1
+        panobj = panobjl.object(attrnum)
+        panobj.clear()
+        panobj.filename = filename
+      } else {   // create a new panel attribute object to hold color and line type
+        panobj = new panattr(filename)
+        panobjl.append(panobj)
+        panobj.remote = panobjl.index(panobj)
+        attrnum = panobjl.index(panobj)
+      }
+  }
+
+//** read_vinfo()
+// fill in panobj entries based on an information line in a vector file
+proc read_vinfo () {
+    if (strcmp(temp_string_,"//printStep")==0) {
+        panobj.printStep = tmpfile.scanvar() // printstep==-1 means cvode
+      } else if (strcmp(temp_string_,"//:")==0) { // a comment
+        tmpfile.gets(temp_string_)
+        sfunc.head(temp_string_,"\n",panobj.comment) // chop final newline
+      } else if (strcmp(temp_string_,"//CPU")==0) { // the machine type for byte storage
+        tmpfile.scanstr(temp_string_)
+        if (strcmp(temp_string_,uname)!=0) {
+            printf("%s written from %s\n",filename,temp_string_)
+          }
+      } else if (strcmp(temp_string_,"//MULTI")==0) { // multiple lines for each entry
+        panobj.entries = tmpfile.scanvar()
+        if (multi_files) { panobj.segments = tmpfile.scanvar() }
+      } else {
+        printf("Line:\t%s\n\tnot recognized in %s\n",temp_string_,panobj.filename)
+        tmpfile.seek(-1,1)
+        tmpfile.gets(temp_string_) // clear this line out
+      }
+  }
+
+//** read_vdotfile() read .file in abbreviated format (see write_vsegs)
+proc read_vdotfile() { local loc,entries,segments,ii
+    entries=panobj.entries segments=panobj.segments
+    panobj.bytes = 1
+    for i=1,entries {  // read this abbreviated file version (much faster)
+        tmpfile.scanstr(temp_string_)
+        loc = tmpfile.scanvar()
+        tmpobj = new vfile_line(temp_string_,-1,loc,segments) // don't set size
+        panobj.llist.append(tmpobj)
+        for ii=1,segments-1 { tmpobj.loc[ii] = tmpfile.scanvar() }
+      }
+  }
+
+//** read_vsegs() read a file that is segmented with diff vectors at diff times
+// (see outvecs)
+func read_vsegs () { local segments,entries,i,ii,jj,sze,loc,ret,cloc,clocend,llen
+    entries=panobj.entries segments=panobj.segments ret=1
+    for i=1,entries { // usually will be the number of cells recorded
+        cloc = tmpfile.tell()   // starting location in the file
+        tmpfile.scanstr(temp_string_)
+        tmpfile.scanstr(temp_string_) // name of a var
+        sze = tmpfile.scanvar()   // size of the vector or time it was dumped
+        loc = tmpfile.scanvar() + (tmpfile.tell() - cloc) // add line length
+        cloc = tmpfile.tell()  // a location where a vec begins
+        tmpobj = new vfile_line(temp_string_,sze,loc,segments)
+        panobj.llist.append(tmpobj)
+        for ii=1,segments-1 {  // go through all the different time segs
+            for jj=1,entries-1 { // go through all the cells
+                if ((ret = tmpfile.gets(temp_string_))==-1) { break } // EOF error
+              }
+            clocend = tmpfile.tell()  // loc of end of this seg
+            tmpfile.scanstr(temp_string_) tmpfile.scanstr(temp_string_) // name of a var
+            if (strcmp(temp_string_,tmpobj.name)!=0) {  // name should match
+                printf("ERROR: %d not %d segs found (%s)\n",ii,segments,tmpobj.name) 
+                segments = ii
+                break
+              }
+            tmpfile.scanvar()  // a time 
+            tmpobj.loc[ii] = tmpfile.scanvar()+(tmpfile.tell()-clocend) // where the vector starts
+            clocend = tmpfile.tell()
+          }
+        tmpfile.seek(cloc)   // go back for next entry
+      }
+    tmpfile.seek(clocend)  // go to end of all this stuff
+    return segments
+  }
+
+//** write_vsegs()
+// write out names of all entries along with locations where the vecs start
+proc write_vsegs () { local ii
+    file_with_dot(filename,temp_string_,temp_string2_) // put .filename into temp_string_
+    sprint(temp_string2_,"grep '^//[^bM]' %s > %s",xtmp,temp_string_)
+    system(temp_string2_)  // copy the non-location lines into the new file
+    tmpfile.aopen(temp_string_)
+    tmpfile.printf("//MULTI %d %d\n",panobj.entries,panobj.segments) // redo in case differs
+    for ltr(XO,panobj.llist) {
+        tmpfile.printf("%s ",XO.name)
+        for ii=0,panobj.segments-1 { tmpfile.printf("%d ",XO.loc[ii]) }
+        tmpfile.printf("\n")
+      }
+    tmpfile.close()
+  }
+
+//** make_vdot_files() go through a list of filenames to convert into .file format
+proc make_vdot_files () { local ii,sav,cnt
+    cnt = panobjl.count()
+    for ltr(XO,$o1) {
+        filename = XO.s
+        print "Processing ",filename
+        read_vfile(cnt) // don't overwrite one that's being used
+      }
+  }
+
+//* print out the CPU name
+proc vfcpu () {
+    sprint(temp_string_,"%s '^//CPU' %s",grep,$s1)
+    system(temp_string_)
+  }
+
+//* rpanel() creates a panel from information in llist
+proc rpanel () { local ii
+    print $1
+    attrnum = $1
+    panobj = panobjl.object(attrnum)  
+    if (panobj.llist.count > 8) { rlist($1) return }
+    sprint(temp_string_,"#%d:%s ",attrnum,simname)
+    xpanel(temp_string_)
+    xlabel(panobj.filename)
+  
+    for ii=0,panobj.llist.count-1 {
+        sprint(temp_string2_,"rv(%d,%d)",attrnum,ii)
+        xbutton(panobj.llist.object(ii).name,temp_string2_)
+      }
+    sprint(temp_string_,"attrpanl(%d)",attrnum)
+    xbutton("Attributes",temp_string_)
+    sprint(temp_string_,"lpvec(filename,vrtmp,%g)",panobj.printStep)
+    xbutton("Print last vec",temp_string_)
+    xbutton("Erase","ge()")
+    xpanel()
+  }
+
+//* rlist(): like rpanel() but puts up a browser list instead of a panel
+proc rlist () {
+    panobjl.object($1).llist.browser(panobjl.object($1).filename,"name")
+    sprint(temp_string_,"rv(%d,hoc_ac_)",$1)
+    panobjl.object($1).llist.accept_action(temp_string_)
+  }
+
+//* rvlist(): like rpanel() but puts up a browser list instead of a panel
+proc rvlist () { local flag,attrnum,rdstr
+    rdstr = 1
+    flag = $1 attrnum = $2 
+    if (numarg()==3) { recstr=$s3  rdstr=0 }
+    if (flag==0) {
+        panobjl.object(attrnum).llist.browser(panobjl.object(attrnum).filename,"name")
+        sprint(temp_string_,"rvec(%d,hoc_ac_)",attrnum)
+        panobjl.object(attrnum).llist.accept_action(temp_string_)
+      } else if (flag==1) { // proc(vec)
+        if (rdstr) string_dialog("Procedure name: proc, called as proc(vec)",recstr)
+        panobjl.object(attrnum).llist.browser(recstr,"name")
+        sprint(temp_string_,"{rvec(%d,hoc_ac_) %s(%s)}",attrnum,recstr,rvvec_name)
+        panobjl.object(attrnum).llist.accept_action(temp_string_)
+        print attrnum,":",recstr,":",temp_string_,":",rvvec_name
+      } else if (flag==2) { // vec.command
+        if (rdstr) string_dialog("comm: print vec.comm",recstr)
+        panobjl.object(attrnum).llist.browser(recstr,"name")
+        sprint(temp_string_,"{rvec(%d,hoc_ac_) print %s.%s}",attrnum,rvvec_name,recstr)
+        panobjl.object(attrnum).llist.accept_action(temp_string_)
+      }
+  }
+
+proc disptray () { print "Must load boxes.hoc to get trays" }
+//* attrpanl() gives attributes for a set of graphs
+proc attrpanl () { local ii,jj
+    attrnum = $1 // use global for xbuttn
+    sfunc.tail(panobjl.object(attrnum).filename,"data.*/",grvecstr)
+    sprint(temp_string_,"#%d:%s:%s (ATTRPANL)",attrnum,simname,grvecstr)
+    xpanel(temp_string_)
+    xvarlabel(panobjl.object(attrnum).filename)
+    xvarlabel(panobjl.object(attrnum).comment)
+    sprint(temp_string_,"panobjl.object(%d).color",attrnum)
+    xvalue("Color(-1=multi)",temp_string_,1)
+    sprint(temp_string_,"panobjl.object(%d).line",attrnum)
+    xvalue("Line",temp_string_,1)
+    xstatebutton("Superimpose",&panobjl.object(attrnum).super,"gnum=-1")
+    xvalue("Superimpose - Graph[#]","gnum",1)
+    xbuttn("Graph limits","wvpanl(")
+    xmenu("Manipulate graphs")
+    xbutton("Mark","gvmarkflag=-(gvmarkflag-1) printf(\"Mark: %d\",gvmarkflag)")
+    xbutton("Erase/redraw","gveraseflag=-(gveraseflag-1) printf(\"Erase: %d\",gveraseflag)")
+    xbuttn("Label graphs","lblall(")
+    xbuttn("Erase graphs","geall(")
+    xbuttn("Remove graphs","remgrs(")
+    sprint(temp_string2_,"disptray(%d)",attrnum)
+    xbutton("Make tray",temp_string2_)
+    sprint(temp_string2_,"setrange(%d,3)",attrnum)
+    xbutton("Erase axes",temp_string2_)
+    sprint(temp_string2_,"for ltr(XO,panobjl.object(%d).glist) XO.exec_menu(\"View = plot\")",attrnum)
+    xbutton("View = plot",temp_string2_)
+    sprint(temp_string2_,"for ltr(XO,panobjl.object(%d).glist) XO.exec_menu(\"Crosshair\")",attrnum)
+    xbutton("Crosshair",temp_string2_)
+    sprint(temp_string2_,"for ltr(XO,panobjl.object(%d).glist) XO.exec_menu(\"NewView\")",attrnum)
+    xbutton("New view",temp_string2_)
+    sprint(temp_string2_,"for ltr(XO,panobjl.object(%d).glist) XO.exec_menu(\"Delete\")",attrnum)
+    xbutton("Delete Text",temp_string2_)
+    sprint(temp_string2_,"for ltr(XO,panobjl.object(%d).glist) XO.exec_menu(\"Move Text\")",attrnum)
+    xbutton("Move Text",temp_string2_)
+    sprint(temp_string2_,"for ltr(XO,panobjl.object(%d).glist) XO.exec_menu(\"Change Text\")",attrnum)
+    xbutton("Change Text",temp_string2_)
+    xmenu()
+    sprint(temp_string_,"panobjl.object(%d).remote",attrnum)
+    sprint(temp_string2_,"grall(%d)",attrnum)
+    xvalue("Graph all",temp_string_,0,temp_string2_)
+    if (attrnum != 0) {
+        xmenu("Manipulate vectors")
+        xbutton("Vector name","string_dialog(\"Change Vector name\",rvvec_name)")
+        xbuttn("Write to vector","rvlist(0,")
+        xbuttn("Proc(vector)","rvlist(1,")
+        xbuttn("vector.command","rvlist(2,")
+        xmenu()
+        xbuttn("Show full panel","rpanel(")
+        xbuttn("Change file","fchooser(")
+      } else {
+        xbutton("Show full panel","pbrgr(\"Graph\",\"gv\")")
+      }
+    xpanel()
+  }
+
+// allows inclusion of attrnum for each item
+proc xbuttn () { sprint(temp_string2_,"%s%d)",$s2,attrnum)  xbutton($s1,temp_string2_) }
+
+//* set something for attrpanl() to value
+func attrset () { local attrnum, ii
+    if (numarg()==0) { printf("attrset(attrnum,\"thing\",val)\n") 
+      } else if (numarg()==2) {
+        sprint(temp_string_,"tempvar = panobjl.object(%d).%s",$1,$s2)
+        execute(temp_string_)
+        return tempvar
+      } else { 
+        sprint(temp_string_,"panobjl.object(%d).%s=%g",$1,$s2,$3)
+        execute(temp_string_) 
+        return $3
+      }
+  }
+
+proc wvpanl () { local attrnum, ii
+    attrnum = $1
+    sfunc.tail(panobjl.object(attrnum).filename,"data.*/",grvecstr)
+    sprint(temp_string_,"#%d:%s:%s (WVPANL)",attrnum,simname,grvecstr)
+    xpanel(temp_string_)
+    sprint(temp_string_,"%d Vectors",panobjl.object(attrnum).llist.count)
+    xlabel(temp_string_)
+    for ii=0,3 {
+         sprint(temp_string_,"panobjl.object(%d).size[%d]",attrnum,ii)
+         sprint(temp_string2_,"chrange(%d,%d)",attrnum,ii)
+         xvalue(szstr[ii].s,temp_string_,0,temp_string2_)
+      }
+    sprint(temp_string_,"panobjl.object(%d).shift",attrnum)
+    sprint(temp_string2_,"chrange(%d,-2)",attrnum)
+    xvalue("Shift L/R",temp_string_,0,temp_string2_)
+    sprint(temp_string2_,"chrange(%d,%d)",attrnum,-1)
+    xmenu("Other")
+    xbutton("Clear/Set to G0",temp_string2_)
+    sprint(temp_string2_,"viewplot(%d)",attrnum)
+    xbutton("View=plot",temp_string2_)
+    sprint(temp_string2_,"setrange(%d,0,tstop,-90,50)",attrnum)
+    xbutton("0,tstop,-90,50",temp_string2_)
+    xbutton("Clean graph list","collapsegrs()")
+    sprint(temp_string2_,"attrpanl(%d)",attrnum)
+    xbutton("Attributes",temp_string2_)
+    xmenu()
+    xpanel()
+    for ii=0,3 if (panobj.size[ii]==0) panobj.size[ii]=panobj.glist.object(0).size(ii+1)
+  }
+
+//* remgrs() gets rid of all of the graphs (called from attrpanl)
+proc remgrs () { local ii,cnt
+    if (isobj(graphItem,"Graph")) { graphItem.unmap graphItem = nil }
+    panobj = panobjl.object($1)
+    for ltr (XO,panobj.glist) XO.unmap()
+    panobj.glist.remove_all
+  }
+
+//* collapsegrs () take off of glist graphs that have been closed on screen
+proc collapsegrs () { local ii
+    if (numarg()==0) { panobj = panobjl.object(0)
+      } else { panobj = panobjl.object($1) }
+    for (ii=panobj.glist.count-1;ii>=0;ii-=1) {
+        if (panobj.glist.object(ii).view_count() == 0) { 
+            panobj.glist.remove(ii)
+          }
+      }
+  }
+
+//* viewplot() set the world for each graph correctly
+proc viewplot () { local cnt,ii,flag,sz1,sz2,sz3,sz4
+    if (numarg()==2) flag=$2 else flag=-1
+    if (flag==0) { sz1=sz3=1e10 sz2=sz4=-1e10 }
+    panobj = panobjl.object($1)
+    for ltr(XO,panobj.glist) {
+        XO.size(&x[0])
+        if (flag==0) { 
+            if (x[0]<sz1) sz1=x[0]
+            if (x[1]>sz2) sz2=x[1]
+            if (x[2]<sz3) sz3=x[2]
+            if (x[3]>sz4) sz4=x[3]
+          } else if (flag==9) {
+            XO.size(0,tstop,x[2],x[3])
+          } else { XO.size(x[0],x[1],x[2],x[3]) }
+      }
+    if (flag==9) { panobj.size[0]=0 panobj.size[1]=tstop }
+    if (flag==0) for ltr(XO,panobj.glist) XO.size(sz1,sz2,sz3,sz4)
+  }
+
+//* nvwall() changes the size of the graphs
+proc nvwall () { local cnt,ii,sz1,sz2,sz3,sz4,wd,ht
+    panobj = panobjl.object($1)
+    if (numarg()==3) { wd=$2 ht=$3 } else { wd=panobj.vsz[0] ht=panobj.vsz[1] }
+    cnt = panobj.glist.count()
+    for (ii=cnt-1;ii>=0;ii=ii-1) { 
+        if (panobj.glist.object(ii).view_count()==0) {panobj.glist.remove(ii)
+          } else {
+            sz1 = panobj.glist.object(ii).size(1)
+            sz2 = panobj.glist.object(ii).size(2)
+            sz3 = panobj.glist.object(ii).size(3)
+            sz4 = panobj.glist.object(ii).size(4)
+            panobj.glist.object(ii).unmap()
+            panobj.vloc = panobj.vloc+panobj.vjmp
+            if (panobj.vloc > 700) { panobj.vloc = 0 }
+            panobj.glist.object(ii).view(sz1,sz3,sz2-sz1,sz4-sz3,0,panobj.vloc,wd,ht)
+          }
+      }
+  }
+
+//* geall() erases all of the graphs
+proc geall () { local cnt,ii
+    panobj = panobjl.object($1)
+    cnt = panobj.glist.count()
+    for ii=0,cnt-1 { 
+        panobj.glist.object(ii).erase_all()
+      }
+  }
+
+//* lblall(attrnum,label,#,xloc,yloc) put label on all of the graphs
+// arg3 tells which single graph to put it on
+proc lblall () { local cnt,ii,min,max,attrnum,lx,ly
+    if (numarg()==0) { printf("lblall(attrnum[,loc])\n")  return }
+    attrnum = $1 panobj = panobjl.object(attrnum)
+    cnt = panobj.glist.count()
+    if (numarg()>2) { min=max=$3 } else { min=0 max=cnt-1 }
+    if (numarg()==5) { lx=$4 ly=$5 } else { lx=0.1 ly=0.8 }
+    if (numarg()>1) { if (sfunc.len($s2)>0) { temp_string_ = $s2
+        }} else if (attrnum==0) { temp_string_ = comment 
+      } else sprint(temp_string_,"%s",panobjl.object(0).comment)
+    for ii=min,max { 
+        panobj.glist.object(ii).color(panobj.color)
+        panobj.glist.object(ii).label(lx,ly,temp_string_)
+        // if (attrnum!=0&&ii<panobj.llist.count()) panobj.glist.object(ii).label(panobj.llist.object(ii).name)
+      }
+  }
+
+//* relbl() put appropriate label on all of the graphs
+proc relbl () { local cnt,ii,min,max,attrnum,lx,ly
+    if (numarg()==0) { printf("relbl(attrnum[,str])\n")  return }
+    attrnum = $1 panobj = panobjl.object(attrnum)
+    cnt = panobj.glist.count()
+    if (numarg()==4) { lx=$3 ly=$4 } else { lx=0.1 ly=0.8 }
+    if (numarg()>1) panobj.glist.object(0).label($s2)
+    for ltr2(XO,YO,panobj.glist,panobj.llist) {
+        XO.color(0)
+        if (attrnum==0) XO.label(0.,.9,YO.var) else XO.label(0.,.9,YO.name) 
+        XO.color(panobj.color)
+        XO.label(lx,ly,YO.vec.label)
+      }
+  }
+
+//* grall() graphs all of the lines from the file
+// use vector $o2 as indices for vectors (see tposvec)
+proc grall () { local attrnum,cnt,ii,min,max,gr,skip,iskp,vind
+    if (numarg()==0) {printf("grall(attrnum[,min,max,remote,gr_offset,skipgr,iskp]): graph vectors.\n")
+        return }
+    attrnum=$1  vind=0
+    panobj = panobjl.object(attrnum)
+    if (attrnum == 0) cnt = printlist.count() else cnt = panobj.llist.count()
+    // will reset max if is vector with numarg()==2
+    // with 2 args, vector $o2 gives indices for vectors (see tposvec)
+    if (numarg()>=2) {
+        if (argtype(2)==1) { 
+            vind=1 min=0 max=$o2.size-1 
+          } else if (numarg()>2) { min=$2 max=$3 } else {
+            min=0 max=cnt-1 }
+      }
+    if (numarg()>3) { panobj.super=1 panobj.remote=$4 }
+    if (numarg()>4) gr=$5 else gr=0
+    if (numarg()>5) skip=$6 else skip=1
+    if (numarg()>6) iskp=$7 else iskp=1
+    if (iskp==0) iskp=1 if (skip==0) skip=1
+    if (panobj.super==1 && panobj.remote==attrnum && panobj.glist.count==0) { 
+        remgrs(attrnum)
+        print "Creating plot"
+        skip=0
+        newPlot(0,tstop,-100,100) panobj.glist.append(graphItem)}
+    if (panobj.super==0 && panobj.glist.count==0) panobj.size[1]=0
+    for (ii=min;ii<=max;ii+=iskp) {
+        if (panobj.super == 1) { 
+            if (gr >= panobjl.object(panobj.remote).glist.count()) break
+            graphItem = panobjl.object(panobj.remote).glist.object(gr) 
+            gr=gr+skip
+          }
+        if (vind) rv($1,$o2.x[ii]) else rv($1,ii)
+      }
+  }
+
+// tposvec(rows,cols): generate the indices for a transposed matrix of rows x cols
+proc tposvec () { local rows,cols,i,j
+    rows=$2 cols=$3
+    $o1.resize($2*$3)
+    for (i=0;i<rows;i+=1) for (j=0;j<cols;j+=1) $o1.x[j*rows+i]=i*cols+j
+  }
+
+// fliptb(rows,cols): generate the indices for a transposed matrix of rows x cols
+proc fliptb () { local rows,cols,i,j,p
+    rows=$2 cols=$3
+    if ($o1.size != $2*$3) {print "Wrong size vector in fliptb()" return}
+    p = allocvecs(1) mso[p].resize(rows)
+    for (j=0;j<cols;j+=1) {
+        mso[p].copy($o1,j*rows,(j+1)*rows-1)
+        mso[p].reverse
+        $o1.copy(mso[p],j*rows)
+      }
+  }
+
+//* setrange() sets the range
+// setrange(attrnum,x0,x1,y0,y1)
+proc setrange () { local i,ii
+    if (numarg()==0){print "setrange(attrnum,x0,x1,y0,y1)\n setrange(attrnum,3) erases axes" return}
+    panobj = panobjl.object($1)
+    if (numarg()==1) { for ltr(XO,panobj.glist) XO.size(0,tstop,-100,50)
+      } else if (numarg()==2) { for ltr(XO,panobj.glist) XO.xaxis(3)
+      } else if (numarg()==3) { for ltr(XO,panobj.glist) XO.size(0,tstop,$2,$3)
+      } else {
+        panobj.size[0]=$2
+        for ltr(XO,panobj.glist) XO.size($2,$3,$4,$5)
+        for i=2,5 panobj.size[i-2]=$i
+      }
+    for ii=0,3 if (panobj.size[ii]==0) panobj.size[ii]=panobj.glist.object(0).size(ii+1)
+  }
+
+//* grransel() -- graph range select
+proc setgrransel () { local attrnum
+    attrnum=$1
+    panobj = panobjl.object(attrnum)
+    for ltr(XO,panobj.glist) { 
+        XO.menu_remove("REVIEW")
+        sprint(tstr,"proc p%d%d(){grransel($1,$2,$3,$4,%d,%d,%s)}",attrnum,i1,attrnum,i1,XO)
+        execute1(tstr)
+        sprint(tstr,"p%d%d",attrnum,i1)
+        XO.menu_tool("REVIEW", tstr)
+        XO.exec_menu("REVIEW")
+      }
+  }
+  
+//** grransel(): CTL-hit == Crosshair
+//               SHT-hit == resize
+//               hit-drag-release == show in square
+//               SHT-hit-drag-release == show new thing there
+// Type: press (2), drag (1), release (3)
+// Keystate: META-SHT-CTL eg 101=5 is META-CTL
+grrcnt=-1
+proc grransel () { local type, x0, y0, keystate, ii, attrnum, gr
+    type=$1 x0=$2 y0=$3 keystate=$4 attrnum=$5 gr=$6
+    graphItem=$o7 // = panobj.glist.object(gr)
+    panobj=panobjl.object(attrnum)
+    if (keystate==1 && type==2) { graphItem.exec_menu("Crosshair") // CTL-MOUSE-1
+      } else if (keystate==3 && type==3) { 
+        print grrcnt
+        if (grrcnt>-1) { printf("Graphing %s\n",printlist.object(grrcnt).var)
+            graphItem.erase_all()
+            rv(attrnum,grrcnt) 
+            graphItem.exec_menu("View = plot")
+          }
+        graphItem.size(panobj.size[0],panobj.size[1],panobj.size[2],panobj.size[3])
+      } else if (keystate==2 && type==2) { grrcnt=-1
+      } else if (keystate==2 && type==1) { 
+        x+=1 // slow it down five-fold
+        if (x>5) { grrcnt=(grrcnt+1)%printlist.count
+            printf("%d: %s\n",grrcnt,printlist.object(grrcnt).var)
+            x=0
+          }
+      } else if (keystate==0 && type==2) { x=x0 y=y0 } else if (keystate==0 && type==3) {
+        graphItem.size(x,x0,y,y0) // resize to chosen square
+      } 
+  }
+
+//* chrange() changes range for a set of graphs (called from attrpanl)
+luprd=0
+proc chrange () { local cnt, flag, ii, sz1, sz2, sz3, sz4
+    if (numarg()==2) { flag = $2 } else { flag = -1 }
+    panobj = panobjl.object($1)
+    cnt = panobj.glist.count()
+    for (ii=cnt-1;ii>=0;ii=ii-1) if (panobj.glist.object(ii).view_count() == 0) panobj.glist.remove(ii)
+    cnt = panobj.glist.count() // check again after removing any with no views
+    if (cnt==0) { for ii=0,3 panobj.size[ii]=0 return }
+    // flag -1 means set everything from the first graph
+    if (flag==-1) for ii=0,3 panobj.size[ii] = panobj.glist.object(0).size(ii+1)
+    if (flag==-2) for ii=0+luprd,1+luprd panobj.size[ii] += panobj.shift // shift right or left
+    if (flag==5) { panobj.size[0]=0 panobj.size[1]=tstop } // just set x
+    // for each of the graphs
+    for ltr(XO,panobj.glist) {
+        sz1=XO.size(1) sz2=XO.size(2) sz3=XO.size(3) sz4=XO.size(4)
+        if (flag==0) XO.size(panobj.size[0],sz2,sz3,sz4)
+        if (flag==1) XO.size(sz1,panobj.size[1],sz3,sz4)
+        if (flag==2) XO.size(sz1,sz2,panobj.size[2],sz4)
+        if (flag==3) XO.size(sz1,sz2,sz3,panobj.size[3])
+        if (flag==-1 || flag==4) XO.size(panobj.size[0],panobj.size[1],panobj.size[2],panobj.size[3])
+        if ((flag==-2 && !luprd) || flag==5) XO.size(panobj.size[0],panobj.size[1],sz3,sz4)
+        if (flag==-2 && luprd) XO.size(sz1,sz2,panobj.size[2],panobj.size[3])
+      }
+    for ii=0,3 if (panobj.size[ii]==0) panobj.size[ii]=panobj.glist.object(0).size(ii+1)
+  }
+
+//* rtvec() reads tvec if it exists, returns -1 if it doesn't
+// rtvec(attrnum)
+func rtvec () { local attrnum,inx,inx2
+    attrnum = $1
+    panobj = panobjl.object(attrnum)
+    if (panobj.tloc > 0) {
+        tmpfile.seek(panobj.tloc)
+        panobj.tvec.vread(tmpfile)
+        return 1
+      } else {
+        return 0
+      }
+  }
+
+//* rv() reads line of vector file into IV graph via vector
+// rv(attrnum,llist_ind1[,llist_ind2])
+// round() round off to nearest integer
+func round () { local ii
+    if (argtype(1)==1) {
+        if ($o1.size==0) return 1e9
+        for ii=0,$o1.size-1 {
+            if ($o1.x[ii]>0) $o1.x[ii]=int($o1.x[ii]+0.5) else $o1.x[ii]=int($o1.x[ii]-0.5) 
+          }
+        return($o1.x[0])
+      } else {
+        if ($1>0) return int($1+0.5) else return int($1-0.5) 
+      }
+  } 
+// rvaltdisp(tvec,vec,name)
+func rvaltdisp () { return 0 } // if returns 1 means there is an alternate display for rv
+proc rv2 () { }  // stub for manipulating the vectors before graphing
+proc rv3 () { }  // stub for manipulating the label
+proc rv () { local attrnum,inx,inx2
+    // open the file and go to correct position
+    if (numarg() == 0) { print "rv(attrnum,ind1,ind2) reads into vrtmp bzw vec" return }
+    attrnum = $1
+    inx = $2
+    if (panobj.printStep>0 && numarg() > 2) { inx2 = $3 } else { inx2 = -1 }
+    if (attrnum==0) { gv(inx) return }
+    rv_readvec(attrnum,inx,vrtmp)  // will set panobj
+    rv2(vrtmp)
+    // create a new plot if necessary and set color
+    nvplt(vrtmp)
+    if (vrtmp.size==0) { // assume this is a spike train in tvec
+        ind.resize(panobj.tvec.size) ind.fill(0)
+        ind.mark(graphItem,panobj.tvec,"O",panobj.line+4,panobj.curcol)
+        // grrtsize()
+      } else if (inx2>-1) {
+        rv_readvec(attrnum,inx2,vec)
+        graphItem.size(0,vrtmp.max,0,vec.max)
+        if (numarg() > 3) {
+            vec.mark(graphItem,vrtmp,$s4,6,panobj.curcol)
+          } else {
+            vec.mark(graphItem,vrtmp,"O",6,panobj.curcol)
+          }
+      } else if (panobj.printStep<0) {
+        if (gvmarkflag) {
+            if (! rvaltdisp(panobj.tvec,vrtmp,panobj.llist.object(inx).name)) {
+                vrtmp.mark(graphItem,panobj.tvec,"O",4,panobj.curcol,panobj.line) 
+                graphItem.exec_menu("View = plot")
+              }
+          } else if (numarg() >= 3) {
+            round(vrtmp) // round off this index vector
+            vrtmp.mark(graphItem,panobj.tvec,"O",$3,panobj.curcol,panobj.line) 
+          } else {
+            vrtmp.line(graphItem,panobj.tvec,panobj.curcol,panobj.line) }
+      } else {
+        vrtmp.line(graphItem,panobj.printStep,panobj.curcol,panobj.line) }
+    // graph it and label the graph
+    if (sfunc.substr(panobj.filename,"batch")!=-1 || \
+        sfunc.substr(panobj.filename,"data")==-1) {
+        grvecstr = panobj.filename
+        } else { sfunc.tail(panobj.filename,"data",grvecstr) }
+    if (sfunc.len(panobj.llist.object(inx).name)>40) {
+        grvecstr=panobj.llist.object(inx).name } else {
+        sprint(grvecstr,"%s:%s",grvecstr,panobj.llist.object(inx).name) }
+    rv3(grvecstr)
+    if (panobj.super == 0 && labelm) { graphItem.label(0,0.9,grvecstr)
+      } else if (labelm) graphItem.label(0.0,0.95,grvecstr)
+  }
+
+// rv_readvec(attrnum,index,vec)
+// read vector #index from file associated with attrnum into vector vec
+proc rv_readvec () { local size,attrnum,inx,ii
+    attrnum = $1
+    inx = $2
+    panobj = panobjl.object(attrnum)
+    tmpfile.getname(temp_string_)
+    if (strcmp(temp_string_,panobj.filename)!=0 || tmpfile.isopen()==0) {
+        if (! tmpfile.ropen(panobj.filename)) { 
+            print "ERROR rv() can't read ",panobj.filename return }}
+    tmpfile.seek(panobj.llist.object(inx).loc)
+    if (panobj.bytes) { 
+        if (numarg()==4) { $o3.vread(tmpfile) $o4.vread(tmpfile) } else {
+            if (panobj.printStep==-2) { panobj.tvec.vread(tmpfile) }
+            $o3.vread(tmpfile)
+          }
+        if (panobj.segments>1) {
+            tmpvec = new Vector($o3.size)
+            for ii=1,panobj.segments-1 {
+                tmpfile.seek(panobj.llist.object(inx).loc[ii])
+                tmpvec.vread(tmpfile)
+                $o3.copy(tmpvec,$o3.size)
+              }
+            tmpvec = nil
+          }
+      } else {
+        tmpfile.scanstr(temp_string_) // get rid of '//'
+        size = tmpfile.scanvar()
+        tmpfile.scanvar() // get rid of the seek number
+        $o3.scanf(tmpfile,size)
+      }
+  }
+
+//* read vector iterator rvtr
+// usage 'for rvtr(vec,#) XO.vec.printf' where # is attrpanl#
+// not debugged for presence of tvec in cvode
+iterator rvtr () { local i,flag,s4flag
+    if (numarg()>=3) {$&3=0} else {i1 = 0}
+    if (numarg()==4) s4flag=1 else s4flag=0
+    attrnum=$2
+    panobj=panobjl.object(attrnum)
+    for i = 0, panobj.entries - 1 {
+        tstr=panobj.llist.object(i).name
+        if (s4flag) {if (strm(tstr,$s4)) flag=1 else flag=0}
+        if (flag) {
+            rv_readvec(attrnum,i,$o1)    
+            iterator_statement
+            if (numarg()>=3) { $&3+=1 } else { i1+=1 }
+          }
+      }
+  }
+
+//* rvec(attrnum,num[,vec]) writes to vec, or contents of rvvec_name or
+//  to vector of same name if rvvec_name is empty
+proc rvec () { local flag,ln,on
+    flag=0 ln=$1
+    if (sfunc.len(rvvec_name)==0) flag=1
+    if (numarg()<2) on=hoc_ac_ else on=$2
+    if (numarg()>2) sprint(rvvec_name,"%s",$o3)
+    if (sfunc.len(rvvec_name)==0) rvvec_name=panobjl.object(ln).llist.object(on).name 
+    printf("Copying %s to %s\n",panobjl.object(ln).llist.object(on).name,rvvec_name) 
+    sprint(temp_string_,"rv_readvec(%d,%d,%s)",ln,on,rvvec_name)
+    if (flag) rvvec_name="" // clear it again
+    if (! execute1(temp_string_)) print "ERROR: Declare target as a vector"
+    if (numarg()==4) $o4.copy(panobj.tvec)
+  }
+
+//* rvl() reads line of vector file into IV graph via vector
+// rvl(attrnum,name,pos[,pos2,pos3,...])
+proc rvl () { local i
+    // open the file and go to correct position
+    panobj=panobjl.object($1)
+    tmpfile.getname(temp_string_)
+    if (strcmp(temp_string_,panobj.filename)!=0 || tmpfile.isopen()==0) {
+        tmpfile.ropen(panobj.filename) }  // only open if necessary
+    if (tmpfile.isopen==0) { printf("ERROR: %s not found.\n",panobj.filename)
+          return }
+    if (numarg() == 3) { 
+        tmpfile.seek($3)
+        tmpfile.gets(temp_string_) // throw away line
+        vrtmp.vread(tmpfile)
+      } else {
+        tmpvec = new Vector()
+        for i=3,numarg() {
+            tmpfile.seek($i)
+            tmpvec.vread(tmpfile)
+            vrtmp.copy(tmpvec,vrtmp.size)
+          } 
+      }
+    tmpvec = nil
+    nvplt(vrtmp)
+    vrtmp.line(graphItem,panobj.printStep,panobj.curcol,panobj.line)
+    // graph it and label the graph
+    if (sfunc.substr(panobj.filename,"batch")!=-1) { grvecstr = panobj.filename
+      } else { sfunc.tail(panobj.filename,"data",grvecstr) }
+    sprint(grvecstr,"%s:%s",grvecstr,$s2)
+    if (panobj.super==0 && labelm) { graphItem.label(0,0.9,grvecstr)
+      } else if (labelm) graphItem.label(grvecstr)
+  }
+
+//* read_file(file,cols[,length]): read multicolumn file
+//  see /u/billl/nrniv/jun/tidata/proc.hoc for improved version
+func read_file () { local ii,cols,pt,length
+    if (numarg()==0) { print "\tread_file(\"file\",cols)"
+        print "\t(must set tstop and printStep.)"
+        return 0
+      }
+    panobjl.object(0).printStep = use_lvardt_ = using_cvode_ = 0
+    print "WARNING: Turning off cvode."
+    if (numarg()==3) { length = $3 } else { length=tstop/printStep }
+    cols = $2
+    if (! tmpfile.ropen($s1)) { printf("\tERROR: can't open file \"%s\"\n",$s1) return 0}
+    printlist.remove_all()
+    tmpfile.scanstr(temp_string_)  pt = 0
+    // skip over a comment line; note that this will skip extra line if comment line is
+    // just one word long
+    while (sfunc.head(temp_string_,"[^-+0-9.e]",temp_string2_) != -1) {
+        tmpfile.gets(temp_string_)  // first word in line was not a number so next line
+        pt = tmpfile.tell()         // location at next line
+        tmpfile.scanstr(temp_string_) // get first word here
+        print temp_string2_
+      }
+    for ii=1,cols { // pick up all of the columns
+        tmpfile.seek(pt)
+        vrtmp.scanf(tmpfile,length,ii,cols)
+        new_printlist_item("col",ii,vrtmp)
+      }
+    return 1
+  }
+
+//* read_rfile(file): read multirow file
+//  use col2row to transpose columnar file first
+proc read_rfile() { local num
+    if (numarg()==0) { print "\tread_rfile(\"file\")" return }
+    if (! tmpfile.ropen($s1)) { printf("\tERROR: can't open file \"%s\"\n",$s1) return}
+    printlist.remove_all()
+    while (tmpfile.scanstr(temp_string_) != -1) {  // read lines
+        num = tmpfile.scanvar() // pick up number of items in col
+        vrtmp.scanf(tmpfile,num)
+        new_printlist_item(temp_string_,vrtmp)
+      }
+  }
+
+// restore_plist() restores the plist from a file in an attrnum
+proc restore_plist () { local cnt,ii,attrnum,savlvar
+    printlist.remove_all
+    attrnum = $1
+    panobj=panobjl.object(attrnum)
+    panobjl.object(0).printStep=panobj.printStep
+    if (panobj.printStep == -2) use_lvardt_=1 else use_lvardt=0
+    cnt = panobj.llist.count()
+    for ii=0,cnt-1 {
+        vite = new vitem(panobj.llist.object(ii).name,0)
+        rv_readvec(attrnum,ii,vite.vec)
+        if (use_lvardt_) vite.tvec.copy(panobj.tvec)
+        printlist.append(vite)
+        vite=nil
+      }
+    if (use_lvardt_) tstop=panobj.tvec.max
+  }
+
+//* sgv() print out spikes from IF recordings like spkt()
+proc sgv () {  local cl
+    if (numarg()==1) cl=$1 else cl=1
+    sgv1()
+    nvplt(ind)
+    panobj.curcol=cl
+    // g.erase_all()
+    vec.mark(graphItem,ind,"O",panobj.line+4,panobj.curcol,4)
+    graphItem.size(0,ind.max+1,0,tstop)
+  }
+
+proc sgv1 () { 
+    revec(ind) revec(vec)
+    for ltr(XO,printlist) if (XO.vec.size==0) {
+        szt=XO.tvec.size
+        if (szt>0) {
+            szi=ind.size 
+            vec.append(XO.tvec)
+            ind.resize(szi+szt)
+            ind.fill(i1,szi,szi+szt-1)
+          }
+      }
+  }
+
+//* gv(vnum) graphs vector
+proc gv () {  local inx,clr
+    ulv()
+    clr=inx=-1
+    if (numarg()==0) { inx = hoc_ac_ } else { 
+        if (argtype(1)==0) inx = $1
+        if (argtype(1)==2) {
+            for ltr(XO,printlist) if (strm(XO.var,$s1)) inx=i1
+            if (inx==-1) {print $s1," not found" return }}
+      }
+    panobj = panobjl.object(0)
+    if (numarg()==2) { clr=panobj.color panobj.color=$2 }
+    if (use_lvardt_) { panobj.tvec = printlist.object(inx).tvec }
+    XO = printlist.object(inx).vec
+    if (XO.size==0) { // assume that this is spk trace
+        if (panobj.tvec.size==0) { printf("\tNO SPIKES IN %s\n",printlist.object(inx).var)
+          } else {
+            nvplt(panobj.tvec)
+            ind.resize(panobj.tvec.size) ind.fill(1)
+            ind.mark(graphItem,panobj.tvec,"O",panobj.line+3,panobj.curcol)
+            // grrtsize()
+          }
+        return
+      } else nvplt(XO)
+    if (gvmarkflag) {
+        XO.mark(graphItem,panobj.tvec,"O",panobj.line+3,panobj.curcol)
+        graphItem.exec_menu("View = plot")
+      } else if (using_cvode_) {
+        XO.line(graphItem,panobj.tvec,panobj.curcol,panobj.line)
+      } else {
+        XO.line(graphItem,printStep,panobj.curcol,panobj.line)
+      }
+    if (labelm) graphItem.label(0.,0.9,printlist.object(inx).var)
+    if (clr>-1) panobj.color=clr
+  }
+proc gvmt () { gvmarkflag=-(gvmarkflag-1) printf("gv Mark: %d\n",gvmarkflag) }
+proc llist () { 
+    if (eqobj(panobj,panattr[0])) {
+        for ltr(XO,printlist) print i1,XO.var } else {
+        for ltr(XO,panobj.llist) print i1,XO.name }
+  }
+
+//* dispspks() display spike times
+proc dispspks () { local attrnum,n
+    attrnum = $1  n=0
+    panobj=panobjl.object(attrnum)
+    if (panobj.super == 1) { 
+        graphItem = panobj.glist.object(panobj.glist.count-1)
+      } else {
+        newPlot(0,1,0,1)
+        panobj.glist.append(graphItem)
+      }
+    if (attrnum==0) {for ltr(XO,printlist) dispspks2(XO.var,XO.tvec,i1)
+      } else for ltr(XO,panobj.llist) {
+        rv_readvec(attrnum,i1,ind) // ind is scratch here since info in tvec
+        dispspks2(XO.name,panobj.tvec,i1) 
+      }
+    grrtsize()
+  }
+
+// $s1 name, $o2 tvec, $3 n
+proc dispspks2 () { local n,col
+    n=$3
+    col = panobj.curcol
+    if (sfunc.substr($s1,"_spks")) {
+        if ($o2.size>0) {
+            ind.resize($o2.size) ind.fill(n)
+            if (sfunc.substr($s1,"NetStim")!=-1) col+=1
+            ind.mark(graphItem,$o2,"O",panobj.line+4,col)
+          }
+      }
+  }
+
+//** grrtsize() use view=plot and then pad a little
+proc grrtsize () { local h,w,frac
+    if (numarg()>=1) tmpobj=$o1 else tmpobj=graphItem
+    if (numarg()>=2) frac = $2 else frac=.05
+    tmpobj.exec_menu("View = plot")
+    tmpobj.size(&x)
+    w=frac*(x[1]-x[0])  h=frac*(x[3]-x[2])
+    x[0]-=2*w x[1]+=w x[2]-=4*h x[3]+=h // need extra padding on bottom
+    tmpobj.size(x[0],x[1],x[2],x[3])
+  }
+
+//* gvv() like gv() but give it vector statt vnum
+proc gvv () {  local inx
+    nvplt($o1)
+    if (numarg()==1) {
+        $o1.line(graphItem,printStep,panobj.curcol,panobj.line)
+      } else { 
+        $o1.line(graphItem,$o2,panobj.curcol,panobj.line)
+        graphItem.size($o2.min,$o2.max,$o1.min,$o1.max)
+      }
+  }
+
+//* ge() erases IV graph
+proc ge () { if (numarg()==0) graphItem.erase_all() else g[$1].erase_all }
+
+//* pvall() dumps all vectors to output_file
+// Save logic:
+// 1) Interactive mode: you're watching simulations while printing out
+// data.  You see something you like and save it - the runnum in the
+// index file then corrsponds to the number on the data file, it is
+// subsequently augmented
+// 2) Batch mode: you're running very long sims and saving directly to
+// vector files.  You put together a simulation you want and save it
+// immediately rather than waiting for the sim to return (in 1 or 2
+// days).  To correspond, the data file (v*) must then be numbered
+// 'runnum-dec_runnum'
+proc pvall () { 
+    sprint(output_file,"%s/v%s.%02d",ddir,datestr,runnum-dec_runnum)
+    while (tmpfile.ropen(output_file)) { runnum = runnum+1
+        sprint(output_file,"%s/v%s.%02d",ddir,datestr,runnum-dec_runnum) 
+      }
+    if (numarg()>0) { comment = $s1 // a comment
+      } else {
+        sprint(temp_string_,"%s.%02d",datestr,runnum-dec_runnum) 
+        if (sfunc.substr(comment,temp_string_) == -1) { comment = "" } // clear comment
+      }
+    printf("Saving to %s\n",output_file)
+    pvplist(output_file,comment)
+    sprint(output_file,"%s/v%s.%02d",ddir,datestr,runnum)
+  }
+
+// pvplist(file,comment) print out the printlist with comment at head
+proc pvother () {}  // user can dump other vectors at top with prvec()
+proc pvplist () { local inx
+    ulv()
+    file_with_dot($s1,temp_string_,temp_string2_) // put .filename into temp_string_
+    if (tmpfile.ropen(temp_string_)) { printf("WARNING: removing %s\n",temp_string_)
+        sprint(temp_string_,"rm %s",temp_string_) system(temp_string_) }
+    if (tmpfile.wopen($s1)==0) { print "Can't open ",$s1  return}
+    tmpfile.printf("//: %s\n",$s2) // comment
+    pvplist1()
+    if (byte_store) {tmpfile.printf("//CPU %s\n",uname)}
+    pvout()
+    tmpfile.close()
+  }
+
+proc pvplist1 () {
+    if (use_lvardt_) {
+        tmpfile.printf("//printStep -2\n")
+      } else if (using_cvode_) {
+        tmpfile.printf("//printStep -1\n")
+      } else {
+        tmpfile.printf("//printStep %g\n",printStep)
+      }
+  }
+
+// pvnext() append another printlist set to same file
+proc pvnext () { local ii
+    if ($1==0) { 
+        pvall(comment)
+        sprint(output_file,"%s/v%s.%02d",ddir,datestr,runnum-1) // decrement back to name
+        return
+      }
+    tmpfile.aopen(output_file)
+    pvout()
+    printf("Append to %s\n",output_file)
+    tmpfile.close()
+  }
+
+// prout() called by pvplist() and pvnext(), actually puts out the vecs
+proc pvout () {
+    ulv()
+    if (!use_lvardt_ && using_cvode_) { prvec("tvec",panobjl.object(0).tvec,tvec_bytesize) } // save precise times
+    pvother()
+    for ltr(XO,printlist) { // no whitespace allowed
+        if (sfunc.len(XO.vec.label)>0) sprint(temp_string_,"%s__(%s)",XO.vec.label,XO.var) else {
+            temp_string_=XO.var } 
+        if (byte_store) {
+            tmpfile.printf("//b%d %s %d %d\n",byte_store,temp_string_,XO.vec.size,tmpfile.tell())
+            if (use_lvardt_==1) if (eqobj(XO.tvec,nil)) { 
+                print "ERROR: can't save under cvode_local, must recreate printlist\n" 
+                return 
+              } else { XO.tvec.vwrite(tmpfile,tvec_bytesize) }
+            XO.vec.vwrite(tmpfile,byte_store)
+            tmpfile.printf("\n")
+          } else {
+            tmpfile.printf("// %s %d %d\n",temp_string_,XO.vec.size,tmpfile.tell())
+            XO.vec.printf(tmpfile)
+          }
+      }
+  }
+
+// prvec(name,vec,byte_flag[,file])  byte_flag=0 means printf
+proc prvec () { local bflag
+    if (numarg()==0) { print "prvec(name,vec,byte_flag[,file])" return}
+    if (numarg()>3) { tmpfile.aopen($s4) }
+    bflag = $3
+    tmpfile.printf("//b%d %s %d %d\n",bflag,$s1,$o2.size,tmpfile.tell())
+    if (bflag==0) {
+        $o2.printf(tmpfile)    
+      } else { $o2.vwrite(tmpfile,bflag) tmpfile.printf("\n") }
+    if (numarg()>3) { tmpfile.close() }
+  }
+
+//* pv() dumps a single vector into output_file
+proc pv () { local inx
+    sprint(output_file,"%s/v%s.%02d",ddir,datestr,runnum-dec_runnum)
+    if (numarg()==0) { inx = hoc_ac_ } else { inx = $1 }
+    printf("Printing %s to %s\n",printlist.object(inx).var,output_file)
+    temp_string_ = printlist.object(inx).var
+    // string_dialog("Name for saved vector",temp_string_)
+    if (tmpfile.ropen(output_file)) { // file exists already
+        tmpfile.close()
+        tmpfile.aopen(output_file)
+        printf("Appending to ",output_file)
+      } else {
+        tmpfile.wopen(output_file)
+        tmpfile.printf("//: %s\n",comment)
+        pvplist1()
+      }
+    if (byte_store) {
+        tmpfile.printf("//b%d %s %d %d\n",byte_store,temp_string_,\
+                       printlist.object(inx).vec.size,tmpfile.tell())
+        if (use_lvardt_==1) if (eqobj(printlist.object(inx).tvec,nil)) { 
+            print "ERROR: can't save under cvode_local, must recreate printlist\n" 
+            return 
+          } else { printlist.object(inx).tvec.vwrite(tmpfile,tvec_bytesize) }
+        printlist.object(inx).vec.vwrite(tmpfile,byte_store)
+        tmpfile.printf("\n")
+      } else {
+        tmpfile.printf("// %s %d %d\n",temp_string_,\
+                       printlist.object(inx).vec.size,tmpfile.tell())
+        printlist.object(inx).vec.printf(tmpfile)
+      }
+    tmpfile.close()
+  }
+
+//* lpv() calls lpvec from printlist
+proc lpv () { local inx
+    if (numarg()==0) { inx = hoc_ac_ } else { inx = $1 }
+    sprint(temp_string_,"%s.%02d:%s",datestr,runnum-dec_runnum,printlist.object(inx).var)
+    lpvec(temp_string_,printlist.object(inx).vec,printStep)
+  }
+
+//* lpvec(title,vector,printstep) dumps a single vector onto the printer using jgraph
+proc lpvec () { local inx,ii
+    tmpfile.wopen("lptmp")
+    tmpfile.printf("newgraph\nnewcurve pts\n")
+    for ii = 0,$o2.size-1 {
+        tmpfile.printf("%g ",ii*$3)
+        $o2.printf(tmpfile,"%g",ii,ii)
+      }
+    tmpfile.printf("marktype none\nlinetype solid\ntitle : %s\n",$s1)
+    tmpfile.close()
+    system("jgraph -P lptmp > lptmp2")
+    system("lpt lptmp2")
+  }
+
+//* phase planes
+//** gppl(n1,n2) graph phase planes from printlist
+proc gppl () {
+    newPlot(0,1,0,1)
+    panobjl.object(0).glist.append(graphItem)
+    printlist.object($2).vec.line(graphItem,printlist.object($1).vec)
+  }
+
+//* routines for printing out in sections
+
+//** outvec_init([output_file,comment])
+proc outvec_init() { local segs
+    if (numarg()>0) { output_file = $s1 } else {
+        sprint(output_file,"%s/v%s.%02d",ddir,datestr,runnum-dec_runnum)
+        while (tmpfile.ropen(output_file)) { runnum = runnum+1 // don't allow an overwrite
+            sprint(output_file,"%s/v%s.%02d",ddir,datestr,runnum-dec_runnum) }
+      }
+    if (numarg()>1) { comment = $s2 }
+    print "\nOutput to ",output_file
+    if (print_flag) { print "WARNING: print_flag=1 --> 0\n"
+        print_flag = 0 }
+    if (outvecint==0 || outvecint>tstop) {
+        printf("WARNING: outvecint being set to tstop\n")
+        outvecint = tstop }
+    outvect = outvecint
+    segs = int(tstop/outvecint)
+    if (tstop/outvecint > segs) { segs=segs+1 }
+    tmpfile.wopen(output_file)
+    if (strcmp(comment,"")!=0) { tmpfile.printf("//: %s\n",comment) }
+    tmpfile.printf("//printStep %g\n",printStep)
+    tmpfile.printf("//MULTI %d %d\n",printlist.count,segs)
+    tmpfile.close()
+  }
+
+//** outvecs()  : print out the vectors and reset them for recording
+proc outvecs () { local ii
+    if (t<outvect || outvecint == 0) { return }
+    tmpfile.aopen(output_file)
+    for ii=0,printlist.count-1 {
+        tmpfile.printf("//b%d %s %d %d\n",byte_store,printlist.object(ii).var,t-outvecint,tmpfile.tell())
+        printlist.object(ii).vec.vwrite(tmpfile,byte_store)
+        tmpfile.printf("\n")
+        printlist.object(ii).vec.play_remove()
+        sprint(temp_string_,"printlist.object(%d).vec.record(&%s,%g)",\
+               ii,printlist.object(ii).var,printStep)
+        execute(temp_string_)
+      }
+    tmpfile.close
+    outvect = outvect+outvecint
+  }
+
+//** outvec_finish () : put out the last section if needed, update the output_file name
+proc outvec_finish() {
+    if (t > outvect-outvecint+2*dt) {
+        tmpfile.aopen(output_file)
+        for ii=0,printlist.count-1 {
+            tmpfile.printf("//b%d %s %d %d\n",byte_store,printlist.object(ii).var,t-outvecint,tmpfile.tell())
+            printlist.object(ii).vec.vwrite(tmpfile,byte_store)
+            tmpfile.printf("\n")
+          }
+        tmpfile.close()
+      }
+  }
+
+//* utility programs (not all used)
+gnum=-1
+proc nvplt () { local xs,ys,flag
+    if (panobj.super == 0) flag=1 else {
+        if (gnum>-1) {
+            sprint(tstr,"x=Graph[%d].view_count",gnum)
+            if (execute1(tstr,0)) if (x>0) {  // use Graph[gnum] if exists and has views
+                graphItem=Graph[gnum] flag=0
+              }                                 // else use graphItem if has views
+          } else if (isobj(graphItem,"Graph")) if (graphItem.view_count() > 0) { 
+            flag=0
+          } else { flag=1 }                   // else need new graph
+      }
+    if (flag) {
+        if (panobj.printStep==0) { panobj.printStep=printStep }
+        if (panobj.size[1] != 0) { // xmax is set
+            newpl(panobj.size[0],panobj.size[1],panobj.size[2],panobj.size[3])
+          } else if (panobj.printStep<0) {
+            newpl(0,panobj.tvec.max,$o1.min,$o1.max)
+          } else {
+            newpl(0,$o1.size()*panobj.printStep,$o1.min,$o1.max)
+          }
+      } else if (gveraseflag) graphItem.erase_all
+    if (panobj.color == -1) {
+        panobj.curcol += 1
+        if (panobj.curcol == 0 || panobj.curcol>7) panobj.curcol = 1 
+      } else panobj.curcol = panobj.color
+    graphItem.color(panobj.curcol)
+    g=graphItem
+  }
+
+double wvloc[4]
+{wvloc[0]=50 wvloc[1]=50 wvloc[2]=800 wvloc[3]=150}
+proc newpl () { local w,h
+    if (numarg()==5) newPlot($1,$2,$3,$4) // 5th arg is flag
+    if (numarg()==8) {wvloc[0]=$5 wvloc[1]=$6 wvloc[2]=$7 wvloc[3]=$8}
+    graphItem = new Graph(0) 
+    g=graphItem
+    graphItem.xaxis()	// view axis for x and y
+    graphItem.view($1,$3,$2-$1,$4-$3,wvloc[0],wvloc[1],wvloc[2],wvloc[3])
+    panobj.glist.append(graphItem)
+  }
+
+proc gs () { if (numarg()==2) { g[$1]=Graph[$2] } else {g=Graph[$1] graphItem=g }}
+proc gg () { local ii,na,a1,a2,a3,newgr,clr
+    na=a1=a2=a3=-1  newgr=1
+    clr=panobj.color lne=panobj.line
+    na=numarg()  if (na>=1) a1=argtype(1)  if (na>=2) a2=argtype(2)  if (na>=3) a3=argtype(3)
+    if (a1==0) ii=$1 else ii=0
+    if (a1==0 && isassigned(g[ii])) if (g[ii].view_count>0) newgr=0
+    if (newgr) g[ii]=new Graph()
+    graphItem=g[ii]
+    graphList[0].append(g[ii])  panobj.glist.append(g[ii])
+    if (gvmarkflag) tstr="mark" else tstr="line"
+    if (na==1 && a1==1) sprint(tstr,"%s.%s(%s,%s",$o1,tstr,g[ii],"1")   // gg(vec)
+    if (na==2) { 
+        if (a1==0 && a2==1) sprint(tstr,"%s.%s(%s,1",$o2,tstr,g[ii])      // gg(g[i],vec) 
+        if (a1==1 && a2==0) sprint(tstr,"%s.%s(%s,%g",$o1,tstr,g[ii],$2)  // gg(vec,step)
+        if (a1==1 && a2==1) sprint(tstr,"%s.%s(%s,%s",$o1,tstr,g[ii],$o2) // gg(vec,ind)
+      }
+    if (na>=3) { 
+        if (a2==1 && a3==1) sprint(tstr,"%s.%s(%s,%s",$o2,tstr,g[ii],$o3)   // gg(g[i],vec,ind)
+        if (a2==1 && a3==0) sprint(tstr,"%s.%s(%s,%g",$o2,tstr,g[ii],$3)   // gg(g[i],vec,step)
+      }
+    if (na>=4) { clr=$4 } if (na>=5) { lne=$5 } if (na>=6) { symb=$s6 }
+    if (sfunc.len(tstr)>4) {
+        if (gvmarkflag) { sprint(tstr,"%s,\"%s\",%d,%d,1)",tstr,symb,lne+5,clr)
+          } else { sprint(tstr,"%s,%d,%d)",tstr,clr,lne) }
+        execute(tstr)
+      }
+  }
+
+//** remove_spaces(string,scratch) removes spaces and splits on '/'
+// ie remove_spaces(temp_string_,temp_string2_)
+proc remove_spaces () {
+    $s2=""  // clear it out
+    while (sfunc.substr($s1," ") != -1) { // still have spaces
+        sfunc.tail($s1," ",$s2)
+        sfunc.head($s1," ",$s1)
+        sprint($s1,"%s%s",$s1,$s2)
+      }
+    $s2="" // clear again
+    if (sfunc.substr($s1,"/") != -1) { // split it up
+        sfunc.tail($s1,"/",$s2)
+        sfunc.head($s1,"/",$s1)
+      }
+  }
+
+//** dirname(full,path) filname(full,file) splits up path/file
+// eg filname("/home/billl/nrniv/thal/params.hoc",temp_string_)
+//    temp_string_ => params.hoc
+proc dirname () { sfunc.head($s1,"[^/]+$",$s2) }
+proc filname () { local ii,cnt
+    cnt = 0
+    $s2=$s1  while (sfunc.tail($s2,"/",$s2) != -1) cnt += 1
+    $s2=$s1  for ii=1,cnt sfunc.tail($s2,"/",$s2)
+  }
+
+//** file_with_dot(filename,result,scratch): put .filename into result
+proc file_with_dot() {
+    if (sfunc.substr($s1,"/") == -1) {
+        sprint($s2,".%s",$s1)
+      } else {
+        sfunc.tail($s1,".*/",$s3)
+        sfunc.head($s1,"/[^/]+$",$s2)
+        sprint($s2,"%s/.%s",$s2,$s3)
+      }
+  }
+
+//** find_secname(variable,result): put secname into result
+proc find_secname () { 
+    sfunc.head($s1,"\.[_A-Za-z0-9]+$",$s2) // strip off stuff after terminal .
+    if (    strm($s1,"\.[_A-Za-z0-9]+[(][0-9.]+[)]$")) {  // form eg v(0.5)
+        sfunc.head($s1,"\.[_A-Za-z0-9]+[(][0-9.]+[)]$",$s2)
+      } else if (isit($s2)) {  // the the stem an obj
+        XO.get_loc() // isit sets XO
+        sectionname($s2)
+        pop_section()
+      } else {
+        printf("grvec.hoc:f_s ERR0: Can't find sec: %s\n",$s1) err() 
+      }
+    if (sfunc.len($s2)==0) { printf("grvec.hoc:f_s ERR: %s\n",$s1) err() }
+  }
+
+//** mkmenu(title,action,proc) makes a menu from printlist
+proc mkmenu () { local ii
+    xmenu($s1)
+    for ii=0,printlist.count-1 {
+        sprint(temp_string_,"%s %s",$s2,printlist.object(ii).var)
+        sprint(temp_string2_,"%s(%d)",$s3,ii)
+        xbutton(temp_string_,temp_string2_)
+      }
+    sprint(temp_string_,"mkpanel(\"%s\",\"%s\",\"%s\")",$s1,$s2,$s3)
+    xbutton("Leave up",temp_string_)
+    xmenu()
+  }
+
+//** mkpanel(title,action,proc) makes a panel from printlist
+proc mkpanel () { local ii
+    sprint(temp_string_,"%s:%s",simname,$s1)
+    xpanel(temp_string_)
+    for ii=0,printlist.count-1 {
+        sprint(temp_string_,"%s %s",$s2,printlist.object(ii).var)
+        sprint(temp_string2_,"%s(%d)",$s3,ii)
+        xbutton(temp_string_,temp_string2_)
+      }
+    xpanel()
+  }
+
+//** drline(x0,y0,x1,y1,OPT graph or color) 
+proc drline () {
+    if (numarg()==0) { print "drline(x0,y0,x1,y1,OPT graph)"
+        return }
+    if (numarg()>4) { 
+        if (argtype(5)==0) { panobj.color=$5 
+                               if (numarg()>5) panobj.line=$6
+          } else {             graphItem = $o5 
+                               if (numarg()>5) panobj.color=$6
+                               if (numarg()>6) panobj.line=$7      }}
+    graphItem.beginline(panobj.color,panobj.line)
+    graphItem.line($1,$2)
+    graphItem.line($3,$4)
+    graphItem.flush()
+  }
+
+//** seevec(varname,min,max) -- uses a stringmatch to find a particular vector
+proc shprl () { 
+    if (numarg()==1) {
+        print panobjl.object($1).filename
+        for ltr(XO,panobjl.object($1).llist) print i1," ",XO.name
+      } else for ltr(XO,printlist) print i1," ",XO.var,XO.vec,XO.tvec
+  }
+
+proc remprl () { local flag
+    flag=0
+    if (numarg()==2) flag=1 else print "LISTING ONLY; rerun with 2 args to remove"
+    for (ii=printlist.count-1;ii>=0;ii-=1) {
+        XO=printlist.object(ii)
+        if (strm(XO.var,$s1)) if (flag) printlist.remove(ii) else print XO.var
+      }
+  }
+
+//** seevec(regexp,flag)
+// flag: 1 savevec, 2 save sections
+proc seevec2 () {} // stub
+proc seevec () { local min,max,flag,a,b,n
+    b=a=allocvecs(2) b+=1
+    flag=0
+    if (numarg()==2) {
+        if (argtype(2)==0) flag=$2
+        if (argtype(2)==1) flag=4
+      }
+    if (numarg()==3) { min=$2 max=$3 flag=2 }
+    if (flag==1 || flag==2 || flag==4) clrveclist()
+    for ltr(XO,printlist) {
+        if (strm(XO.var,$s1)) {
+            printf("%d %s: %s/%s\n",i1,XO.var,printlist.object(i1).vec,printlist.object(i1).tvec)
+            if (flag==3) seevec2(XO)
+            if (flag==1) savevec(XO.vec,XO.tvec)
+            if (flag==4) {
+                mso[b].interpolate($o2,XO.tvec,XO.vec)
+                savevec($o2,mso[b])
+              }
+            if (flag==2) {
+                mso[b].indvwhere(XO.tvec,"()",min,max)
+                mso[a].index(XO.vec,mso[b])
+                mso[b].where(XO.tvec,"()",min,max)
+                savevec(mso[a],mso[b])
+              } 
+            n+=1
+          }
+      }
+    dealloc(a)
+  }
+
+//** file_len(fname): retrieve file length; uses global x
+func file_len () { 
+    sprint(temp_string_,"wc %s",$s1)
+    sassign(temp_string_,temp_string_)
+    sscanf(temp_string_,"%d",&x)
+    return x
+  }
+
+//** count_substr(str,sub): count occurences of substring in str
+func count_substr () { local cnt
+    cnt = 0
+    while (sfunc.tail($s1,$s2,$s1) != -1) { cnt += 1}
+    return cnt
+  }
+
+// for ltr(XO,panobj.glist) { print XO,XO.view_count }
+
+//** xgetargs(panel_name,command,arg1[,arg2,...],defaults)
+// eg xgetargs("Random session","newrand","# of patts","patt size  ","overlap   ","5,33,7")
+objref argvl,argv
+argvl = new List()
+strdef mesg
+proc xgetargs () { local i,args
+    args=numarg()-3  i=numarg()
+    argv = new Vector(args)
+    argvl.append(argv)
+    argv.resize(0)
+    sprint(temp_string_,"argv.append(%s)",$si)
+    execute(temp_string_)
+    if (argv.size!=args) argv.resize(args)
+    xpanel($s1)
+    mesg=""  xvarlabel(mesg)
+    for i=3,numarg()-1 {
+        sprint(temp_string_,"%s.x[%d]",argv,i-3)
+        xvalue($si,temp_string_)
+      }
+    sprint(temp_string_,"xgetexec(\"%s\",%d,%s)",$s2,args,argv)
+    xbutton($s1,temp_string_)
+    xpanel()
+  }
+
+proc xgetexec () { local i,args
+    args = $2
+    if ($o3.size!=args) { mesg="Error-close & relaunch panel" return }
+    sprint(temp_string_,"%s(",$s1)
+    for i=0,args-2 sprint(temp_string_,"%s%g,",temp_string_,$o3.x[i])
+    sprint(temp_string_,"%s%g)",temp_string_,$o3.x[i])
+    // print temp_string_
+    execute(temp_string_)
+  }
+  
+//** procbutt() put up a single proc in a button
+proc procbutt () {
+    xpanel($s1)
+    xbutton($s1,$s1)
+    xpanel(500,500)
+  }
+
+proc prlclr () {
+    for ltr(XO,printlist) {
+        cvode.record_remove(XO.vec)
+      }
+    printlist.remove_all
+  }
+
+//* read the files in dir and add one item to printlist
+proc dir2pr () { local ix
+    printlist.remove_all cvode_local(1) // assuming this
+    ix=$1
+    for ltr(dir) {
+        read_vfile(1,XO.s)
+        rv_readvec(1,ix,vrtmp)
+        new_printlist_item(panobj.comment,vrtmp,panobj.tvec)
+      }
+    if (numarg()==3) { pvplist($s2,$s3) read_vfile(1,$s2) }
+  }
+
+// op([obj,list],num) -- create object pointer
+proc op () {
+    if (numarg()==1) {             XO=tmpobj.object($1) } else\
+    if (numarg()==2) { tmpobj=$o1  XO=tmpobj.object($2) } else\
+    if (numarg()==3) { tmpobj=$o2 $o1=tmpobj.object($3) }
+  }
+// END /usr/site/nrniv/local/hoc/grvec.hoc
+//================================================================
+//================================================================
+// INSERTED /usr/site/nrniv/local/hoc/nqs.hoc
+// $Id: nqs.hoc,v 1.18 2004/02/10 17:11:33 billl Exp $
+
+if (!(name_declared("VECST_INSTALLED") && name_declared("MATRIX_INSTALLED"))) {
+    printf("NQS ERROR: Need vecst.mod and matrix.mod nmodl packages compiled in special.\n")
+  } else {
+    if (!VECST_INSTALLED) install_vecst()
+    if (!MATRIX_INSTALLED) install_matrix()
+  }
+
+//* NQS template
+// potential to overwrite XO,tstr,tmplist,tmpfile,i1
+begintemplate NQS
+public oflag // flag to operate on out 
+public s,comment,file,v,m,x,ind,scr,this,sstr,out,objl         // strings and vecs
+public sv,rd,append,pr,prn,zvec,resize,size,fi,sets,gets,tog   // routines
+public cp,mo,aind,it,appi,eq,sort,select,stat,rdcols,map,apply
+public spr
+objref v[1],s[1],x,nil,ind,scr,this,out,objl,cob
+
+strdef comment,file,sstr,sstr2,sstr3,sstr4
+double m[1]
+external readnums,savenums,readdbls,savedbls,rdvstr,wrvstr,sfunc,repl_mstr
+external vlk,String,savevec,tmplist,tmpfile,strm,XO,tstr,i1,allocvecs,dealloc,mso
+external isnum,chop,isassigned
+
+proc init () { local ii,flag
+    flag=0 // set if creating the internal NQS
+    if (numarg()==1) if (argtype(1)==2) { rd($s1) return }
+    if (numarg()>=1) {
+        if ($1=1e-9) { flag=1 } else {
+            m=$1
+            objref v[m],s[m]
+            for ii=0,m-1 { v[ii]=new Vector() s[ii]=new String() }
+          }
+      }
+    x=new Vector(m) scr=x.c ind=x.c
+    scr.resize(0) ind.resize(0)
+    objl=new List() cob=this
+    if (!flag) {out=new NQS(1e-9) out.cp(this)}
+    if (numarg()>=2) file=$s2
+    if (numarg()>=3) comment=$s3
+    if (numarg()>=4) x.x[0]=$4
+  }
+
+//* tog() toggle flag that determines whether actions are on out or this
+proc tog () {
+    if (numarg()==1) oflag=$1 else oflag=1-oflag
+    if (oflag) { 
+        print "Operate on output of select"
+        cob=out // current object=out
+      } else {
+        print "Operate on full db"
+        cob=this
+      }
+  }
+
+//** sets() set the strings to given args
+proc sets () { local i,nm
+    nm=numarg()
+    if (nm==2 && argtype(1)==0) s[$1].s=$s2 else {
+        if (nm>m) { 
+            if (! boolean_dialog("Resize TABLE?","YES","NO")) return
+            printf("resizing TABLE: %d -> %d\n",m,nm) resize(nm) 
+          }
+        for i=1,nm s[i-1].s=$si
+      }
+  }
+// gets() print the strings
+proc gets () { for ii=0,m-1 printf("%d:%s ",ii,s[ii].s) }
+
+//** select () -- based loosely on SQL select
+func select () { local i,b,c,f2,x,y,min,flag,ret
+    b=c=allocvecs(2) c+=1
+    min=1 flag=0
+    if (numarg()>=1) if (argtype(1)==0) {min=2 flag=$1} // don't clear ind
+    if (flag==0) ind.resize(0) // default
+    for (i=min;i<=numarg();) {
+        mso[c].copy(ind) 
+        if (argtype(i)!=2) { printf("ERR1: arg %d should be name\n",i) return -1}
+        if ((vn=fi($si))<0) return  
+                          i+=1 
+        if (argtype(i)!=2) { printf("ERR2: arg %d should be operator\n",i) return -1}
+          tstr=$si        i+=1
+        if (strm(tstr,"[[(]")) f2=1 else f2=0 // opstring2 needs 2 args
+        if (argtype(i)!=0) { printf("ERR3: arg %d should be dbl\n",i) return -1}
+          x=$i            i+=1 
+        if (f2) {
+            if (argtype(i)!=0) { printf("ERR4: arg %d should be dbl\n",i) return -1}
+            y=$i            i+=1
+          }
+        if (f2) mso[b].indvwhere(v[vn],tstr,x,y) else { // the engine
+                  mso[b].indvwhere(v[vn],tstr,x)   }
+        ind.resize(v.size) // make sure it's big enough for insct -- shouldn't need
+        if (mso[c].size>0) ind.insct(mso[b],mso[c]) else ind.copy(mso[b])
+        if (ind.size==0) break
+      }
+    ret=ind.size
+    if (flag<=0) { // flag<0 means to use the final ind to redo this.out
+        out.cp(this) // may become too large then will need a nondestructive fewind() 
+        if (numarg()>0) { 
+            out.ind.copy(ind) out.aind()
+          } else ret=v.size  // nql.select() selects all
+      }
+    dealloc(b)
+    cob=out
+    return ret
+  }
+
+//*** fi(STR[,XO]) find the index for a particular string, can set a objref
+func fi () { local num,flag,ii,ret,err
+    err=num=flag=0
+    for ii=0,m-1 if (strcmp(s[ii].s,$s1)==0) {flag=1 ret=ii break} // exact match
+    if (strcmp($s1,"scr")==0) {flag=1 ret=-2}
+    if (!flag) for ii=0,m-1 if (strm(s[ii].s,$s1)) { 
+        if (num>=1) {
+            err=1 printf("NQS fi ERR: regexp matches more than once: %d %s\n",ii,s[ii].s)
+          } else {
+            num+=1 ret=ii flag=1
+          }
+      }
+    if (err) printf("NQS WARNING; ambiguous regexp; fi() returning pointer for: %d %s\n",ret,s[ret].s)
+    if (flag) {
+        if (numarg()==2) $o2=v[ret] 
+        return ret
+      } else {
+        printf("NQS.fi() ERR '%s' not found\n",$s1)
+        return -1
+      }
+  }
+
+//** stat("name","vec_operation")
+proc stat () { local i,vn
+    if ((vn=fi($s1))==-1) return
+    if (vn==-2) { for i=2,numarg() {
+          sprint(sstr,"printf(\"%s=%%g; \",%s.%s)",$si,scr,$si)
+          execute(sstr) 
+        }} else for i=2,numarg() {
+        sprint(sstr,"printf(\"%s=%%g; \",%s.%s)",$si,cob.v[vn],$si)
+        execute(sstr)
+      }
+    print ""
+  }
+
+//** it() set's global tstr and XO to string bzw vec
+iterator it () { local ii
+    i1=0
+    for ii=0,m-1 {
+        XO=cob.v[ii] tstr=s[ii].s
+        iterator_statement
+        i1+=1
+      }
+  }
+
+//** spr() spread-sheet functionality using vector functions
+// takes a compound expression utilizing column names in slant brackets <>
+// anything quoted can use either ' or \"
+// output is copied to scr
+proc spr () { local ii,vn
+    sstr=$s1
+    while (sfunc.tail(sstr,"<",sstr2)!=-1) {
+        sfunc.head(sstr2,">",sstr2)
+        if ((vn=fi(sstr2))==-1) return
+        sprint(sstr2,"<%s>",sstr2)
+        sprint(sstr3,"%s",v[vn])
+        repl_mstr(sstr,sstr2,sstr3,sstr4)
+      }
+    repl_mstr(sstr,"'","\"",sstr4)
+    sprint(sstr,"%s.copy(%s)",scr,sstr)
+    execute(sstr)
+  }
+
+//** sort () sort according to one index
+proc sort () { local beg,ii,vn
+    if ((vn=fi($s1))<0) return
+    cob.v[vn].sortindex(cob.ind)
+    if (numarg()==2) if ($2==-1) cob.ind.reverse
+    cob.scr.resize(cob.v.size)
+    for (beg=0;beg<m;beg+=10) { // fewind() can only handle 10 vecs at a time
+        sprint(sstr,"%s.fewind(%s",cob.scr,cob.ind)
+        for ii=beg,beg+9 if (ii<m) sprint(sstr,"%s,%s",sstr,cob.v[ii])
+        sprint(sstr,"%s)",sstr)
+        execute(sstr)
+      }      
+    cob.ind.resize(0) // prevents reusing it
+  }  
+
+//** aind () -- index all of the vecs
+proc aind () { local beg,ii
+    scr.resize(v.size)
+    for (beg=0;beg<m;beg+=10) { // fewind() can only handle 9 vecs at a time
+        sprint(sstr,"%s.fewind(%s",scr,ind)
+        for ii=beg,beg+9 if (ii<m) sprint(sstr,"%s,%s",sstr,v[ii])
+        sprint(sstr,"%s)",sstr)
+        execute(sstr)
+      }      
+    ind.resize(0) // prevents reusing it
+  }  
+
+//** append(VEC) or append(x1,x2,...) appends to ends of given vectors
+proc append () { local i,flag
+    flag=0
+    if (numarg()==1 && argtype(1)==1) { // a vector
+        if ($o1.size>m) { print "NQS append ERR1: vec too large; doing nothing"
+          } else {
+              for i=0,$o1.size-1 v[i].append($o1.x[i])
+          }
+      } else {
+        if (numarg()>m) {
+            print "NQS append ERR2: args>m; doing nothing"
+            flag=1
+          } 
+        if (! flag) for i=1,numarg() v[i-1].append($i)
+      }
+  }
+
+//** appi(index,VEC) or append(index,x1,x2,...) appends to ends of vectors starting at index
+proc appi () { local i,flag,ix
+    flag=0 ix=$1
+    if (numarg()==2 && argtype(2)==1) { // a vector
+        if ($o1.size>m-ix) { print "NQS appi ERR1: vec too large; doing nothing"
+          } else {
+            for i=ix,$o1.size-1 v[i].append($o1.x[i])
+          }
+      } else {
+        if (numarg()-1>m-ix) {
+            print "NQS appi ERR2: args>m; doing nothing"
+            flag=1
+          } 
+        if (! flag) for i=2,numarg() v[ix+i-2].append($i)
+      }
+  }
+
+//** map() map $s1 command to other args, replacing strings with vectors as found
+// eg nqs.map("gg",0,"volt","cai",2)
+proc map () { local i,agt,wf
+    sprint(sstr,"%s(",$s1) // the command
+    wf=0
+    for i=2,numarg() { // the args
+        agt=argtype(i)
+        if (agt==0) {
+            sprint(sstr,"%s%g,",sstr,$i)
+          } else if (agt==1) {
+            sprint(sstr,"%s%s,",sstr,$oi)
+          } else if (agt==2) {
+            if ((vn=fi($si))<0) {
+                sprint(sstr,"%s\"%s\",",sstr,$si) 
+                printf("NQS.map WARNING: including raw string: %s\n",$si) wf=1
+              } else {
+                sprint(sstr,"%s%s,",sstr,cob.v[vn]) 
+              }
+          } else { printf("argtype %d for arg %d not implemented for NQS:map\n",agt,i) return }
+      }
+    chop(sstr) sprint(sstr,"%s)",sstr)
+    if (wf) if (boolean_dialog(sstr,"CANCEL","EXECUTE")) return
+    execute(sstr)
+  }
+
+//** apply function or .op to every selected vector
+proc apply () { local ii,fl
+    if (numarg()==2) fl=fi($s2) else fl=-1
+    cob=out
+    for ii=0,m-1 {
+        if (fl!=-1 && fl!=ii) continue
+        if (strm($s1,"\\.")) sprint(sstr,"%s%s"  ,out.v[ii],$s1) else {
+                               sprint(sstr,"%s(%s)",$s1,out.v[ii]) }
+        execute(sstr)
+      }
+  }
+
+//** pr() print out vectors
+proc pr () { local ii,i
+    if (numarg()==0) {
+        for ii=0,m-1 {
+            printf("%s (%d,%g): ",s[ii].s,ii,m,x.x[ii]) vlk(cob.v[ii])
+          }
+      } else {
+        for i=1,numarg() {
+            if ((ii=fi($si))<0) return
+            printf("%s %d/%d (%g): ",s[ii].s,ii,m,x.x[ii]) vlk(cob.v[ii])
+          }
+      }        
+  }
+
+// prn() print out single index from vectors
+proc prn () { local jj,ii,ix,max
+    ix=$1
+    if (numarg()==2) max=$2 else max=ix
+    for jj=ix,max {
+        if (jj<0 || jj>=cob.v[ii].size) { 
+            printf("prn: Index out of range (%d)\n",cob.v[ii].size) return }
+        for ii=0,m-1 printf("%s:%g ",s[ii].s,cob.v[ii].x[jj])
+        print ""
+      }
+  }
+
+// zvec() -- clear -- resize all the vectors to 0
+proc zvec () { local ii
+    for ii=0,m-1 { x.fill(0) v[ii].resize(0) }
+  }
+
+// size() -- return num of vectors and size of each vector
+func size () { local ii
+    printf("%d x %d",m,cob.v.size)
+    for ii=1,m-1 printf(",%d",cob.v[ii].size)
+    print ""
+    return cob.v.size
+  }
+
+//** resize() -- augment or dec the number of vectors -- overwrites tmplist
+// also serves as a clear function -- is that a good idea?
+proc resize () { local newsz,ii,jj
+    newsz = $1
+    if (m==newsz) { printf("clearing %s\n",this)
+      } else if (newsz>m) {
+        tmplist.remove_all
+        for ii=0,m-1 { tmplist.append(v[ii]) tmplist.append(s[ii]) }
+        objref v[newsz],s[newsz]
+        jj=-1
+        for ii=0,m-1 { v[ii]=tmplist.object(jj+=1) s[ii]=tmplist.object(jj+=1) }
+        for ii=m,newsz-1 { v[ii]=new Vector() s[ii]=new String() }
+        m=newsz
+        tmplist.remove_all
+      } else {
+        for (ii=m-1;ii>=newsz;ii-=1) { v[ii]=nil s[ii]=nil }
+        m=newsz
+      }
+    if (isassigned(out)) { 
+        out.resize(m) // avoid recursion
+        for ii=0,m-1 { out.v[ii].resize(0) out.s[ii].s="" }
+      }
+    x.resize(m) x.fill(0)
+    cob=this
+  }
+
+//** sv(FNAME) save the NQS -- may want to change to append
+proc sv () { local i
+    if (tmpfile.ropen($s1)) if (! boolean_dialog("File exists","Overwrite","Cancel")) { 
+        print "Cancelled" return }
+    if (! tmpfile.wopen($s1)) { printf("ERR: can't open file\n") return }
+    savenums(m)
+    wrvstr(file) wrvstr(comment)
+    for i=0,m-1 wrvstr(s[i].s)
+    for i=0,m-1 v[i].vwrite(tmpfile)
+    x.vwrite(tmpfile)
+    tmpfile.close
+  }
+
+// rd(FNAME) read format saved by sv()
+func rd () {
+    if (! tmpfile.ropen($s1)) { printf("ERR: can't open file\n") return 0 }
+    if (! readnums(&ii)) return 0
+    if (ii!=m) {
+        m=ii
+        objref v[m],s[m]
+        for ii=0,m-1 { v[ii]=new Vector() s[ii]=new String() }
+        x = new Vector(m) scr=x.c ind=x.c
+      }
+    rdvstr(file) rdvstr(comment)
+    for i=0,m-1 rdvstr(s[i].s)
+    for i=0,m-1 v[i].vread(tmpfile)
+    x.vread(tmpfile)
+    tmpfile.close
+    return 1
+  }
+
+func rdcols () { local ii,cols,li,errflag,num
+    errflag=0
+    if (! tmpfile.ropen($s1)) { printf("\trdcols ERR0: can't open file \"%s\"\n",$s1) return 0}
+    if (tmpfile.scanstr(sstr)==-1) {printf("\trdcols ERR1: file \"%s\"\n",$s1) return 0}
+    if (isnum(sstr)){printf("\trdcols ERR2: no labels in file \"%s\"\n",$s1) return 0}
+    cols=-1
+    while (! isnum(sstr)) { cols+=1 tmpfile.scanstr(sstr) }
+    // 'grep -cve' takes 10x longer than 'wc -l' but skips blank lines
+    sprint(sstr,"grep -cvP '^ *$' %s > /tmp/xtmp",$s1) system(sstr)
+    tmpfile.ropen("/tmp/xtmp") li=tmpfile.scanvar()-1
+    printf("%d cols; %d lines of data in %s.\n",cols,li,$s1)
+    tmpfile.ropen($s1)
+    tmpfile.gets(sstr) // remove first line
+    num=scr.scanf(tmpfile,li*cols)
+    if (num!=li*cols) { // err not reached since scanf dumps out
+        printf("WARNING: expected %d vals; found %d\n",li*cols,num) errflag=3 }
+    if (tmpfile.scanstr(sstr)>-1) { 
+        printf("WARNING: %s found after reading in %d vals\n",sstr,li*cols) errflag=4 }
+    resize(cols)
+    tmpfile.seek(0)
+    for ii=0,cols-1 { 
+        tmpfile.scanstr(s[ii].s)
+        v[ii].resize(li)
+        v[ii].mcol(scr,ii,cols)
+      }  
+    if (errflag) { printf("rdcols ERR%d\n",errflag) return 0 }
+    return cols
+  }
+
+// cp(NQS) copy 1 NQS to another
+proc cp () { local ii
+    ii=$o1.m
+    if (ii!=m) {
+        m=ii
+        objref v[m],s[m]
+        for ii=0,m-1 { v[ii]=new Vector() s[ii]=new String() }
+        x = new Vector(m) scr=x.c ind=x.c
+      }
+    objl.remove_all
+    for ii=0,$o1.objl.count-1 { objl.append($o1.objl.object(ii)) }
+    file=$o1.file comment=$o1.comment
+    for ii=0,m-1 { s[ii].s=$o1.s[ii].s v[ii].copy($o1.v[ii]) }
+    x.copy($o1.x)
+    scr.resize(0) ind.resize(0)
+  }
+
+// eq(NQS) -- just check the vecs
+func eq () { local ii
+    if ($o1.m!=m) return 0
+    for ii=0,m-1 if (! $o1.v[ii].eq(v[ii])) return 0
+    return 1
+  }
+
+// mo([flag][,STAT1,...]) -- create global objectvars that point to the vectors
+// first time use flag=1 to create new global objrefs, else just shift them
+// flag=1 reassign objl but don't care if they already exist
+// flag=2 don't print out the assignments
+// flag=3 reassign objl; make sure they're unique
+proc mo () { local ii,flag,i,hf
+    if (numarg()>=1) flag=$1 else flag=0 // flag:create objrefs
+    if (flag==1 || flag==3) {
+        if (objl.count>0) if (! boolean_dialog("Rename object pointers?","YES","NO")) return
+        objl.remove_all
+        for ii=0,m-1 if (sfunc.len(s[ii].s)>0) {
+            sstr=s[ii].s
+            repl_mstr(sstr,"[^A-za-z0-9]","",tstr)
+            sprint(sstr,"%sv",sstr)
+            if (flag==3) { // make sure it's unique
+                hf=0
+                while (name_declared(sstr)) { hf=1
+                    printf("%s exists ... ",sstr)
+                    sprint(sstr,"%sv",sstr) 
+                  } 
+                if (hf) printf(" -> %s\n",sstr)
+              } else if (name_declared(sstr)) printf("%s reassigned: ",sstr)
+            printf("%s -> v[%d] (%s)\n",sstr,ii,s[ii].s)
+            sprint(tstr,"objref %s",sstr) execute(tstr)
+            sprint(tstr,"%s=%s",sstr,v[ii]) execute(tstr)
+            objl.append(new String(sstr))
+          }
+        sprint(tstr,"indv=%s",ind) execute(tstr)
+      } else {
+        if (objl.count==0) { 
+            printf("Must create %s with mo(1)\n",sstr) 
+          } else if (objl.count>m) { 
+            printf("STAT:mo ERR: wrong objref count in objl: %d vs %d\n",objl.count,m)
+            return
+          } else {
+            if (objl.count<m) { 
+                printf("STAT:mo WARNING: unreferenced vecs for %s: refs %d<m %d\n",this,objl.count,m) }
+            for ii=0,objl.count-1 {
+                XO=objl.object(ii)
+                if (flag!=2) printf("%s -> %s.v[%d] (%s)\n",XO.s,this,ii,s[ii].s)
+                sprint(tstr,"%s=%s",XO.s,v[ii]) execute(tstr)
+              }
+          }
+        sprint(tstr,"indv=%s",ind) execute(tstr)
+      }
+    if (numarg()>1) for i=2,numarg() { // propagate the objl to other STATs
+        $oi.objl.remove_all
+        for ii=0,objl.count-1 $oi.objl.append(objl.object(ii))
+      }
+  }
+endtemplate NQS
+
+//* ancillary routines
+//** prl2nqs(NQS) -- transfer printlist to NQS
+proc prl2nqs () { local tstep
+    if ($o1.m != printlist.count+1) $o1.resize(printlist.count+1)
+    tstep=0.1 // 0.1 ms step size for interpolation
+    $o1.s[0].s="time"
+    $o1.v[0].indgen(0,printlist.object(0).tvec.max,tstep)
+    for ii=0,printlist.count-1 {
+        XO=printlist.object(ii)
+        $o1.s[ii+1].s = XO.var
+        $o1.v[ii+1].interpolate($o1.v[0],XO.tvec,XO.vec)
+      }
+  }
+//** pvp2nqs(NQS) -- transfer grvec data file to NQS
+proc pvp2nqs () { local tstep,tv1,v1
+    if (! read_vfile(1,$s1)) { printf("Can't open %s\n",$s1) return }
+    tv1=v1=allocvecs(2)  v1+=1
+    if ($o2.m != panobj.llist.count+1) $o2.resize(panobj.llist.count+1)
+    tstep=0.1 // 0.1 ms step size for interpolation
+    $o2.s[0].s="time"
+    for ii=0,panobj.llist.count-1 {
+        XO=panobj.llist.object(ii)
+        $o2.s[ii+1].s = XO.name
+        tmpfile.seek(XO.loc) mso[tv1].vread(tmpfile) mso[v1].vread(tmpfile) // or use rv_readvec
+        if (ii==0) $o2.v[ii].indgen(0,mso[tv1].max,tstep)
+        $o2.v[ii+1].interpolate($o2.v[0],mso[tv1],mso[v1])
+      }
+    dealloc(tv1)
+  }
+// END /usr/site/nrniv/local/hoc/nqs.hoc
+//================================================================
+// END init.hoc
+//================================================================
+//================================================================
+// INSERTED geom.hoc
+/* $Id: geom.hoc,v 1.2 2004/01/27 21:48:11 billl Exp $ */
+proc geomfile() { }                /* For remote loading */
+
+begintemplate rinzelnrn
+   public soma, dend
+   create soma, dend
+
+   proc init() {
+       geometry()
+     }
+//
+// SPEC: Geometry for a simple 2 compartment neuron.
+//       from Pinsky and Rinzel, JCompNeur, 1994
+// 
+
+//
+// PROCEDURE: geometry
+//      DESC: Calls all necessary procs
+//            to specify parameters of
+//            the given section.
+//
+proc geometry() {
+      init_topology_0()
+      init_dx_0()
+      init_diam_0()
+  
+      access soma
+  }
+
+//
+// PROCEDURE: init_topology
+//      DESC: Connections between
+//            all compartments are
+//            specified in this proc.
+//
+proc init_topology_0() {
+      soma connect dend(0), 1
+  }
+
+//
+// PROCEDURE: init_dx_0
+//      DESC: Lengths of all
+//            compartments are
+//            specified in this proc.
+//
+proc init_dx_0() { local p
+      p = 0.5 // proportion of area taken up by soma
+      soma.L = p*20/PI
+      dend.L = (1-p)*20/PI
+  }
+
+//
+// PROCEDURE: init_diam_0
+//      DESC: Diameters of all
+//            compartments are
+//            specified in this proc.
+//
+proc init_diam_0() { 
+      soma.diam = 10
+      dend.diam = 10
+  }
+
+endtemplate rinzelnrn
+// END geom.hoc
+//================================================================
+//================================================================
+// INSERTED network.hoc
+// $Id: network.hoc,v 1.4 2004/01/27 21:56:37 billl Exp $
+
+NNRN = 1
+objref nrn[NNRN],stim[NNRN]
+
+//
+// Component Allocation:
+//-----------------------
+
+for ii=0, NNRN-1 nrn[ii] = new rinzelnrn()
+access nrn[0].soma
+
+//
+// Specify Network Geometry
+//--------------------------
+for ii=0, NNRN-1 nrn[ii].soma stim[ii] = new IClamp(0.5)
+// END network.hoc
+//================================================================
+//================================================================
+// INSERTED params.hoc
+// $Id: params.hoc,v 1.110 2004/02/10 20:36:02 billl Exp $
+
+//* Global defaults
+tstop       = 1500       /* msec */
+celsius     = 37.0       /* degC */
+v_init       = -60       /* mV */  
+
+//* Electrical parameters
+gc=2.1 // mS/cm2; Ra in ohm-cm
+pp=0.5 // proporton of dend to soma size
+
+// adjust Ra to get the desired longitudinal resistance
+forall Ra=1
+global_Ra = (1e-6/(gc/pp * (area(0.5)*1e-8) * 1e-3))/(2*ri(0.5))
+forall { Ra=global_Ra  cm=3 }
+
+//* soma
+gpas=0.1e-3
+proc setpars () {
+    forsec "soma" {
+        insert pas
+        insert kdr
+        insert nafPR
+    
+        gmax_nafPR=00030e-3
+        gmax_kdr=00015e-3
+        g_pas=gpas
+        e_pas = -60
+		ek=-75
+      }
+    
+    //* dend
+    forsec "dend" {
+        insert pas
+        insert rcadecay
+        insert cal
+        insert kcRT03
+        insert rkq
+    
+        g_pas=gpas
+        e_pas=-60.
+        phi_rcadecay = 130
+        gmax_cal = 00010e-3
+        erev_cal = 80
+        gmax_kcRT03=00015e-3
+        gmax_rkq=0000.8e-3
+		ek=-75
+      }
+
+  }
+setpars()
+//* stim and rheobase
+// inject 0.75 muA/cm2 -> 
+stim[0].del = 0
+stim[0].dur = tstop
+stim[0].amp = 0.00075/pp
+
+nrn[0].soma  stim[0].loc(0.5)
+// END params.hoc
+//================================================================
+//================================================================
+// INSERTED run.hoc
+// $Id: run.hoc,v 1.18 2004/02/12 22:13:57 billl Exp $
+
+cvode_local(1)
+
+objref fih
+fih = new FInitializeHandler("unset()")
+
+proc unset () {
+    forall { 
+        if (ismembrane("nafPR")) { Inf_nafPR[0]=0 h_nafPR=0 g_nafPR=0 }
+        if (ismembrane("kdr")) { m_kdr=0 }
+        if (ismembrane("rkq")) { m_rkq=0 }
+        if (ismembrane("cal")) { m_cal=0 }
+        if (ismembrane("kcRT03")) { m_kcRT03=0 }
+      }
+  }
+
+proc setMemb() {}
+
+proc nprl () {
+    printlist.remove_all
+    new_printlist_item("nrn[0].soma.v(0.5)")
+    new_printlist_item("nrn[0].dend.v(0.5)")
+    new_printlist_item("nrn[0].dend.cai(0.5)")
+    new_printlist_item("nrn[0].dend.g_cal(0.5)")
+    new_printlist_item("nrn[0].dend.g_rkq(0.5)")
+    new_printlist_item("nrn[0].soma.g_nafPR(0.5)")
+    new_printlist_item("nrn[0].soma.h_nafPR(0.5)")
+    new_printlist_item("nrn[0].dend.m_cal(0.5)")
+    new_printlist_item("nrn[0].dend.m_rkq(0.5)")
+    new_printlist_item("nrn[0].dend.g_kcRT03(0.5)")
+    new_printlist_item("nrn[0].dend.ica(0.5)")
+  }
+
+nprl()
+// END run.hoc
+//================================================================
+
+run()
+printlist.object(2).vec.mul(90/800).sub(60) // rescale cai to fit it on the graph
+
+objref vs,vd,cad
+{vs=new Vector() vd=vs.c cad=vs.c}
+tmpfile.ropen("xpp.dat")
+tvec.scanf(tmpfile,5001,1,11)
+
+if (unix_mac_pc()==1) { // 1==unix, 2==mac, 3==mswin
+    {tmpfile.seek(0) vs.scanf(tmpfile,5001,2,11)}
+    {tmpfile.seek(0) vd.scanf(tmpfile,5001,3,11)}
+    {tmpfile.seek(0) cad.scanf(tmpfile,5001,4,11)}
+  } else {
+    {tmpfile.ropen("xpp.dat") vs.scanf(tmpfile,5001,2,11)}
+    {tmpfile.ropen("xpp.dat") vd.scanf(tmpfile,5001,3,11)}
+    {tmpfile.ropen("xpp.dat") cad.scanf(tmpfile,5001,4,11)}
+  }
+
+cad.mul(90/800).sub(60)
+
+{panobj.super=1 labelm=0 panobj.line=2}
+newpl(500,600,-60,20,50,50,250,250)
+{gv(0,1) gv(1,2) gv(2,3)}
+g.label("NEURON simulation")
+newpl(400,500,-60,20,50,50,250,250)
+{gg(0,vs,tvec,1,2) gg(0,vd,tvec,2,2) gg(0,cad,tvec,3,2)}
+g.label("XPPAUT simulation")
+newpl(0,tstop,-70,30,50,450,800,150)
+{gv(0,1) gg(0,vs,tvec,2,7)}
+{g.label("NEURON") g.color(2) g.label("XPPAUT")}
+// END batch_.hoc
+//================================================================
