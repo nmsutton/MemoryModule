@@ -74,10 +74,18 @@ def createSyn(input_layer, output_layer, fire_rate_ratio):
 	'''
 	len_in_layer = len(input_layer)
 	len_out_layer = len(output_layer)
-	syn_dict = {"weight": syn_weight} 
+	syn_weight = 50.0
+	max_syn_ratio = 2.5
+	#syn_multipler = 1.0
+	perc_conn = fire_rate_ratio
 
-	perc_conn = fire_rate_ratio / (fire_rate_ratio+1)
-	conn_total = math.floor(len_in_layer*perc_conn)
+	if fire_rate_ratio < 1.0:
+		prec_conn = 1/perc_conn
+		syn_weight = syn_weight * -1.0
+	perc_conn = 1 - perc_conn
+
+	syn_dict = {"weight": syn_weight} 
+	conn_total = math.floor(len_in_layer*(perc_conn/max_syn_ratio))
 
 	for i in range(conn_total):
 		nest.Connect([input_layer[i]], [output_layer[i]], "one_to_one", syn_dict)
