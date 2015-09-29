@@ -10,6 +10,7 @@ http://f1000research.com/articles/3-104/v1
 
 import pylab
 import nest
+import math as math
 
 '''
 Create objects to run experiment with
@@ -43,13 +44,46 @@ how is that processed in connections?
 #nest.SetStatus(e_c_5_layer, {"I_e": -50.1})
 #nest.SetStatus(c_a_1_layer, {"I_e": -50.1})
 
-syn_dict_ex = {"weight": 1.2}
-syn_dict_in = {"weight": -2.0}
 #syn_ec3_to_ec5 = {"weight": 0.928}
-syn_ec3_to_ec5 = {"weight": -20.0}
-syn_ec5_to_ca1 = {"weight": 2.164}
-nest.Connect(e_c_3_layer, e_c_5_layer, "one_to_one", syn_spec=syn_ec3_to_ec5)
-nest.Connect(e_c_5_layer, c_a_1_layer, "one_to_one", syn_spec=syn_ec5_to_ca1)
+#syn_ec3_to_ec5 = {"weight": -20.0}
+#syn_ec5_to_ca1 = {"weight": 2.164}
+
+'''
+	Synapses
+'''
+syn_weight = 50.0
+
+def createSyn(input_layer, output_layer, fire_rate_ratio):
+	'''
+		Note: later uneven numbers of neurons in layers
+		could be added but for now using even.
+
+		Ratio of 1.0 creates 50% ex and 50% inh
+		2.0 creates 66% ex and 33% inh
+		0.5 creates 33% ex and 66% inh
+
+		TODO: check if ratio calc works exactly right
+
+		TODO: for now synapses are one-to-one to control ratio of responses.
+		In the future more e.g. one-to-many should be made while controlling
+		activity between layers
+
+		Note: It is needed that the number of exhitatory connections totally
+		control the amount of firing fore each next layer, no origional firing
+		occurs in any layer but the first.
+	'''
+	len_in_layer = len(input_layer)
+	len_out_layer = len(output_layer)
+	syn_dict = {"weight": syn_weight} 
+
+	perc_conn = fire_rate_ratio / (fire_rate_ratio+1)
+	conn_total = math.floor(len_in_layer*perc_conn)
+
+	for i in range(conn_total):
+		nest.Connect([input_layer[i]], [output_layer[i]], "one_to_one", syn_dict)
+
+createSyn(e_c_3_layer,e_c_5_layer,0.928)
+createSyn(e_c_5_layer,c_a_1_layer,2.164)
 
 nest.Connect(multimeter, e_c_3_layer)
 nest.Connect(multimeter2, c_a_1_layer)
