@@ -43,7 +43,7 @@ how is that processed in connections?
 '''
 	Synapses
 '''
-syn_weight = 100.0
+syn_weight = 300.0
 
 def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 	'''
@@ -71,7 +71,7 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 	syn_dict = {"weight": syn_weight}
 
 	for time_greater in range(times_greater_ratio):
-		adjusted_delay = 0.1 + (60.0 * time_greater)
+		adjusted_delay = 0.1 + (20.0 * time_greater)
 		adjusted_conn_total = len_in_layer
 		if (time_greater==(times_greater_ratio-1)): 
 			adjusted_conn_total = math.floor(len_in_layer*(fire_rate_ratio-(times_greater_ratio-1)))
@@ -80,9 +80,11 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 		for i in range(adjusted_conn_total):
 			nest.Connect([input_layer[i]], [output_layer[i]], "one_to_one", syn_dict)
 
-createSyn(e_c_3_layer,e_c_5_layer,0.928, syn_weight)
+#createSyn(e_c_3_layer,e_c_5_layer,0.928, syn_weight)
+createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight)
 # 2.164/0.928=2.332
-createSyn(e_c_5_layer,c_a_1_layer,2.332, syn_weight)
+#createSyn(e_c_5_layer,c_a_1_layer,2.332, syn_weight)
+createSyn(e_c_5_layer,c_a_1_layer,8.0, syn_weight)
 
 nest.Connect(multimeter, e_c_3_layer)
 nest.Connect(multimeter2, c_a_1_layer)
