@@ -23,28 +23,12 @@ nest.SetStatus(noise, [{"rate": 80000.0}, {"rate": 15000.0}])'''
 # values for neurons taken from http://neuralensemble.org/docs/PyNN/examples/Izhikevich.html?highlight=izhikevich
 pop1 = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-160.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
 pop2 = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-180.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
-#pop1 = nest.Create("izhikevich",{'a':0.02,'b':0.2,'d':6.0})
-#pop2 = nest.Create("izhikevich",{'a':0.02,'b':0.2,'d':6.0})
-#pop1 = nest.Create("izhikevich")
-#pop2 = nest.Create("izhikevich")
 
 '''
 Form connections between objects and run sim
 '''
-'''syn_dict_ex = {"weight": 1.2}
-syn_dict_in = {"weight": -2.0}
-nest.Connect([noise[0]], pop1, syn_spec=syn_dict_ex)
-nest.Connect([noise[1]], pop1, syn_spec=syn_dict_in)'''
-#nest.SetStatus(pop1, {"I_e": 376.0})
-#nest.SetStatus(pop1, {"I_e": 10.0})
 
-#nest.Connect(pop1, pop2, syn_spec = {"weight":-10.0})
-
-# find number of neurons in layer
-print('len pop1:')
-print(len(pop1))
-
-syn_weight = 500.0
+syn_weight = 100.0
 
 def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 	'''
@@ -71,53 +55,7 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 	len_in_layer = len(input_layer)
 	len_out_layer = len(output_layer)
 	times_greater_ratio = math.ceil(fire_rate_ratio)
-	max_syn_ratio = 2.5
-	syn_multipler = 1.0
-
-	syn_dict = {"weight": syn_weight}#, "delay":60.0} 
-
-	#perc_conn = fire_rate_ratio / (fire_rate_ratio+1)
-	#print(perc_conn)
-	#conn_total = math.floor(len_in_layer*1.0)#(syn_multipler*perc_conn/max_syn_ratio))
-	#print(conn_total)
-
-	'''len_in_layer = len(input_layer)
-	len_out_layer = len(output_layer)
-	max_syn_ratio = 2.5
-	syn_multipler = 2.0
-
-	perc_conn = fire_rate_ratio
-
-	#if fire_rate_ratio >= 1.0:
-		#perc_conn = fire_rate_ratio / (fire_rate_ratio+1)
-	#elif fire_rate_ratio < 1.0:
-	if fire_rate_ratio < 1.0:
-		#perc_conn = (1/fire_rate_ratio) / ((1/fire_rate_ratio)+1)
-		prec_conn = 1/perc_conn
-		syn_weight = syn_weight * -1.0
-	perc_conn = 1 - perc_conn
-	print (perc_conn)
-
-	syn_dict = {"weight": syn_weight} 
-
-	conn_total = math.floor(len_in_layer*(syn_multipler*perc_conn/max_syn_ratio))
-	print (conn_total)'''
-	
-	'''conn_dict = {"rule": "fixed_outdegree", "outdegree":conn_total, "autapses": False, "multapses": False}
-	syn_dict = {"weight": syn_weight} 
-	nest.Connect(pop1, pop2, conn_dict, syn_dict)'''
-
-	'''for i in range(numb_ex):
-		nest.Connect(input_layer[i], output_layer[i], syn_spec=syn_dict_ex)
-	for i in range(numb_inh):
-		nest.Connect(input_layer[i], output_layer[i], syn_spec=syn_dict_in)'''
-
-	'''print (input_layer[0])
-	print (output_layer[0])
-	print (input_layer)
-	print (output_layer)'''
-	print('times_greater_ratio')
-	print(times_greater_ratio)
+	syn_dict = {"weight": syn_weight}
 
 	for time_greater in range(times_greater_ratio):
 		adjusted_delay = 0.1 + (60.0 * time_greater)
@@ -129,9 +67,9 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 		for i in range(adjusted_conn_total):
 			nest.Connect([input_layer[i]], [output_layer[i]], "one_to_one", syn_dict)#syn_spec=syn_weight)
 
-#createSyn(pop1,pop2,0.928, syn_weight)
+createSyn(pop1,pop2,0.928, syn_weight)
 #createSyn(pop1,pop2,1.000, syn_weight)
-createSyn(pop1,pop2,2.164, syn_weight)
+#createSyn(pop1,pop2,2.164, syn_weight)
 #createSyn(pop1,pop2,3.0, syn_weight)
 
 nest.Connect(multimeter, pop1)

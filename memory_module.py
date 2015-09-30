@@ -26,9 +26,9 @@ spikedetector_c_a_1 = nest.Create("spike_detector", params={"withgid": True, "wi
 '''noise = nest.Create("poisson_generator", 2)
 nest.SetStatus(noise, [{"rate": 80000.0}, {"rate": 15000.0}])'''
 
-e_c_3_layer = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':14.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
-e_c_5_layer = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':14.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
-c_a_1_layer = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-160.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
+e_c_3_layer = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-160.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
+e_c_5_layer = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-180.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
+c_a_1_layer = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-180.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
 
 '''
 Form connections between neurons and run sim
@@ -51,7 +51,7 @@ how is that processed in connections?
 '''
 	Synapses
 '''
-syn_weight = 50.0
+syn_weight = 100.0
 
 def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 	'''
@@ -72,34 +72,35 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 		control the amount of firing fore each next layer, no origional firing
 		occurs in any layer but the first.
 	'''
+
 	len_in_layer = len(input_layer)
 	len_out_layer = len(output_layer)
-	max_syn_ratio = 2.5
-	#syn_multipler = 1.0
-	perc_conn = fire_rate_ratio
+	times_greater_ratio = math.ceil(fire_rate_ratio)
+	syn_dict = {"weight": syn_weight}
 
-	if fire_rate_ratio < 1.0:
-		prec_conn = 1/perc_conn
-		syn_weight = syn_weight * -1.0
-	perc_conn = 1 - perc_conn
+	for time_greater in range(times_greater_ratio):
+		adjusted_delay = 0.1 + (60.0 * time_greater)
+		adjusted_conn_total = len_in_layer
+		if (time_greater==(times_greater_ratio-1)): 
+			adjusted_conn_total = math.floor(len_in_layer*(fire_rate_ratio-(times_greater_ratio-1)))
 
-	syn_dict = {"weight": syn_weight} 
-	conn_total = math.floor(len_in_layer*(perc_conn/max_syn_ratio))
-
-	for i in range(conn_total):
-		nest.Connect([input_layer[i]], [output_layer[i]], "one_to_one", syn_dict)
+		syn_dict = {"weight": syn_weight, "delay":adjusted_delay} 
+		for i in range(adjusted_conn_total):
+			nest.Connect([input_layer[i]], [output_layer[i]], "one_to_one", syn_dict)
 
 createSyn(e_c_3_layer,e_c_5_layer,0.928, syn_weight)
-createSyn(e_c_5_layer,c_a_1_layer,2.164, syn_weight)
+# 2.164/0.928=2.332
+createSyn(e_c_5_layer,c_a_1_layer,2.332, syn_weight)
 
 nest.Connect(multimeter, e_c_3_layer)
 nest.Connect(multimeter2, c_a_1_layer)
+
 nest.Connect(e_c_3_layer, spikedetector_e_c_3)
 nest.Connect(e_c_5_layer, spikedetector_e_c_5)
 nest.Connect(c_a_1_layer, spikedetector_c_a_1)
 
 #nest.Simulate(350.0)
-nest.Simulate(1000.0)
+nest.Simulate(2000.0)
 
 '''
 Record activity
@@ -125,24 +126,24 @@ dSD = nest.GetStatus(spikedetector_e_c_3,keys='events')[0]
 evs = dSD["senders"]
 ts = dSD["times"]
 print ('number of spikes')
-print (len(ts))
-pylab.figure(2)
-pylab.plot(ts, evs, ".")
+print(sum(ts>800))
+#pylab.figure(2)
+#pylab.plot(ts, evs, ".")
 
 dSD = nest.GetStatus(spikedetector_e_c_5,keys='events')[0]
 evs = dSD["senders"]
 ts = dSD["times"]
 print ('number of spikes')
-print (len(ts))
-pylab.figure(3)
-pylab.plot(ts, evs, ".")
+print(sum(ts>800))
+#pylab.figure(3)
+#pylab.plot(ts, evs, ".")
 
 dSD = nest.GetStatus(spikedetector_c_a_1,keys='events')[0]
 evs = dSD["senders"]
 ts = dSD["times"]
 print ('number of spikes')
-print (len(ts))
-pylab.figure(4)
-pylab.plot(ts, evs, ".")
+print(sum(ts>800))
+#pylab.figure(4)
+#pylab.plot(ts, evs, ".")
 
 pylab.show()
