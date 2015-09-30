@@ -53,7 +53,7 @@ how is that processed in connections?
 '''
 syn_weight = 50.0
 
-def createSyn(input_layer, output_layer, fire_rate_ratio):
+def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 	'''
 		Note: later uneven numbers of neurons in layers
 		could be added but for now using even.
@@ -74,7 +74,6 @@ def createSyn(input_layer, output_layer, fire_rate_ratio):
 	'''
 	len_in_layer = len(input_layer)
 	len_out_layer = len(output_layer)
-	syn_weight = 50.0
 	max_syn_ratio = 2.5
 	#syn_multipler = 1.0
 	perc_conn = fire_rate_ratio
@@ -90,8 +89,8 @@ def createSyn(input_layer, output_layer, fire_rate_ratio):
 	for i in range(conn_total):
 		nest.Connect([input_layer[i]], [output_layer[i]], "one_to_one", syn_dict)
 
-createSyn(e_c_3_layer,e_c_5_layer,0.928)
-createSyn(e_c_5_layer,c_a_1_layer,2.164)
+createSyn(e_c_3_layer,e_c_5_layer,0.928, syn_weight)
+createSyn(e_c_5_layer,c_a_1_layer,2.164, syn_weight)
 
 nest.Connect(multimeter, e_c_3_layer)
 nest.Connect(multimeter2, c_a_1_layer)

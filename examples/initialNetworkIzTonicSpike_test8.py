@@ -21,8 +21,8 @@ spikedetector2 = nest.Create("spike_detector",
 nest.SetStatus(noise, [{"rate": 80000.0}, {"rate": 15000.0}])'''
 
 # values for neurons taken from http://neuralensemble.org/docs/PyNN/examples/Izhikevich.html?highlight=izhikevich
-pop1 = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':14.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
-pop2 = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':14.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
+pop1 = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-160.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
+pop2 = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-180.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
 #pop1 = nest.Create("izhikevich",{'a':0.02,'b':0.2,'d':6.0})
 #pop2 = nest.Create("izhikevich",{'a':0.02,'b':0.2,'d':6.0})
 #pop1 = nest.Create("izhikevich")
@@ -44,7 +44,7 @@ nest.Connect([noise[1]], pop1, syn_spec=syn_dict_in)'''
 print('len pop1:')
 print(len(pop1))
 
-syn_weight = 50.0
+syn_weight = 500.0
 
 def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 	'''
@@ -70,6 +70,19 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 	'''
 	len_in_layer = len(input_layer)
 	len_out_layer = len(output_layer)
+	times_greater_ratio = math.ceil(fire_rate_ratio)
+	max_syn_ratio = 2.5
+	syn_multipler = 1.0
+
+	syn_dict = {"weight": syn_weight}#, "delay":60.0} 
+
+	#perc_conn = fire_rate_ratio / (fire_rate_ratio+1)
+	#print(perc_conn)
+	#conn_total = math.floor(len_in_layer*1.0)#(syn_multipler*perc_conn/max_syn_ratio))
+	#print(conn_total)
+
+	'''len_in_layer = len(input_layer)
+	len_out_layer = len(output_layer)
 	max_syn_ratio = 2.5
 	syn_multipler = 2.0
 
@@ -88,7 +101,7 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 	syn_dict = {"weight": syn_weight} 
 
 	conn_total = math.floor(len_in_layer*(syn_multipler*perc_conn/max_syn_ratio))
-	print (conn_total)
+	print (conn_total)'''
 	
 	'''conn_dict = {"rule": "fixed_outdegree", "outdegree":conn_total, "autapses": False, "multapses": False}
 	syn_dict = {"weight": syn_weight} 
@@ -103,22 +116,30 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 	print (output_layer[0])
 	print (input_layer)
 	print (output_layer)'''
+	print('times_greater_ratio')
+	print(times_greater_ratio)
 
-	for i in range(conn_total):
-		print(i)
-		nest.Connect([input_layer[i]], [output_layer[i]], "one_to_one", syn_dict)#syn_spec=syn_weight)
-		print ('node')
-		print (i)
+	for time_greater in range(times_greater_ratio):
+		adjusted_delay = 0.1 + (60.0 * time_greater)
+		adjusted_conn_total = len_in_layer
+		if (time_greater==(times_greater_ratio-1)): 
+			adjusted_conn_total = math.floor(len_in_layer*(fire_rate_ratio-(times_greater_ratio-1)))
 
+		syn_dict = {"weight": syn_weight, "delay":adjusted_delay} 
+		for i in range(adjusted_conn_total):
+			nest.Connect([input_layer[i]], [output_layer[i]], "one_to_one", syn_dict)#syn_spec=syn_weight)
 
-createSyn(pop1,pop2,0.928, syn_weight)
+#createSyn(pop1,pop2,0.928, syn_weight)
+#createSyn(pop1,pop2,1.000, syn_weight)
+createSyn(pop1,pop2,2.164, syn_weight)
+#createSyn(pop1,pop2,3.0, syn_weight)
 
 nest.Connect(multimeter, pop1)
 nest.Connect(multimeter2, pop2)
 nest.Connect(pop1, spikedetector)
 nest.Connect(pop2, spikedetector2)
 
-nest.Simulate(1000.0)
+nest.Simulate(2000.0)
 
 '''
 Record activity
@@ -134,17 +155,18 @@ ts2 = dmm2["events"]["times"]
 '''
 Plot results
 '''
-'''pylab.figure(1)
+pylab.figure(1)
 pylab.plot(ts, Vms)
 
 pylab.figure(2)
-pylab.plot(ts2, Vms2)'''
+pylab.plot(ts2, Vms2)
 
 dSD = nest.GetStatus(spikedetector,keys='events')[0]
 evs = dSD["senders"]
 ts = dSD["times"]
 print ('number of spikes')
 print (len(ts))
+print(sum(ts>800))
 '''pylab.figure(3)
 pylab.plot(ts, evs, ".")'''
 
@@ -153,6 +175,7 @@ evs_b = dSD_b["senders"]
 ts_b = dSD_b["times"]
 print ('number of spikes')
 print (len(ts_b))
+print(sum(ts_b>800))
 #pylab.figure(4)
 #pylab.plot(ts_b, evs_b, ".")
 
