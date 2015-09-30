@@ -39,14 +39,6 @@ groups in layers for connections
 With a number of neuron mismatch between layers
 how is that processed in connections?
 '''
-# avoid default I_e values by setting them here
-#nest.SetStatus(e_c_3_layer, {"I_e": -15.1})
-#nest.SetStatus(e_c_5_layer, {"I_e": -50.1})
-#nest.SetStatus(c_a_1_layer, {"I_e": -50.1})
-
-#syn_ec3_to_ec5 = {"weight": 0.928}
-#syn_ec3_to_ec5 = {"weight": -20.0}
-#syn_ec5_to_ca1 = {"weight": 2.164}
 
 '''
 	Synapses
@@ -99,7 +91,11 @@ nest.Connect(e_c_3_layer, spikedetector_e_c_3)
 nest.Connect(e_c_5_layer, spikedetector_e_c_5)
 nest.Connect(c_a_1_layer, spikedetector_c_a_1)
 
-#nest.Simulate(350.0)
+'''
+	NOTE: filtering of spike counts after a certain
+	time happens later and therefore only a portion
+	of sim time is counted.
+'''
 nest.Simulate(2000.0)
 
 '''
