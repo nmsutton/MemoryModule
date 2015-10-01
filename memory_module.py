@@ -11,6 +11,7 @@ http://f1000research.com/articles/3-104/v1
 import pylab
 import nest
 import math as math
+import numpy as np
 
 '''
 Create objects to run experiment with
@@ -26,9 +27,9 @@ spikedetector_c_a_1 = nest.Create("spike_detector", params={"withgid": True, "wi
 '''noise = nest.Create("poisson_generator", 2)
 nest.SetStatus(noise, [{"rate": 80000.0}, {"rate": 15000.0}])'''
 
-e_c_3_layer = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-160.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
-e_c_5_layer = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-180.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
-c_a_1_layer = nest.Create("izhikevich",100,{'V_m':-70.0,'I_e':-180.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
+e_c_3_layer = nest.Create("izhikevich",500,{'V_m':-70.0,'I_e':-160.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
+e_c_5_layer = nest.Create("izhikevich",500,{'V_m':-70.0,'I_e':-180.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
+c_a_1_layer = nest.Create("izhikevich",500,{'V_m':-70.0,'I_e':-180.0,'a':0.0012,'b':3.0,'c':-68.5,'d':10.0})
 
 '''
 Form connections between neurons and run sim
@@ -45,8 +46,10 @@ how is that processed in connections?
 '''
 syn_weight = 300.0
 
-def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
+def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight, neuron_range):
 	'''
+		neuron_range: min_index, max_index, total_neurons
+
 		Note: later uneven numbers of neurons in layers
 		could be added but for now using even.
 
@@ -65,10 +68,15 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 		occurs in any layer but the first.
 	'''
 
-	len_in_layer = len(input_layer)
-	len_out_layer = len(output_layer)
 	times_greater_ratio = math.ceil(fire_rate_ratio)
 	syn_dict = {"weight": syn_weight}
+	min_index = neuron_range[0]
+	max_index = neuron_range[1]
+	total_neurons = neuron_range[2]
+	total_range = range(math.floor((max_index-min_index)*total_neurons))
+	total_range = np.array(total_range) + math.floor(min_index*total_neurons)
+	len_in_layer = len(total_range)
+	#len_out_layer = len(output_layer)
 
 	for time_greater in range(times_greater_ratio):
 		adjusted_delay = 0.1 + (20.0 * time_greater)
@@ -78,13 +86,19 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight):
 
 		syn_dict = {"weight": syn_weight, "delay":adjusted_delay} 
 		for i in range(adjusted_conn_total):
-			nest.Connect([input_layer[i]], [output_layer[i]], "one_to_one", syn_dict)
+			#print(total_range[0])
+			#print(i)
+			n_i = total_range[i]
+			nest.Connect([input_layer[n_i]], [output_layer[n_i]], "one_to_one", syn_dict)
 
 #createSyn(e_c_3_layer,e_c_5_layer,0.928, syn_weight)
-createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight)
+#createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [1, 7, len(e_c_3_layer)])
+createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [0.0, 0.5, len(e_c_3_layer)])
+createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [0.50, 1.0, len(e_c_3_layer)])
 # 2.164/0.928=2.332
 #createSyn(e_c_5_layer,c_a_1_layer,2.332, syn_weight)
-createSyn(e_c_5_layer,c_a_1_layer,8.0, syn_weight)
+#createSyn(e_c_5_layer,c_a_1_layer,8.0, syn_weight, [1, 7, len(e_c_3_layer)])
+createSyn(e_c_5_layer,c_a_1_layer,8.0, syn_weight, [0.0, 1.0, len(e_c_3_layer)])
 
 nest.Connect(multimeter, e_c_3_layer)
 nest.Connect(multimeter2, c_a_1_layer)
