@@ -44,8 +44,8 @@ how is that processed in connections?
 '''
 	Synapses
 '''
-syn_weight = 50.0
-spike_time_incr = 10.0
+syn_weight = 500.0
+spike_time_incr = 40.0
 
 def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight, neuron_range):
 	'''
@@ -75,11 +75,11 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight, neuron_ran
 	max_index = neuron_range[1]
 	total_neurons = neuron_range[2]
 	total_range = range(math.floor((max_index-min_index)*total_neurons))
-	print(total_range[-1])
+	#print(total_range[-1])
 	total_range = np.array(total_range) + math.floor(min_index*total_neurons)
-	print(total_range[-1])
+	#print(total_range[-1])
 	len_in_layer = len(total_range)
-	print(len_in_layer)
+	#print(len_in_layer)
 	#len_out_layer = len(output_layer)
 
 	for time_greater in range(times_greater_ratio):
@@ -96,11 +96,22 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight, neuron_ran
 			n_i = total_range[i]
 			nest.Connect([input_layer[n_i]], [output_layer[n_i]], "one_to_one", syn_dict)
 
-'''createSyn(e_c_3_layer,e_c_5_layer,1.4917, syn_weight, [0.0, 0.233, len(e_c_3_layer)])
-createSyn(e_c_3_layer,e_c_5_layer,2.2081, syn_weight, [0.233, 0.567, len(e_c_3_layer)])
-createSyn(e_c_3_layer,e_c_5_layer,0.6152, syn_weight, [0.567, 0.667, len(e_c_3_layer)])
-createSyn(e_c_3_layer,e_c_5_layer,0.3024, syn_weight, [0.667, 1.0, len(e_c_3_layer)])'''
+syn_weight = 50.0
+createSyn(e_c_3_layer,e_c_5_layer,1.4917, 50.0, [0.0, 0.233, len(e_c_3_layer)])
+createSyn(e_c_3_layer,e_c_5_layer,2.2081, 80.0, [0.233, 0.567, len(e_c_3_layer)])
+##createSyn(e_c_3_layer,e_c_5_layer,2.2081, 80.0, [0.233, 0.367, len(e_c_3_layer)])
+##createSyn(e_c_3_layer,e_c_5_layer,2.2081, 80.0, [0.367, 0.567, len(e_c_3_layer)])
+createSyn(e_c_3_layer,e_c_5_layer,0.6152, 40.0, [0.567, 0.667, len(e_c_3_layer)])
+##createSyn(e_c_3_layer,e_c_5_layer,0.3024, 30.0, [0.667, 0.733, len(e_c_3_layer)])
+##createSyn(e_c_3_layer,e_c_5_layer,0.3024, 30.0, [0.733, 1.0, len(e_c_3_layer)])
+##createSyn(e_c_3_layer,e_c_5_layer,0.6152, 40.0, [0.567, 0.667, len(e_c_3_layer)])
+createSyn(e_c_3_layer,e_c_5_layer,0.3024, 30.0, [0.667, 1.0, len(e_c_3_layer)])
 
+createSyn(e_c_5_layer,c_a_1_layer,6.8897, 50.0, [0.0, 0.233, len(e_c_3_layer)])
+createSyn(e_c_5_layer,c_a_1_layer,4.6546, 35.0, [0.233, 0.367, len(e_c_3_layer)])
+createSyn(e_c_5_layer,c_a_1_layer,1.6016, 118.0, [0.367, 0.567, len(e_c_3_layer)])
+createSyn(e_c_5_layer,c_a_1_layer,5.7480, 38.0, [0.567, 0.733, len(e_c_3_layer)])
+createSyn(e_c_5_layer,c_a_1_layer,7.6722, 55.0, [0.733, 1.0, len(e_c_3_layer)])
 '''createSyn(e_c_5_layer,c_a_1_layer,6.8897, syn_weight, [0.0, 0.233, len(e_c_3_layer)])
 createSyn(e_c_5_layer,c_a_1_layer,4.6546, syn_weight, [0.233, 0.367, len(e_c_3_layer)])
 createSyn(e_c_5_layer,c_a_1_layer,1.6016, syn_weight, [0.367, 0.567, len(e_c_3_layer)])
@@ -109,13 +120,13 @@ createSyn(e_c_5_layer,c_a_1_layer,7.6722, syn_weight, [0.733, 1.0, len(e_c_3_lay
 
 #createSyn(e_c_3_layer,e_c_5_layer,0.928, syn_weight)
 #createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [1, 7, len(e_c_3_layer)])
-createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [0.0, 1.0, len(e_c_3_layer)])
+#createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [0.0, 1.0, len(e_c_3_layer)])
 #createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [0.0, 0.5, len(e_c_3_layer)])
 #createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [0.50, 1.0, len(e_c_3_layer)])
 # 2.164/0.928=2.332
 #createSyn(e_c_5_layer,c_a_1_layer,2.332, syn_weight)
 #createSyn(e_c_5_layer,c_a_1_layer,8.0, syn_weight, [1, 7, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,8.0, syn_weight, [0.0, 1.0, len(e_c_3_layer)])
+#createSyn(e_c_5_layer,c_a_1_layer,8.0, syn_weight, [0.0, 1.0, len(e_c_3_layer)])
 
 nest.Connect(multimeter, e_c_3_layer)
 nest.Connect(multimeter2, c_a_1_layer)
