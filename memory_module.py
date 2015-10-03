@@ -45,7 +45,7 @@ how is that processed in connections?
 	Synapses
 '''
 syn_weight = 500.0
-spike_time_incr = 10.0
+spike_time_incr = 5.0
 
 def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight, neuron_range):
 	'''
@@ -108,15 +108,15 @@ createSyn(e_c_3_layer,e_c_5_layer,0.3024, 30.0, [0.733, 1.0, len(e_c_3_layer)])#
 #createSyn(e_c_3_layer,e_c_5_layer,0.3024, 30.0, [0.667, 1.0, len(e_c_3_layer)])
 
 #createSyn(e_c_5_layer,c_a_1_layer,6.8897, 50.0, [0.0, 0.233, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,6.8897, 150.0, [0.0, 0.233, len(e_c_3_layer)])#
+createSyn(e_c_5_layer,c_a_1_layer,6.8897, 180.0, [0.0, 0.233, len(e_c_3_layer)])#
 #createSyn(e_c_5_layer,c_a_1_layer,4.6546, 35.0, [0.233, 0.367, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,4.6546, 140.0, [0.233, 0.367, len(e_c_3_layer)])#
+createSyn(e_c_5_layer,c_a_1_layer,4.6546, 170.0, [0.233, 0.367, len(e_c_3_layer)])#
 #createSyn(e_c_5_layer,c_a_1_layer,1.6016, 118.0, [0.367, 0.567, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,1.6016, 140.0, [0.367, 0.567, len(e_c_3_layer)])
+createSyn(e_c_5_layer,c_a_1_layer,1.6016, 170.0, [0.367, 0.567, len(e_c_3_layer)])#
 #createSyn(e_c_5_layer,c_a_1_layer,5.7480, 38.0, [0.567, 0.733, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,5.7480, 100.0, [0.567, 0.733, len(e_c_3_layer)])
+createSyn(e_c_5_layer,c_a_1_layer,5.7480, 100.0, [0.567, 0.733, len(e_c_3_layer)])#
 #createSyn(e_c_5_layer,c_a_1_layer,7.6722, 55.0, [0.733, 1.0, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,7.6722, 115.0, [0.733, 1.0, len(e_c_3_layer)])
+createSyn(e_c_5_layer,c_a_1_layer,7.6722, 115.0, [0.733, 1.0, len(e_c_3_layer)])#
 '''createSyn(e_c_5_layer,c_a_1_layer,6.8897, syn_weight, [0.0, 0.233, len(e_c_3_layer)])
 createSyn(e_c_5_layer,c_a_1_layer,4.6546, syn_weight, [0.233, 0.367, len(e_c_3_layer)])
 createSyn(e_c_5_layer,c_a_1_layer,1.6016, syn_weight, [0.367, 0.567, len(e_c_3_layer)])
