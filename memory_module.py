@@ -44,7 +44,7 @@ how is that processed in connections?
 '''
 	Synapses
 '''
-syn_weight = 500.0
+
 spike_time_incr = 5.0
 
 def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight, neuron_range):
@@ -96,42 +96,51 @@ def createSyn(input_layer, output_layer, fire_rate_ratio, syn_weight, neuron_ran
 			n_i = total_range[i]
 			nest.Connect([input_layer[n_i]], [output_layer[n_i]], "one_to_one", syn_dict)
 
-syn_weight = 50.0
-createSyn(e_c_3_layer,e_c_5_layer,1.4917, 50.0, [0.0, 0.233, len(e_c_3_layer)])#
-#createSyn(e_c_3_layer,e_c_5_layer,2.2081, 80.0, [0.233, 0.567, len(e_c_3_layer)])
-createSyn(e_c_3_layer,e_c_5_layer,2.2081, 80.0, [0.233, 0.367, len(e_c_3_layer)])#
-createSyn(e_c_3_layer,e_c_5_layer,2.2081, 80.0, [0.367, 0.567, len(e_c_3_layer)])#
-#createSyn(e_c_3_layer,e_c_5_layer,0.6152, 40.0, [0.567, 0.667, len(e_c_3_layer)])
-createSyn(e_c_3_layer,e_c_5_layer,0.6152, 40.0, [0.567, 0.667, len(e_c_3_layer)])#
-createSyn(e_c_3_layer,e_c_5_layer,0.3024, 30.0, [0.667, 0.733, len(e_c_3_layer)])#
-createSyn(e_c_3_layer,e_c_5_layer,0.3024, 30.0, [0.733, 1.0, len(e_c_3_layer)])#
-#createSyn(e_c_3_layer,e_c_5_layer,0.3024, 30.0, [0.667, 1.0, len(e_c_3_layer)])
+def eval_syn_weight(firing_ratio, initial_firing, region):
+	'''
+		Formula fitting tool used from here:
+		http://www.xuru.org/rt/MLR.asp
+	'''
+	if region == "ec3_to_ec5":
+		x1 = firing_ratio
+		x2 = initial_firing
+		w1 = 25.52143243
+		w2 = 1.057133539*(10**-2)
+		w3 = 25.75235337		
+		y = w1 * x1 + w2 * x2 + w3
+		return y	
+	elif region == "ec5_to_ca1":
+		x1 = firing_ratio
+		x2 = initial_firing
+		w1 = 5.128145363
+		w2 = 9.81585591*(10**-2)
+		w3 = 61.24183811
+		y = w1 * x1 + w2 * x2 + w3
+		return y
 
-#createSyn(e_c_5_layer,c_a_1_layer,6.8897, 50.0, [0.0, 0.233, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,6.8897, 180.0, [0.0, 0.233, len(e_c_3_layer)])#
-#createSyn(e_c_5_layer,c_a_1_layer,4.6546, 35.0, [0.233, 0.367, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,4.6546, 170.0, [0.233, 0.367, len(e_c_3_layer)])#
-#createSyn(e_c_5_layer,c_a_1_layer,1.6016, 118.0, [0.367, 0.567, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,1.6016, 170.0, [0.367, 0.567, len(e_c_3_layer)])#
-#createSyn(e_c_5_layer,c_a_1_layer,5.7480, 38.0, [0.567, 0.733, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,5.7480, 100.0, [0.567, 0.733, len(e_c_3_layer)])#
-#createSyn(e_c_5_layer,c_a_1_layer,7.6722, 55.0, [0.733, 1.0, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,7.6722, 115.0, [0.733, 1.0, len(e_c_3_layer)])#
-'''createSyn(e_c_5_layer,c_a_1_layer,6.8897, syn_weight, [0.0, 0.233, len(e_c_3_layer)])
+syn_weight = eval_syn_weight(1.4917, 582.5, "ec3_to_ec5")
+createSyn(e_c_3_layer,e_c_5_layer,1.4917, syn_weight, [0.0, 0.233, len(e_c_3_layer)])
+syn_weight = eval_syn_weight(2.2081, 332.5, "ec3_to_ec5")
+createSyn(e_c_3_layer,e_c_5_layer,2.2081, syn_weight, [0.233, 0.367, len(e_c_3_layer)])#
+syn_weight = eval_syn_weight(2.2081, 500, "ec3_to_ec5")
+createSyn(e_c_3_layer,e_c_5_layer,2.2081, syn_weight, [0.367, 0.567, len(e_c_3_layer)])#
+syn_weight = eval_syn_weight(0.6152, 250, "ec3_to_ec5")
+createSyn(e_c_3_layer,e_c_5_layer,0.6152, syn_weight, [0.567, 0.667, len(e_c_3_layer)])#
+syn_weight = eval_syn_weight(0.3024, 167.5, "ec3_to_ec5")
+createSyn(e_c_3_layer,e_c_5_layer,0.3024, syn_weight, [0.667, 0.733, len(e_c_3_layer)])#
+syn_weight = eval_syn_weight(0.3024, 667.5, "ec3_to_ec5")
+createSyn(e_c_3_layer,e_c_5_layer,0.3024, syn_weight, [0.733, 1.0, len(e_c_3_layer)])#
+
+syn_weight = eval_syn_weight(6.8897, 865, "ec5_to_ca1")
+createSyn(e_c_5_layer,c_a_1_layer,6.8897, syn_weight, [0.0, 0.233, len(e_c_3_layer)])
+syn_weight = eval_syn_weight(4.6546, 725, "ec5_to_ca1")
 createSyn(e_c_5_layer,c_a_1_layer,4.6546, syn_weight, [0.233, 0.367, len(e_c_3_layer)])
+syn_weight = eval_syn_weight(1.6016, 1090, "ec5_to_ca1")
 createSyn(e_c_5_layer,c_a_1_layer,1.6016, syn_weight, [0.367, 0.567, len(e_c_3_layer)])
+syn_weight = eval_syn_weight(5.7480, 195, "ec5_to_ca1")
 createSyn(e_c_5_layer,c_a_1_layer,5.7480, syn_weight, [0.567, 0.733, len(e_c_3_layer)])
-createSyn(e_c_5_layer,c_a_1_layer,7.6722, syn_weight, [0.733, 1.0, len(e_c_3_layer)])'''
-
-#createSyn(e_c_3_layer,e_c_5_layer,0.928, syn_weight)
-#createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [1, 7, len(e_c_3_layer)])
-#createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [0.0, 1.0, len(e_c_3_layer)])
-#createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [0.0, 0.5, len(e_c_3_layer)])
-#createSyn(e_c_3_layer,e_c_5_layer,0.3, syn_weight, [0.50, 1.0, len(e_c_3_layer)])
-# 2.164/0.928=2.332
-#createSyn(e_c_5_layer,c_a_1_layer,2.332, syn_weight)
-#createSyn(e_c_5_layer,c_a_1_layer,8.0, syn_weight, [1, 7, len(e_c_3_layer)])
-#createSyn(e_c_5_layer,c_a_1_layer,8.0, syn_weight, [0.0, 1.0, len(e_c_3_layer)])
+syn_weight = eval_syn_weight(7.6722, 200, "ec5_to_ca1")
+createSyn(e_c_5_layer,c_a_1_layer,7.6722, syn_weight, [0.733, 1.0, len(e_c_3_layer)])
 
 nest.Connect(multimeter, e_c_3_layer)
 nest.Connect(multimeter2, c_a_1_layer)
