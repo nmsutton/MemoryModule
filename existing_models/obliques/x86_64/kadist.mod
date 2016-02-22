@@ -1,1 +1,0 @@
-../kadist.mod

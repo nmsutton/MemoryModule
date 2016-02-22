@@ -1,1 +1,0 @@
-../netstims.mod
