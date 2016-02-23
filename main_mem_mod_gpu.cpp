@@ -101,11 +101,11 @@ int main(int argc, const char* argv[]) {
 
 	// random connection with 10% probability
 	//int c0=sim->connect(spike_gen, e_c_3_layer, "random", RangeWeight(0.005f), 0.1f, RangeDelay(1,10));
-	int c0=sim->connect(spike_gen, e_c_3_layer, "random", RangeWeight(0.005f), 1.0);
+	int c0=sim->connect(spike_gen, e_c_3_layer1, "random", RangeWeight(0.1f), 0.2);
 	//int c1=sim->connect(e_c_3_layer, e_c_5_layer, "random", RangeWeight(0.001f), 0.1f, RangeDelay(1,10));
-	int c1=sim->connect(e_c_3_layer, e_c_5_layer, "random", RangeWeight(0.005f), 0.0);
+	int c1=sim->connect(e_c_3_layer1, e_c_5_layer1, "random", RangeWeight(0.005f), 0.0);
 	//int c2=sim->connect(e_c_5_layer, c_a_1_layer, "random", RangeWeight(0.003f), 0.1f, RangeDelay(1,10));
-	int c2=sim->connect(e_c_5_layer, c_a_1_layer, "random", RangeWeight(0.005f), 0.0);
+	int c2=sim->connect(e_c_5_layer1, c_a_1_layer1, "random", RangeWeight(0.005f), 0.0);
 
 	sim->setConductances(false);
 
@@ -114,26 +114,31 @@ int main(int argc, const char* argv[]) {
 
 	sim->setupNetwork();
 
-	sim->setExternalCurrent(e_c_3_layer, -190.0);
-	sim->setExternalCurrent(e_c_5_layer, -190.0);
-	sim->setExternalCurrent(c_a_1_layer, -190.0);
+	sim->setExternalCurrent(e_c_3_layer1, -190.0);
+	sim->setExternalCurrent(e_c_5_layer1, -190.0);
+	sim->setExternalCurrent(c_a_1_layer1, -190.0);
 
 	SpikeMonitor* SpikeMonInput  = sim->setSpikeMonitor(spike_gen,"DEFAULT");
+	SpikeMonitor* SpikeMonInput2  = sim->setSpikeMonitor(e_c_3_layer1,"DEFAULT");
+	SpikeMonitor* SpikeMonInput3  = sim->setSpikeMonitor(e_c_5_layer1,"DEFAULT");
+	SpikeMonitor* SpikeMonInput4  = sim->setSpikeMonitor(c_a_1_layer1,"DEFAULT");
 
 	// accept firing rates within this range of target firing
-	double target_firing_e_c_3 = 3.6;//27.4;	// target firing rate for gec3
+	double target_firing_e_c_3_1 = 1.49;//27.4;	// target firing rate for gec3
 	double target_firing_e_c_5 = 2.6;//42.8;	// target firing rate for gec5
 	double target_firing_c_a_1 = 1.2;//42.8;	// target firing rate for gca1
 
 	// algorithm will terminate when at least one of the termination conditions is reached
 	double errorMarginHz = 0.015;	// error margin
-	int maxIter = 5;//100;				// max number of iterations
+	int maxIter = 30;//100;				// max number of iterations
+	double startingWeight = 0.6;
+	double stepSize = 0.0001;
 
 	// set up weight tuning from input -> EC3
-	SimpleWeightTuner swt_sg_to_ec3(sim, errorMarginHz, maxIter);
-	swt_sg_to_ec3.setConnectionToTune(c0, 0.0); // start at 0
-	swt_sg_to_ec3.setTargetFiringRate(e_c_3_layer, target_firing_e_c_3);
-
+	SimpleWeightTuner swt_sg_to_ec3(sim, errorMarginHz, maxIter, stepSize);
+	swt_sg_to_ec3.setConnectionToTune(c0, startingWeight); // start at 0
+	swt_sg_to_ec3.setTargetFiringRate(e_c_3_layer1, target_firing_e_c_3_1);
+/*
 	// set up weight tuning from EC3 -> EC5
 	SimpleWeightTuner swt_ec3_to_ec5(sim, errorMarginHz, maxIter);
 	swt_ec3_to_ec5.setConnectionToTune(c1, 0.0); // start at 0
@@ -143,16 +148,16 @@ int main(int argc, const char* argv[]) {
 	SimpleWeightTuner swt_ec5_to_ca1(sim, errorMarginHz, maxIter);
 	swt_ec5_to_ca1.setConnectionToTune(c2, 0.0); // start at 0
 	swt_ec5_to_ca1.setTargetFiringRate(c_a_1_layer, target_firing_c_a_1);
-
+*/
 
 	// ---------------- RUN STATE -------------------
 
-	/*printf("\nMemory module synaptic strength tuning\n");
+	printf("\nMemory module synaptic strength tuning\n");
 	printf("- Tune weights from spike generator to EC3\n");
 	while (!swt_sg_to_ec3.done()) {
 		swt_sg_to_ec3.iterate();
 	}
-
+/*
 	printf("- Tune weights from EC3 to EC5\n");
 		while (!swt_ec3_to_ec5.done()) {
 			swt_ec3_to_ec5.iterate();
@@ -163,8 +168,8 @@ int main(int argc, const char* argv[]) {
 			swt_ec5_to_ca1.iterate();
 	}*/
 
-	printf("\n- Verify result (gec3=%.4fHz, gec5=%.4fHz, gac1=%.4fHz, +/- %.4fHz)\n",
-			target_firing_e_c_3, target_firing_e_c_5, target_firing_c_a_1, errorMarginHz);
+	//printf("\n- Verify result (gec3=%.4fHz, gec5=%.4fHz, gac1=%.4fHz, +/- %.4fHz)\n",
+	//		target_firing_e_c_3, target_firing_e_c_5, target_firing_c_a_1, errorMarginHz);
 	sim->runNetwork(10,0);
 
 	delete sim;
