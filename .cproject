@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.base.376590228">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.376590228" moduleId="org.eclipse.cdt.core.settings" name="Default">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.base.376590228" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.376590228.1874192531" name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.948282793" name="cdt.managedbuild.toolchain.gnu.base" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.931206457" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="${workspace_loc:/MemModGPU}/mem_mod_gpu" id="cdt.managedbuild.target.gnu.builder.base.183932700" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.583646693" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1965890529" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.include.paths.1345937572" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/kernel/include"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/interface/include"/>
+									<listOptionValue builtIn="false" value="/usr/local/cuda-7.5/targets/x86_64-linux/include"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/spike_monitor"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/connection_monitor"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/group_monitor"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/server"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/spike_generators"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/simple_weight_tuner"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/offline_analysis_toolbox"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/stopwatch"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/visual_stimulus"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/eo_pti/include"/>
+									<listOptionValue builtIn="false" value="/opt/CARL/CARLsim/include/connection_monitor"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.784806642" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.996496703" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1961713310" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.709800265" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1715195578" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2136935363" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.1507680889" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1973512069" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.base.376590228.497121554">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.376590228.497121554" moduleId="org.eclipse.cdt.core.settings" name="CustomConfig">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.base.376590228.497121554" name="CustomConfig" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.376590228.497121554." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.534996465" name="cdt.managedbuild.toolchain.gnu.base" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.557455344" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder autoBuildTarget="all" cleanBuildTarget="clean" command="mem_mod_gpu/make" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="cdt.managedbuild.target.gnu.builder.base.1930428064" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1470355149" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1587169788" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.include.paths.616723507" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/kernel/include"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/interface/include"/>
+									<listOptionValue builtIn="false" value="/usr/local/cuda-7.5/targets/x86_64-linux/include"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/spike_monitor"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/connection_monitor"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/group_monitor"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/carlsim/server"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/spike_generators"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/simple_weight_tuner"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/offline_analysis_toolbox"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/stopwatch"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/visual_stimulus"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master/tools/eo_pti/include"/>
+									<listOptionValue builtIn="false" value="/opt/CARL/CARLsim/include/connection_monitor"/>
+									<listOptionValue builtIn="false" value="/CompNeuro/CARLsim-master"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.620980560" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.137557661" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.952270066" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.804709909" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1777621234" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1911633829" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.1634556048" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1690097457" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="MemModGPU.null.1979680778" name="MemModGPU"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.376590228;cdt.managedbuild.toolchain.gnu.base.376590228.1874192531;cdt.managedbuild.tool.gnu.c.compiler.base.996496703;cdt.managedbuild.tool.gnu.c.compiler.input.1961713310">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.376590228;cdt.managedbuild.toolchain.gnu.base.376590228.1874192531;cdt.managedbuild.tool.gnu.cpp.compiler.base.1965890529;cdt.managedbuild.tool.gnu.cpp.compiler.input.784806642">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/MemModGPU"/>
+		</configuration>
+	</storageModule>
+</cproject>
