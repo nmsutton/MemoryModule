@@ -50,29 +50,58 @@
 int main(int argc, const char* argv[]) {
 	// ---------------- CONFIG STATE -------------------
 	CARLsim *sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
+	int neuronsPerGroup = 500;
 
 	// input is a SpikeGenerator group that fires every 20 ms (50 Hz)
 	PeriodicSpikeGenerator PSG(1.15f);
-	int spike_gen=sim->createSpikeGeneratorGroup("sg", 500, EXCITATORY_NEURON);
+	int spike_gen=sim->createSpikeGeneratorGroup("sg", neuronsPerGroup, EXCITATORY_NEURON);
 	sim->setSpikeGenerator(spike_gen, &PSG);
 
 	//
-	int e_c_3_layer=sim->createGroup("ec3", 500, EXCITATORY_NEURON);
-	//sim->setNeuronParameters(e_c_3_layer, 0.0012f, 3.0f, -68.5f, 10.0f);
-	//sim->setNeuronParameters(e_c_3_layer, 0.1f, 0.2f, -65.0f, 2.0f); // FS
-	sim->setNeuronParameters(e_c_3_layer, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	int e_c_3_layer1=sim->createGroup("ec3_1", ceil(neuronsPerGroup*.233), EXCITATORY_NEURON);
+	int e_c_3_layer2=sim->createGroup("ec3_2", ceil(neuronsPerGroup*.133), EXCITATORY_NEURON);
+	int e_c_3_layer3=sim->createGroup("ec3_3", ceil(neuronsPerGroup*.2), EXCITATORY_NEURON);
+	int e_c_3_layer4=sim->createGroup("ec3_4", ceil(neuronsPerGroup*.1), EXCITATORY_NEURON);
+	int e_c_3_layer5=sim->createGroup("ec3_5", ceil(neuronsPerGroup*.067), EXCITATORY_NEURON);
+	int e_c_3_layer6=sim->createGroup("ec3_6", ceil(neuronsPerGroup*.267), EXCITATORY_NEURON);
+	sim->setNeuronParameters(e_c_3_layer1, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(e_c_3_layer2, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(e_c_3_layer3, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(e_c_3_layer4, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(e_c_3_layer5, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(e_c_3_layer6, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
 
 	//
-	int e_c_5_layer=sim->createGroup("ec5", 500, EXCITATORY_NEURON);
-	sim->setNeuronParameters(e_c_5_layer, 0.0012f, 3.0f, -68.5f, 10.0f);
+	int e_c_5_layer1=sim->createGroup("ec5_1", ceil(neuronsPerGroup*.233), EXCITATORY_NEURON);
+	int e_c_5_layer2=sim->createGroup("ec5_2", ceil(neuronsPerGroup*.133), EXCITATORY_NEURON);
+	int e_c_5_layer3=sim->createGroup("ec5_3", ceil(neuronsPerGroup*.2), EXCITATORY_NEURON);
+	int e_c_5_layer4=sim->createGroup("ec5_4", ceil(neuronsPerGroup*.1), EXCITATORY_NEURON);
+	int e_c_5_layer5=sim->createGroup("ec5_5", ceil(neuronsPerGroup*.067), EXCITATORY_NEURON);
+	int e_c_5_layer6=sim->createGroup("ec5_6", ceil(neuronsPerGroup*.267), EXCITATORY_NEURON);
+	sim->setNeuronParameters(e_c_5_layer1, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(e_c_5_layer2, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(e_c_5_layer3, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(e_c_5_layer4, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(e_c_5_layer5, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(e_c_5_layer6, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
 
 	//
-	int c_a_1_layer=sim->createGroup("ca1", 500, EXCITATORY_NEURON);
-	sim->setNeuronParameters(c_a_1_layer, 0.0012f, 3.0f, -68.5f, 10.0f);
+	int c_a_1_layer1=sim->createGroup("ca1_1", ceil(neuronsPerGroup*.233), EXCITATORY_NEURON);
+	int c_a_1_layer2=sim->createGroup("ca1_2", ceil(neuronsPerGroup*.133), EXCITATORY_NEURON);
+	int c_a_1_layer3=sim->createGroup("ca1_3", ceil(neuronsPerGroup*.2), EXCITATORY_NEURON);
+	int c_a_1_layer4=sim->createGroup("ca1_4", ceil(neuronsPerGroup*.1), EXCITATORY_NEURON);
+	int c_a_1_layer5=sim->createGroup("ca1_5", ceil(neuronsPerGroup*.067), EXCITATORY_NEURON);
+	int c_a_1_layer6=sim->createGroup("ca1_6", ceil(neuronsPerGroup*.267), EXCITATORY_NEURON);
+	sim->setNeuronParameters(c_a_1_layer1, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(c_a_1_layer2, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(c_a_1_layer3, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(c_a_1_layer4, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(c_a_1_layer5, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+	sim->setNeuronParameters(c_a_1_layer6, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
 
 	// random connection with 10% probability
 	//int c0=sim->connect(spike_gen, e_c_3_layer, "random", RangeWeight(0.005f), 0.1f, RangeDelay(1,10));
-	int c0=sim->connect(spike_gen, e_c_3_layer, "random", RangeWeight(0.005f), 0.0);
+	int c0=sim->connect(spike_gen, e_c_3_layer, "random", RangeWeight(0.005f), 1.0);
 	//int c1=sim->connect(e_c_3_layer, e_c_5_layer, "random", RangeWeight(0.001f), 0.1f, RangeDelay(1,10));
 	int c1=sim->connect(e_c_3_layer, e_c_5_layer, "random", RangeWeight(0.005f), 0.0);
 	//int c2=sim->connect(e_c_5_layer, c_a_1_layer, "random", RangeWeight(0.003f), 0.1f, RangeDelay(1,10));
