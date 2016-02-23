@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdtprojectproperties>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.IncludePaths">
+<language name="C Source File">
+
+</language>
+<language name="C++ Source File">
+<includepath>/CompNeuro/CARLsim-master/carlsim/kernel/include</includepath>
+<includepath>/CompNeuro/CARLsim-master/carlsim/interface/include</includepath>
+<includepath>/usr/local/cuda-7.5/targets/x86_64-linux/include</includepath>
+<includepath>/CompNeuro/CARLsim-master/carlsim/spike_monitor</includepath>
+<includepath>/CompNeuro/CARLsim-master/carlsim/connection_monitor</includepath>
+<includepath>/CompNeuro/CARLsim-master/carlsim/group_monitor</includepath>
+<includepath>/CompNeuro/CARLsim-master/carlsim/server</includepath>
+<includepath>/CompNeuro/CARLsim-master/tools/spike_generators</includepath>
+<includepath>/CompNeuro/CARLsim-master/tools/simple_weight_tuner</includepath>
+<includepath>/CompNeuro/CARLsim-master/tools/offline_analysis_toolbox</includepath>
+<includepath>/CompNeuro/CARLsim-master/tools/stopwatch</includepath>
+<includepath>/CompNeuro/CARLsim-master/tools/visual_stimulus</includepath>
+<includepath>/CompNeuro/CARLsim-master/tools/eo_pti/include</includepath>
+<includepath>/opt/CARL/CARLsim/include/connection_monitor</includepath>
+<includepath>/CompNeuro/CARLsim-master</includepath>
+
+</language>
+<language name="Object File">
+
+</language>
+<language name="Assembly Source File">
+
+</language>
+</section>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.Macros">
+<language name="C Source File">
+
+</language>
+<language name="C++ Source File">
+
+</language>
+<language name="Object File">
+
+</language>
+<language name="Assembly Source File">
+
+</language>
+</section>
+</cdtprojectproperties>

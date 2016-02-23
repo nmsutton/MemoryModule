@@ -1,0 +1,691 @@
+[INFO carlsim/kernel/src/snn_cpu.cpp:2029] *********************************************************************************
+[INFO carlsim/kernel/src/snn_cpu.cpp:2031] ********************      Welcome to CARLsim 3.0      ***************************
+[INFO carlsim/kernel/src/snn_cpu.cpp:2032] *********************************************************************************
+
+[INFO carlsim/kernel/src/snn_cpu.cpp:2034] ***************************** Configuring Network ********************************
+[INFO carlsim/kernel/src/snn_cpu.cpp:2036] Starting CARLsim simulation "MemModGPU" in USER mode
+[INFO carlsim/kernel/src/snn_cpu.cpp:2037] Random number seed: 42
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2043] Current local time and date: Tue Feb 23 14:56:28 2016
+
+[INFO carlsim/kernel/src/snn_gpu.cu:2905] CUDA devices Configuration:
+[INFO carlsim/kernel/src/snn_gpu.cu:2906]   - Number of CUDA devices          =         1
+[INFO carlsim/kernel/src/snn_gpu.cu:2909]   - CUDA device ID with max GFLOPs  =         0
+[INFO carlsim/kernel/src/snn_gpu.cu:2918]   - Use CUDA device[0]              = GeForce GTX 680
+[INFO carlsim/kernel/src/snn_gpu.cu:2919]   - CUDA Compute Capability (CC)    =       3.0
+
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:207] grp_Info[0, sg].numPostSynapses = 52, grp_Info[1, ec3_1].numPreSynapses = 158
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:215] CONNECT SETUP: connId=0, mulFast=1.000000, mulSlow=1.000000
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:207] grp_Info[1, ec3_1].numPostSynapses = 0, grp_Info[7, ec5_1].numPreSynapses = 0
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:215] CONNECT SETUP: connId=1, mulFast=1.000000, mulSlow=1.000000
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:207] grp_Info[7, ec5_1].numPostSynapses = 0, grp_Info[13, ca1_1].numPreSynapses = 0
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:215] CONNECT SETUP: connId=2, mulFast=1.000000, mulSlow=1.000000
+[INFO carlsim/kernel/src/snn_cpu.cpp:467] Running CUBA mode (all synaptic conductances disabled)
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4438] Beginning reorganization of network....
+[INFO carlsim/kernel/src/snn_cpu.cpp:2474] 
+
+[INFO carlsim/kernel/src/snn_cpu.cpp:2475] ***************************** Setting up Network **********************************
+[INFO carlsim/kernel/src/snn_cpu.cpp:2477] numN = 2006, numPostSynapses = 52, numPreSynapses = 158, maxDelay = 1
+[INFO carlsim/kernel/src/snn_cpu.cpp:2306] allocated nSpikeCnt
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 1(ec3_1), St=0, End=116
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 2(ec3_2), St=117, End=183
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 3(ec3_3), St=184, End=283
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 4(ec3_4), St=284, End=333
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 5(ec3_5), St=334, End=367
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 6(ec3_6), St=368, End=501
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 7(ec5_1), St=502, End=618
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 8(ec5_2), St=619, End=685
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 9(ec5_3), St=686, End=785
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 10(ec5_4), St=786, End=835
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 11(ec5_5), St=836, End=869
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 12(ec5_6), St=870, End=1003
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 13(ca1_1), St=1004, End=1120
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 14(ca1_2), St=1121, End=1187
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 15(ca1_3), St=1188, End=1287
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 16(ca1_4), St=1288, End=1337
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 17(ca1_5), St=1338, End=1371
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2434] Allocation for 18(ca1_6), St=1372, End=1505
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2666] Allocation for 0(sg), St=1506, End=2005
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group sg(0): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =      500
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =     1506
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =     2005
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =       52
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:304]   - Refractory period          =  0.00000
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec3_1(1): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =      117
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      116
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =      158
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec3_2(2): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =       67
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      117
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      183
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec3_3(3): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =      100
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      184
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      283
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec3_4(4): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =       50
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      284
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      333
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec3_5(5): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =       34
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      334
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      367
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec3_6(6): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =      134
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      368
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      501
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec5_1(7): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =      117
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      502
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      618
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec5_2(8): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =       67
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      619
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      685
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec5_3(9): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =      100
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      686
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      785
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec5_4(10): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =       50
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      786
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      835
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec5_5(11): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =       34
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      836
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =      869
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ec5_6(12): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =      134
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =      870
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =     1003
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ca1_1(13): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =      117
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =     1004
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =     1120
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ca1_2(14): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =       67
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =     1121
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =     1187
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ca1_3(15): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =      100
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =     1188
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =     1287
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ca1_4(16): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =       50
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =     1288
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =     1337
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ca1_5(17): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =       34
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =     1338
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =     1371
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:288] Group ca1_6(18): 
+[INFO carlsim/kernel/src/print_snn_info.cpp:291]   - Type                       =    EXCIT
+[INFO carlsim/kernel/src/print_snn_info.cpp:292]   - Size                       =      134
+[INFO carlsim/kernel/src/print_snn_info.cpp:293]   - Start Id                   =     1372
+[INFO carlsim/kernel/src/print_snn_info.cpp:294]   - End Id                     =     1505
+[INFO carlsim/kernel/src/print_snn_info.cpp:295]   - numPostSynapses            =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:296]   - numPreSynapses             =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:270] Connection ID 2: ec5_1(7) => ca1_1(13)
+[INFO carlsim/kernel/src/print_snn_info.cpp:271]   - Type                       =    FIXED
+[INFO carlsim/kernel/src/print_snn_info.cpp:272]   - Min weight                 =  0.00000
+[INFO carlsim/kernel/src/print_snn_info.cpp:273]   - Max weight                 =  0.00500
+[INFO carlsim/kernel/src/print_snn_info.cpp:274]   - Initial weight             =  0.00500
+[INFO carlsim/kernel/src/print_snn_info.cpp:275]   - Min delay                  =        1
+[INFO carlsim/kernel/src/print_snn_info.cpp:276]   - Max delay                  =        1
+[INFO carlsim/kernel/src/print_snn_info.cpp:277]   - Radius X                   =    -1.00
+[INFO carlsim/kernel/src/print_snn_info.cpp:278]   - Radius Y                   =    -1.00
+[INFO carlsim/kernel/src/print_snn_info.cpp:279]   - Radius Z                   =    -1.00
+[INFO carlsim/kernel/src/print_snn_info.cpp:283]   - Avg numPreSynapses         =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:284]   - Avg numPostSynapses        =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:270] Connection ID 1: ec3_1(1) => ec5_1(7)
+[INFO carlsim/kernel/src/print_snn_info.cpp:271]   - Type                       =    FIXED
+[INFO carlsim/kernel/src/print_snn_info.cpp:272]   - Min weight                 =  0.00000
+[INFO carlsim/kernel/src/print_snn_info.cpp:273]   - Max weight                 =  0.00500
+[INFO carlsim/kernel/src/print_snn_info.cpp:274]   - Initial weight             =  0.00500
+[INFO carlsim/kernel/src/print_snn_info.cpp:275]   - Min delay                  =        1
+[INFO carlsim/kernel/src/print_snn_info.cpp:276]   - Max delay                  =        1
+[INFO carlsim/kernel/src/print_snn_info.cpp:277]   - Radius X                   =    -1.00
+[INFO carlsim/kernel/src/print_snn_info.cpp:278]   - Radius Y                   =    -1.00
+[INFO carlsim/kernel/src/print_snn_info.cpp:279]   - Radius Z                   =    -1.00
+[INFO carlsim/kernel/src/print_snn_info.cpp:283]   - Avg numPreSynapses         =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:284]   - Avg numPostSynapses        =        0
+[INFO carlsim/kernel/src/print_snn_info.cpp:270] Connection ID 0: sg(0) => ec3_1(1)
+[INFO carlsim/kernel/src/print_snn_info.cpp:271]   - Type                       =    FIXED
+[INFO carlsim/kernel/src/print_snn_info.cpp:272]   - Min weight                 =  0.00000
+[INFO carlsim/kernel/src/print_snn_info.cpp:273]   - Max weight                 =  0.10000
+[INFO carlsim/kernel/src/print_snn_info.cpp:274]   - Initial weight             =  0.10000
+[INFO carlsim/kernel/src/print_snn_info.cpp:275]   - Min delay                  =        1
+[INFO carlsim/kernel/src/print_snn_info.cpp:276]   - Max delay                  =        1
+[INFO carlsim/kernel/src/print_snn_info.cpp:277]   - Radius X                   =    -1.00
+[INFO carlsim/kernel/src/print_snn_info.cpp:278]   - Radius Y                   =    -1.00
+[INFO carlsim/kernel/src/print_snn_info.cpp:279]   - Radius Z                   =    -1.00
+[INFO carlsim/kernel/src/print_snn_info.cpp:283]   - Avg numPreSynapses         =      100
+[INFO carlsim/kernel/src/print_snn_info.cpp:284]   - Avg numPostSynapses        =       23
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2746] ******************
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2747] CompactConnection: 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2748] ******************
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2749] old_postCnt = 26000, new_postCnt = 11728
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2750] old_preCnt = 18486,  new_postCnt = 11728
+[DEBUG carlsim/kernel/src/print_snn_info.cpp:66] checkNetworkBuilt()
+[DEBUG carlsim/kernel/src/print_snn_info.cpp:67] Network not yet elaborated and built...
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 0:sg s=1506 e=2005 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 0:sg s=1506 e=2005  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 1:ec3_1 s=0 e=116 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 1:ec3_1 s=0 e=116  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4898] 	0 (sg) start=0, type=F maxWts = 0.100000 (**)
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 2:ec3_2 s=117 e=183 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 2:ec3_2 s=117 e=183  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 3:ec3_3 s=184 e=283 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 3:ec3_3 s=184 e=283  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 4:ec3_4 s=284 e=333 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 4:ec3_4 s=284 e=333  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 5:ec3_5 s=334 e=367 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 5:ec3_5 s=334 e=367  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 6:ec3_6 s=368 e=501 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 6:ec3_6 s=368 e=501  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 7:ec5_1 s=502 e=618 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 7:ec5_1 s=502 e=618  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 8:ec5_2 s=619 e=685 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 8:ec5_2 s=619 e=685  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 9:ec5_3 s=686 e=785 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 9:ec5_3 s=686 e=785  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 10:ec5_4 s=786 e=835 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 10:ec5_4 s=786 e=835  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 11:ec5_5 s=836 e=869 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 11:ec5_5 s=836 e=869  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 12:ec5_6 s=870 e=1003 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 12:ec5_6 s=870 e=1003  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 13:ca1_1 s=1004 e=1120 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 13:ca1_1 s=1004 e=1120  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 14:ca1_2 s=1121 e=1187 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 14:ca1_2 s=1121 e=1187  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 15:ca1_3 s=1188 e=1287 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 15:ca1_3 s=1188 e=1287  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 16:ca1_4 s=1288 e=1337 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 16:ca1_4 s=1288 e=1337  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 17:ca1_5 s=1338 e=1371 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 17:ca1_5 s=1338 e=1371  
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4859] Grp: 18:ca1_6 s=1372 e=1505 
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:4861] Grp: 18:ca1_6 s=1372 e=1505  
+[INFO carlsim/kernel/src/snn_cpu.cpp:4473] 
+[INFO carlsim/kernel/src/snn_cpu.cpp:4475] *****************      Initializing GPU Simulation      *************************
+[INFO carlsim/kernel/src/snn_gpu.cu:2991] GPU Memory Management: (Total 3.999 GB)
+[INFO carlsim/kernel/src/snn_gpu.cu:2992] Data			Size		Total Used	Total Available
+[INFO carlsim/kernel/src/snn_gpu.cu:2994] Init:			3.999 GB	0.716 GB	3.283 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3001] Ntw Params:		0.000 GB	0.716 GB	3.283 GB
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 500, Total Buffer Cnt = 4, Buffer Cnt = 4
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 117, Total Buffer Cnt = 5, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 67, Total Buffer Cnt = 6, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 100, Total Buffer Cnt = 7, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 50, Total Buffer Cnt = 8, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 34, Total Buffer Cnt = 9, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 134, Total Buffer Cnt = 11, Buffer Cnt = 2
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 117, Total Buffer Cnt = 12, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 67, Total Buffer Cnt = 13, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 100, Total Buffer Cnt = 14, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 50, Total Buffer Cnt = 15, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 34, Total Buffer Cnt = 16, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 134, Total Buffer Cnt = 18, Buffer Cnt = 2
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 117, Total Buffer Cnt = 19, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 67, Total Buffer Cnt = 20, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 100, Total Buffer Cnt = 21, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 50, Total Buffer Cnt = 22, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 34, Total Buffer Cnt = 23, Buffer Cnt = 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 134, Total Buffer Cnt = 25, Buffer Cnt = 2
+[DEBUG carlsim/kernel/src/snn_gpu.cu:285] STATIC THREAD ALLOCATION
+[DEBUG carlsim/kernel/src/snn_gpu.cu:286] ------------------------
+[DEBUG carlsim/kernel/src/snn_gpu.cu:287] Buffer Size = 128, Buffer Count = 25
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 0. Start=1506, size=128 grpId=0:sg (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 1. Start=1634, size=128 grpId=0:sg (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 2. Start=1762, size=128 grpId=0:sg (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 3. Start=1890, size=116 grpId=0:sg (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 4. Start=0, size=117 grpId=1:ec3_1 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 5. Start=117, size=67 grpId=2:ec3_2 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 6. Start=184, size=100 grpId=3:ec3_3 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 7. Start=284, size=50 grpId=4:ec3_4 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 8. Start=334, size=34 grpId=5:ec3_5 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 9. Start=368, size=128 grpId=6:ec3_6 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 10. Start=496, size=6 grpId=6:ec3_6 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 11. Start=502, size=117 grpId=7:ec5_1 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 12. Start=619, size=67 grpId=8:ec5_2 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 13. Start=686, size=100 grpId=9:ec5_3 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 14. Start=786, size=50 grpId=10:ec5_4 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 15. Start=836, size=34 grpId=11:ec5_5 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 16. Start=870, size=128 grpId=12:ec5_6 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 17. Start=998, size=6 grpId=12:ec5_6 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 18. Start=1004, size=117 grpId=13:ca1_1 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 19. Start=1121, size=67 grpId=14:ca1_2 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 20. Start=1188, size=100 grpId=15:ca1_3 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 21. Start=1288, size=50 grpId=16:ca1_4 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 22. Start=1338, size=34 grpId=17:ca1_5 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 23. Start=1372, size=128 grpId=18:ca1_6 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:311] 24. Start=1500, size=6 grpId=18:ca1_6 (SpikeMonId=-1) (GroupMonId=-1)
+[DEBUG carlsim/kernel/src/snn_gpu.cu:319] GPU loadBufferSize = 128, GPU loadBufferCount = 25
+[INFO carlsim/kernel/src/snn_gpu.cu:3008] Static Load:		0.001 GB	0.717 GB	3.282 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3014] Group Id:		0.000 GB	0.717 GB	3.282 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3030] Conn Info:		0.003 GB	0.720 GB	3.279 GB
+[DEBUG carlsim/kernel/src/snn_gpu.cu:2820] copyExternalCurrent: grpId=-1, ptrPos=0, length=1506, allocate=y
+[INFO carlsim/kernel/src/snn_gpu.cu:3045] State Info:		0.008 GB	0.728 GB	3.271 GB
+
+
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3084] Transfering group settings to GPU:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group sg:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 7
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 500
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 52
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is set
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is set
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec3_1:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 117
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 158
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec3_2:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 67
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec3_3:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 100
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec3_4:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 50
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec3_5:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 34
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec3_6:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 134
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec5_1:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 117
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec5_2:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 67
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec5_3:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 100
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec5_4:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 50
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec5_5:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 34
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ec5_6:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 134
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ca1_1:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 117
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ca1_2:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 67
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ca1_3:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 100
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ca1_4:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 50
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ca1_5:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 34
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3086] Settings for Group ca1_6:
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3088] 	Type: 6
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3089] 	SizeN: 134
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3090] 	MaxFiringRate: 1000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3091] 	RefractPeriod: 0.000000
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3092] 	M: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3093] 	PreM: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3094] 	spikeGenerator: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3095] 	FixedInputWts: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3096] 	MaxDelay: 1
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3097] 	WithSTDP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3114] 	WithSTP: 0
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3120] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3121] 	spikeMonitorRT: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:3125] 	spikeGen: Is Null
+[DEBUG carlsim/kernel/src/snn_gpu.cu:2820] copyExternalCurrent: grpId=1, ptrPos=0, length=117, allocate=n
+[DEBUG carlsim/kernel/src/snn_gpu.cu:2820] copyExternalCurrent: grpId=7, ptrPos=502, length=117, allocate=n
+[DEBUG carlsim/kernel/src/snn_gpu.cu:2820] copyExternalCurrent: grpId=13, ptrPos=1004, length=117, allocate=n
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 0 (sg)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 1 (ec3_1)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 7 (ec5_1)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 13 (ca1_1)
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=0ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.500000,true): updated weight ranges to [0.000000,0.600000]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000010,true): updated weight ranges to [0.000000,0.600010]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000010,true): updated weight ranges to [0.000000,0.600020]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000010,true): updated weight ranges to [0.000000,0.600030]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000010,true): updated weight ranges to [0.000000,0.600040]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000010,true): updated weight ranges to [0.000000,0.600050]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000010,true): updated weight ranges to [0.000000,0.600060]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000002,true): updated weight ranges to [0.000000,0.600063]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000002,true): updated weight ranges to [0.000000,0.600065]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000002,true): updated weight ranges to [0.000000,0.600068]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000002,true): updated weight ranges to [0.000000,0.600070]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000001,true): updated weight ranges to [0.000000,0.600071]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000001,true): updated weight ranges to [0.000000,0.600071]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000001,true): updated weight ranges to [0.000000,0.600072]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000000,true): updated weight ranges to [0.000000,0.600072]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000000,true): updated weight ranges to [0.000000,0.600072]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000000,true): updated weight ranges to [0.000000,0.600072]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000000,true): updated weight ranges to [0.000000,0.600072]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000000,true): updated weight ranges to [0.000000,0.600073]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(0,0.000000,true): updated weight ranges to [0.000000,0.600073]
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=n, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=10000ms, printRunSummary=y, copyState=n
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=40.000s) SpikeMonitor for group sg(0) has 6000 spikes in 40000ms (0.30 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=40.000s) SpikeMonitor for group ec3_1(1) has 1404 spikes in 40000ms (0.30 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=40.000s) SpikeMonitor for group ec5_1(7) has 0 spikes in 40000ms (0.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=40.000s) SpikeMonitor for group ca1_1(13) has 0 spikes in 40000ms (0.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/snn_cpu.cpp:3008] 
+
+[INFO carlsim/kernel/src/snn_cpu.cpp:3010] ********************      GPU Simulation Summary      ***************************
+[INFO carlsim/kernel/src/snn_cpu.cpp:3013] Network Parameters: 	numNeurons = 2006 (numNExcReg:numNInhReg = 75.1:0.0)
+[INFO carlsim/kernel/src/snn_cpu.cpp:3014] 			numSynapses = 11728
+[INFO carlsim/kernel/src/snn_cpu.cpp:3015] 			maxDelay = 1
+[INFO carlsim/kernel/src/snn_cpu.cpp:3016] Simulation Mode:	CUBA
+[INFO carlsim/kernel/src/snn_cpu.cpp:3017] Random Seed:		42
+[INFO carlsim/kernel/src/snn_cpu.cpp:3018] Timing:			Model Simulation Time = 40 sec
+[INFO carlsim/kernel/src/snn_cpu.cpp:3019] 			Actual Execution Time = 3.23 sec
+[INFO carlsim/kernel/src/snn_cpu.cpp:3020] Average Firing Rate:	2+ms delay = 0.000 Hz
+[INFO carlsim/kernel/src/snn_cpu.cpp:3021] 			1ms delay = inf Hz
+[INFO carlsim/kernel/src/snn_cpu.cpp:3022] 			Overall = 13.543 Hz
+[INFO carlsim/kernel/src/snn_cpu.cpp:3023] Overall Firing Count:	2+ms delay = 0
+[INFO carlsim/kernel/src/snn_cpu.cpp:3024] 			1ms delay = 1086663
+[INFO carlsim/kernel/src/snn_cpu.cpp:3025] 			Total = 1086663
+[INFO carlsim/kernel/src/snn_cpu.cpp:3026] *********************************************************************************
+
