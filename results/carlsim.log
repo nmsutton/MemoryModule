@@ -5,7 +5,7 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:2034] ***************************** Configuring Network ********************************
 [INFO carlsim/kernel/src/snn_cpu.cpp:2036] Starting CARLsim simulation "MemModGPU" in USER mode
 [INFO carlsim/kernel/src/snn_cpu.cpp:2037] Random number seed: 42
-[DEBUG carlsim/kernel/src/snn_cpu.cpp:2043] Current local time and date: Mon Feb 22 21:37:13 2016
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2043] Current local time and date: Mon Feb 22 21:48:02 2016
 
 [INFO carlsim/kernel/src/snn_gpu.cu:2905] CUDA devices Configuration:
 [INFO carlsim/kernel/src/snn_gpu.cu:2906]   - Number of CUDA devices          =         1
@@ -114,8 +114,8 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:4475] *****************      Initializing GPU Simulation      *************************
 [INFO carlsim/kernel/src/snn_gpu.cu:2991] GPU Memory Management: (Total 3.999 GB)
 [INFO carlsim/kernel/src/snn_gpu.cu:2992] Data			Size		Total Used	Total Available
-[INFO carlsim/kernel/src/snn_gpu.cu:2994] Init:			3.999 GB	0.930 GB	3.069 GB
-[INFO carlsim/kernel/src/snn_gpu.cu:3001] Ntw Params:		0.000 GB	0.930 GB	3.069 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:2994] Init:			3.999 GB	0.924 GB	3.075 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3001] Ntw Params:		0.000 GB	0.924 GB	3.075 GB
 [DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 500, Total Buffer Cnt = 4, Buffer Cnt = 4
 [DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 500, Total Buffer Cnt = 8, Buffer Cnt = 4
 [DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 500, Total Buffer Cnt = 12, Buffer Cnt = 4
@@ -140,11 +140,11 @@
 [DEBUG carlsim/kernel/src/snn_gpu.cu:311] 14. Start=1256, size=128 grpId=3:ca1 (SpikeMonId=-1) (GroupMonId=-1)
 [DEBUG carlsim/kernel/src/snn_gpu.cu:311] 15. Start=1384, size=116 grpId=3:ca1 (SpikeMonId=-1) (GroupMonId=-1)
 [DEBUG carlsim/kernel/src/snn_gpu.cu:319] GPU loadBufferSize = 128, GPU loadBufferCount = 16
-[INFO carlsim/kernel/src/snn_gpu.cu:3008] Static Load:		0.001 GB	0.931 GB	3.068 GB
-[INFO carlsim/kernel/src/snn_gpu.cu:3014] Group Id:		0.000 GB	0.931 GB	3.068 GB
-[INFO carlsim/kernel/src/snn_gpu.cu:3030] Conn Info:		0.002 GB	0.933 GB	3.066 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3008] Static Load:		0.001 GB	0.925 GB	3.074 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3014] Group Id:		0.000 GB	0.925 GB	3.074 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3030] Conn Info:		0.002 GB	0.927 GB	3.072 GB
 [DEBUG carlsim/kernel/src/snn_gpu.cu:2820] copyExternalCurrent: grpId=-1, ptrPos=0, length=1500, allocate=y
-[INFO carlsim/kernel/src/snn_gpu.cu:3045] State Info:		0.008 GB	0.940 GB	3.059 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3045] State Info:		0.008 GB	0.934 GB	3.065 GB
 
 
 [DEBUG carlsim/kernel/src/snn_gpu.cu:3084] Transfering group settings to GPU:
@@ -232,7 +232,7 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:3016] Simulation Mode:	CUBA
 [INFO carlsim/kernel/src/snn_cpu.cpp:3017] Random Seed:		42
 [INFO carlsim/kernel/src/snn_cpu.cpp:3018] Timing:			Model Simulation Time = 10 sec
-[INFO carlsim/kernel/src/snn_cpu.cpp:3019] 			Actual Execution Time = 0.77 sec
+[INFO carlsim/kernel/src/snn_cpu.cpp:3019] 			Actual Execution Time = 0.78 sec
 [INFO carlsim/kernel/src/snn_cpu.cpp:3020] Average Firing Rate:	2+ms delay = 0.000 Hz
 [INFO carlsim/kernel/src/snn_cpu.cpp:3021] 			1ms delay = inf Hz
 [INFO carlsim/kernel/src/snn_cpu.cpp:3022] 			Overall = 0.300 Hz
