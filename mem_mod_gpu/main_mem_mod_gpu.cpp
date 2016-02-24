@@ -101,7 +101,7 @@ int main(int argc, const char* argv[]) {
 
 	// random connection with 10% probability
 	//int c0=sim->connect(spike_gen, e_c_3_layer, "random", RangeWeight(0.005f), 0.1f, RangeDelay(1,10));
-	int c0=sim->connect(spike_gen, e_c_3_layer1, "random", RangeWeight(0.1f), 0.2);
+	int c0=sim->connect(spike_gen, e_c_3_layer1, "random", RangeWeight(0.5f), 0.7);
 	//int c1=sim->connect(e_c_3_layer, e_c_5_layer, "random", RangeWeight(0.001f), 0.1f, RangeDelay(1,10));
 	int c1=sim->connect(e_c_3_layer1, e_c_5_layer1, "random", RangeWeight(0.005f), 0.0);
 	//int c2=sim->connect(e_c_5_layer, c_a_1_layer, "random", RangeWeight(0.003f), 0.1f, RangeDelay(1,10));
@@ -122,6 +122,7 @@ int main(int argc, const char* argv[]) {
 	SpikeMonitor* SpikeMonInput2  = sim->setSpikeMonitor(e_c_3_layer1,"DEFAULT");
 	SpikeMonitor* SpikeMonInput3  = sim->setSpikeMonitor(e_c_5_layer1,"DEFAULT");
 	SpikeMonitor* SpikeMonInput4  = sim->setSpikeMonitor(c_a_1_layer1,"DEFAULT");
+	//sim->setConnectionMonitor(spike_gen, e_c_3_layer1, "DEFAULT");
 
 	// accept firing rates within this range of target firing
 	double target_firing_e_c_3_1 = 1.49;//27.4;	// target firing rate for gec3
@@ -131,12 +132,12 @@ int main(int argc, const char* argv[]) {
 	// algorithm will terminate when at least one of the termination conditions is reached
 	double errorMarginHz = 0.015;	// error margin
 	int maxIter = 30;//100;				// max number of iterations
-	double startingWeight = 0.6;
-	double stepSize = 0.0001;
+	double startingWeight = 0.05;
+	double stepSize = 1.0;
 
 	// set up weight tuning from input -> EC3
 	SimpleWeightTuner swt_sg_to_ec3(sim, errorMarginHz, maxIter, stepSize);
-	swt_sg_to_ec3.setConnectionToTune(c0, startingWeight); // start at 0
+	swt_sg_to_ec3.setConnectionToTune(c0, startingWeight, true); // start at 0
 	swt_sg_to_ec3.setTargetFiringRate(e_c_3_layer1, target_firing_e_c_3_1);
 /*
 	// set up weight tuning from EC3 -> EC5
@@ -151,12 +152,13 @@ int main(int argc, const char* argv[]) {
 */
 
 	// ---------------- RUN STATE -------------------
-
+/*
 	printf("\nMemory module synaptic strength tuning\n");
 	printf("- Tune weights from spike generator to EC3\n");
 	while (!swt_sg_to_ec3.done()) {
 		swt_sg_to_ec3.iterate();
 	}
+	*/
 /*
 	printf("- Tune weights from EC3 to EC5\n");
 		while (!swt_ec3_to_ec5.done()) {
@@ -170,6 +172,23 @@ int main(int argc, const char* argv[]) {
 
 	//printf("\n- Verify result (gec3=%.4fHz, gec5=%.4fHz, gac1=%.4fHz, +/- %.4fHz)\n",
 	//		target_firing_e_c_3, target_firing_e_c_5, target_firing_c_a_1, errorMarginHz);
+	double step_size = 1.0;
+	sim->runNetwork(5,0);
+	sim->biasWeights(e_c_3_layer1, step_size, false);
+	sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
+	sim->scaleWeights(c0, 0.07, false);
+	sim->runNetwork(5,0);
+	sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
+	sim->scaleWeights(c0, 0.9, false);
+	sim->runNetwork(5,0);
+	sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
+	sim->scaleWeights(c0, 2.0, false);
+	sim->runNetwork(5,0);
+	sim->setWeight(c0, spike_gen, e_c_3_layer1, 3.8, false);
+	sim->scaleWeights(c0, 0.8, false);
+	sim->runNetwork(5,0);
+	sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
+	sim->scaleWeights(c0, 2.0, false);
 	sim->runNetwork(10,0);
 
 	delete sim;
