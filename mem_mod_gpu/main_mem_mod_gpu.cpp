@@ -50,10 +50,10 @@
 int main(int argc, const char* argv[]) {
 	// ---------------- CONFIG STATE -------------------
 	CARLsim *sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
-	int neuronsPerGroup = 500;
+	int neuronsPerGroup = 2146;//500;
 
 	// input is a SpikeGenerator group that fires every 20 ms (50 Hz)
-	PeriodicSpikeGenerator PSG(1.15f);
+	PeriodicSpikeGenerator PSG(0.01f);//1.15f);
 	int spike_gen=sim->createSpikeGeneratorGroup("sg", neuronsPerGroup, EXCITATORY_NEURON);
 	sim->setSpikeGenerator(spike_gen, &PSG);
 
@@ -101,9 +101,9 @@ int main(int argc, const char* argv[]) {
 
 	// random connection with 10% probability
 	//int c0=sim->connect(spike_gen, e_c_3_layer, "random", RangeWeight(0.005f), 0.1f, RangeDelay(1,10));
-	int c0=sim->connect(spike_gen, e_c_3_layer1, "random", RangeWeight(0.5f), 0.7);
+	int c0=sim->connect(spike_gen, e_c_3_layer1, "random", RangeWeight(0.5f), 0.0);
 	//int c1=sim->connect(e_c_3_layer, e_c_5_layer, "random", RangeWeight(0.001f), 0.1f, RangeDelay(1,10));
-	int c1=sim->connect(e_c_3_layer1, e_c_5_layer1, "random", RangeWeight(0.005f), 0.0);
+	int c1=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", RangeWeight(10.0f), 1.0);
 	//int c2=sim->connect(e_c_5_layer, c_a_1_layer, "random", RangeWeight(0.003f), 0.1f, RangeDelay(1,10));
 	int c2=sim->connect(e_c_5_layer1, c_a_1_layer1, "random", RangeWeight(0.005f), 0.0);
 
@@ -114,8 +114,8 @@ int main(int argc, const char* argv[]) {
 
 	sim->setupNetwork();
 
-	sim->setExternalCurrent(e_c_3_layer1, -190.0);
-	sim->setExternalCurrent(e_c_5_layer1, -190.0);
+	sim->setExternalCurrent(e_c_3_layer1, -160.0);
+	sim->setExternalCurrent(e_c_5_layer1, -180.0);
 	sim->setExternalCurrent(c_a_1_layer1, -190.0);
 
 	SpikeMonitor* SpikeMonInput  = sim->setSpikeMonitor(spike_gen,"DEFAULT");
@@ -136,9 +136,11 @@ int main(int argc, const char* argv[]) {
 	double stepSize = 1.0;
 
 	// set up weight tuning from input -> EC3
+/*
 	SimpleWeightTuner swt_sg_to_ec3(sim, errorMarginHz, maxIter, stepSize);
 	swt_sg_to_ec3.setConnectionToTune(c0, startingWeight, true); // start at 0
 	swt_sg_to_ec3.setTargetFiringRate(e_c_3_layer1, target_firing_e_c_3_1);
+*/
 /*
 	// set up weight tuning from EC3 -> EC5
 	SimpleWeightTuner swt_ec3_to_ec5(sim, errorMarginHz, maxIter);
@@ -172,24 +174,25 @@ int main(int argc, const char* argv[]) {
 
 	//printf("\n- Verify result (gec3=%.4fHz, gec5=%.4fHz, gac1=%.4fHz, +/- %.4fHz)\n",
 	//		target_firing_e_c_3, target_firing_e_c_5, target_firing_c_a_1, errorMarginHz);
-	double step_size = 1.0;
-	sim->runNetwork(5,0);
-	sim->biasWeights(e_c_3_layer1, step_size, false);
-	sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
-	sim->scaleWeights(c0, 0.07, false);
-	sim->runNetwork(5,0);
-	sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
+	double step_size = 100.0;
+	sim->runNetwork(1,0);
+	sim->biasWeights(c1, step_size, true);
+	//sim->setWeight(c1, e_c_3_layer1, e_c_3_layer5, 10000.0, true);
+	//sim->scaleWeights(c1, 1000.0, true);
+	sim->runNetwork(2,0);
+	sim->runNetwork(1,500);
+	/*sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
 	sim->scaleWeights(c0, 0.9, false);
-	sim->runNetwork(5,0);
+	sim->runNetwork(2,0);
 	sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
 	sim->scaleWeights(c0, 2.0, false);
-	sim->runNetwork(5,0);
+	sim->runNetwork(2,0);
 	sim->setWeight(c0, spike_gen, e_c_3_layer1, 3.8, false);
 	sim->scaleWeights(c0, 0.8, false);
-	sim->runNetwork(5,0);
+	sim->runNetwork(2,0);
 	sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
 	sim->scaleWeights(c0, 2.0, false);
-	sim->runNetwork(10,0);
+	sim->runNetwork(10,0);*/
 
 	delete sim;
 	return 0;
