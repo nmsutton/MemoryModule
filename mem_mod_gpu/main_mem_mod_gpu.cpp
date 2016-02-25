@@ -104,6 +104,12 @@ int main(int argc, const char* argv[]) {
 	int c0=sim->connect(spike_gen, e_c_3_layer1, "random", RangeWeight(0.5f), 0.0);
 	//int c1=sim->connect(e_c_3_layer, e_c_5_layer, "random", RangeWeight(0.001f), 0.1f, RangeDelay(1,10));
 	int c1=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", RangeWeight(10.0f), 1.0);
+	int c4=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 2.5);
+	int c5=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 3.5);
+	int c6=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 4.5);
+	int c7=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 5.5);
+	int c8=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 6.5);
+	int c9=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 7.5);
 	//int c2=sim->connect(e_c_5_layer, c_a_1_layer, "random", RangeWeight(0.003f), 0.1f, RangeDelay(1,10));
 	int c2=sim->connect(e_c_5_layer1, c_a_1_layer1, "random", RangeWeight(0.005f), 0.0);
 
