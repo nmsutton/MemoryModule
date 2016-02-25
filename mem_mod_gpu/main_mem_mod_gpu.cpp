@@ -181,7 +181,7 @@ int main(int argc, const char* argv[]) {
 	//printf("\n- Verify result (gec3=%.4fHz, gec5=%.4fHz, gac1=%.4fHz, +/- %.4fHz)\n",
 	//		target_firing_e_c_3, target_firing_e_c_5, target_firing_c_a_1, errorMarginHz);
 	double step_size = 100.0;
-	sim->runNetwork(1,0);
+	sim->runNetwork(2,0);
 	sim->biasWeights(c1, step_size, true);
 	//sim->setWeight(c1, e_c_3_layer1, e_c_3_layer5, 10000.0, true);
 	//sim->scaleWeights(c1, 1000.0, true);

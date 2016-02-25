@@ -5,7 +5,7 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:2034] ***************************** Configuring Network ********************************
 [INFO carlsim/kernel/src/snn_cpu.cpp:2036] Starting CARLsim simulation "MemModGPU" in USER mode
 [INFO carlsim/kernel/src/snn_cpu.cpp:2037] Random number seed: 42
-[DEBUG carlsim/kernel/src/snn_cpu.cpp:2043] Current local time and date: Wed Feb 24 21:17:44 2016
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2043] Current local time and date: Wed Feb 24 21:58:12 2016
 
 [INFO carlsim/kernel/src/snn_gpu.cu:2905] CUDA devices Configuration:
 [INFO carlsim/kernel/src/snn_gpu.cu:2906]   - Number of CUDA devices          =         1
@@ -349,8 +349,8 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:4475] *****************      Initializing GPU Simulation      *************************
 [INFO carlsim/kernel/src/snn_gpu.cu:2991] GPU Memory Management: (Total 3.999 GB)
 [INFO carlsim/kernel/src/snn_gpu.cu:2992] Data			Size		Total Used	Total Available
-[INFO carlsim/kernel/src/snn_gpu.cu:2994] Init:			3.999 GB	0.829 GB	3.171 GB
-[INFO carlsim/kernel/src/snn_gpu.cu:3001] Ntw Params:		0.000 GB	0.829 GB	3.171 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:2994] Init:			3.999 GB	0.939 GB	3.061 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3001] Ntw Params:		0.000 GB	0.939 GB	3.061 GB
 [DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 2146, Total Buffer Cnt = 17, Buffer Cnt = 17
 [DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 501, Total Buffer Cnt = 21, Buffer Cnt = 4
 [DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 286, Total Buffer Cnt = 24, Buffer Cnt = 3
@@ -451,11 +451,11 @@
 [DEBUG carlsim/kernel/src/snn_gpu.cu:311] 75. Start=6258, size=128 grpId=18:ca1_6 (SpikeMonId=-1) (GroupMonId=-1)
 [DEBUG carlsim/kernel/src/snn_gpu.cu:311] 76. Start=6386, size=61 grpId=18:ca1_6 (SpikeMonId=-1) (GroupMonId=-1)
 [DEBUG carlsim/kernel/src/snn_gpu.cu:319] GPU loadBufferSize = 128, GPU loadBufferCount = 77
-[INFO carlsim/kernel/src/snn_gpu.cu:3008] Static Load:		0.001 GB	0.830 GB	3.170 GB
-[INFO carlsim/kernel/src/snn_gpu.cu:3014] Group Id:		0.000 GB	0.830 GB	3.170 GB
-[INFO carlsim/kernel/src/snn_gpu.cu:3030] Conn Info:		0.031 GB	0.861 GB	3.139 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3008] Static Load:		0.001 GB	0.940 GB	3.060 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3014] Group Id:		0.000 GB	0.940 GB	3.060 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3030] Conn Info:		0.031 GB	0.971 GB	3.029 GB
 [DEBUG carlsim/kernel/src/snn_gpu.cu:2820] copyExternalCurrent: grpId=-1, ptrPos=0, length=6447, allocate=y
-[INFO carlsim/kernel/src/snn_gpu.cu:3045] State Info:		0.050 GB	0.910 GB	3.089 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3045] State Info:		0.050 GB	1.020 GB	2.979 GB
 
 
 [DEBUG carlsim/kernel/src/snn_gpu.cu:3084] Transfering group settings to GPU:
@@ -751,25 +751,25 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 1 (ec3_1)
 [INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 7 (ec5_1)
 [INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 13 (ca1_1)
-[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1000ms, printRunSummary=y, copyState=n
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=2000ms, printRunSummary=y, copyState=n
 [INFO carlsim/kernel/src/snn_cpu.cpp:766] 
 [INFO carlsim/kernel/src/snn_cpu.cpp:769] ******************** Running GPU Simulation on GPU 0 ***************************
 [INFO carlsim/kernel/src/snn_cpu.cpp:773] 
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=1.000s) SpikeMonitor for group sg(0) has 2146 spikes in 1000ms (1.00 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=1.000s) SpikeMonitor for group ec3_1(1) has 3765 spikes in 1000ms (7.51 +/- 0.50 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=1.000s) SpikeMonitor for group ec5_1(7) has 27011 spikes in 1000ms (53.91 +/- 5.02 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=1.000s) SpikeMonitor for group ca1_1(13) has 0 spikes in 1000ms (0.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group sg(0) has 2146 spikes in 2000ms (0.50 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group ec3_1(1) has 6012 spikes in 2000ms (6.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group ec5_1(7) has 42379 spikes in 2000ms (42.29 +/- 4.35 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group ca1_1(13) has 0 spikes in 2000ms (0.00 +/- 0.00 Hz)
 [DEBUG carlsim/kernel/src/snn_cpu.cpp:941] biasWeights(1,100.000000,true): updated weight ranges to [0.000000,110.000000]
 [DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=2000ms, printRunSummary=y, copyState=n
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=3.000s) SpikeMonitor for group sg(0) has 0 spikes in 2000ms (0.00 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=3.000s) SpikeMonitor for group ec3_1(1) has 4509 spikes in 2000ms (4.50 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=3.000s) SpikeMonitor for group ec5_1(7) has 36246 spikes in 2000ms (36.17 +/- 3.63 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=3.000s) SpikeMonitor for group ca1_1(13) has 0 spikes in 2000ms (0.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group sg(0) has 0 spikes in 2000ms (0.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group ec3_1(1) has 4509 spikes in 2000ms (4.50 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group ec5_1(7) has 31406 spikes in 2000ms (31.34 +/- 3.33 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group ca1_1(13) has 0 spikes in 2000ms (0.00 +/- 0.00 Hz)
 [DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1500ms, printRunSummary=y, copyState=n
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.500s) SpikeMonitor for group sg(0) has 0 spikes in 1500ms (0.00 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.500s) SpikeMonitor for group ec3_1(1) has 3006 spikes in 1500ms (4.00 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.500s) SpikeMonitor for group ec5_1(7) has 22166 spikes in 1500ms (29.50 +/- 2.96 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.500s) SpikeMonitor for group ca1_1(13) has 0 spikes in 1500ms (0.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group sg(0) has 0 spikes in 1500ms (0.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group ec3_1(1) has 3507 spikes in 1500ms (4.67 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group ec5_1(7) has 28530 spikes in 1500ms (37.96 +/- 3.94 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group ca1_1(13) has 0 spikes in 1500ms (0.00 +/- 0.00 Hz)
 [INFO carlsim/kernel/src/snn_cpu.cpp:3008] 
 
 [INFO carlsim/kernel/src/snn_cpu.cpp:3010] ********************      GPU Simulation Summary      ***************************
@@ -778,13 +778,13 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:3015] 			maxDelay = 7
 [INFO carlsim/kernel/src/snn_cpu.cpp:3016] Simulation Mode:	CUBA
 [INFO carlsim/kernel/src/snn_cpu.cpp:3017] Random Seed:		42
-[INFO carlsim/kernel/src/snn_cpu.cpp:3018] Timing:			Model Simulation Time = 4 sec
-[INFO carlsim/kernel/src/snn_cpu.cpp:3019] 			Actual Execution Time = 1.09 sec
-[INFO carlsim/kernel/src/snn_cpu.cpp:3020] Average Firing Rate:	2+ms delay = 0.399 Hz
+[INFO carlsim/kernel/src/snn_cpu.cpp:3018] Timing:			Model Simulation Time = 5 sec
+[INFO carlsim/kernel/src/snn_cpu.cpp:3019] 			Actual Execution Time = 1.35 sec
+[INFO carlsim/kernel/src/snn_cpu.cpp:3020] Average Firing Rate:	2+ms delay = 0.404 Hz
 [INFO carlsim/kernel/src/snn_cpu.cpp:3021] 			1ms delay = inf Hz
-[INFO carlsim/kernel/src/snn_cpu.cpp:3022] 			Overall = 17.566 Hz
-[INFO carlsim/kernel/src/snn_cpu.cpp:3023] Overall Firing Count:	2+ms delay = 10278
-[INFO carlsim/kernel/src/snn_cpu.cpp:3024] 			1ms delay = 593501
-[INFO carlsim/kernel/src/snn_cpu.cpp:3025] 			Total = 603779
+[INFO carlsim/kernel/src/snn_cpu.cpp:3022] 			Overall = 17.163 Hz
+[INFO carlsim/kernel/src/snn_cpu.cpp:3023] Overall Firing Count:	2+ms delay = 13026
+[INFO carlsim/kernel/src/snn_cpu.cpp:3024] 			1ms delay = 724372
+[INFO carlsim/kernel/src/snn_cpu.cpp:3025] 			Total = 737398
 [INFO carlsim/kernel/src/snn_cpu.cpp:3026] *********************************************************************************
 
