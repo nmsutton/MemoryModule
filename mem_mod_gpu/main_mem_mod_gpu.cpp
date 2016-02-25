@@ -50,7 +50,7 @@
 int main(int argc, const char* argv[]) {
 	// ---------------- CONFIG STATE -------------------
 	CARLsim *sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
-	int neuronsPerGroup = 2146;//500;
+	int neuronsPerGroup = 500;//500;
 
 	// input is a SpikeGenerator group that fires every 20 ms (50 Hz)
 	PeriodicSpikeGenerator PSG(0.01f);//1.15f);
@@ -98,6 +98,8 @@ int main(int argc, const char* argv[]) {
 	sim->setNeuronParameters(c_a_1_layer4, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
 	sim->setNeuronParameters(c_a_1_layer5, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
 	sim->setNeuronParameters(c_a_1_layer6, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
+
+
 
 	// random connection with 10% probability
 	//int c0=sim->connect(spike_gen, e_c_3_layer, "random", RangeWeight(0.005f), 0.1f, RangeDelay(1,10));
@@ -201,5 +203,23 @@ int main(int argc, const char* argv[]) {
 	sim->runNetwork(10,0);*/
 
 	delete sim;
+	return 0;
+}
+
+int create_syn(double input_layer, double output_layer, double groups_in_layer, double fire_rate_ratios[], double syn_weights[]) {
+
+	for (int i = 0; i < groups_in_layer; i++) {
+		double times_greater_ratio = int(ceil(fire_rate_ratios[i]));
+	}
+
+	/*double min_index = neuron_range[0];
+	double max_index = neuron_range[1];
+	double total_neurons = neuron_range[2];
+	double total_range = range(int(math.floor((max_index-min_index)*total_neurons)))
+	#print(total_range[-1])
+	total_range = np.array(total_range) + int(math.floor(min_index*total_neurons))
+	#print(total_range[-1])
+	len_in_layer = len(total_range)*/
+
 	return 0;
 }
