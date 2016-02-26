@@ -47,6 +47,45 @@
 	#include <simple_weight_tuner.h>
 #endif
 
+
+struct create_syn_variables
+{
+	int input_layer;
+	int output_layer;
+	double fire_rate_ratios[];
+	double syn_weights[];
+	double groups_in_layer;
+	int syn_connections[10000]; //hardcoded 10000 as max connections for now TODO: make this dynamically sized
+	int syn_connections_formed;
+	CARLsim *sim;
+};
+
+
+create_syn_variables create_syn(create_syn_variables syn_variables) {
+	int new_connections_last_index = syn_variables.groups_in_layer + syn_variables.syn_connections_formed;
+	int normalized_delay = 0;
+	for (int i = syn_variables.syn_connections_formed; i < (new_connections_last_index); i++) {
+		double times_greater_ratio = int(ceil(syn_variables.fire_rate_ratios[i]));
+		normalized_delay = 1.5 + (new_connections_last_index - i);
+
+		syn_variables.syn_connections[i]=syn_variables.sim->connect(syn_variables.input_layer,
+				syn_variables.output_layer, "full", RangeWeight(10.0f), 1.0, normalized_delay);
+
+		syn_variables.syn_connections_formed++;
+	}
+
+	/*double min_index = neuron_range[0];
+	double max_index = neuron_range[1];
+	double total_neurons = neuron_range[2];
+	double total_range = range(int(math.floor((max_index-min_index)*total_neurons)))
+	#print(total_range[-1])
+	total_range = np.array(total_range) + int(math.floor(min_index*total_neurons))
+	#print(total_range[-1])
+	len_in_layer = len(total_range)*/
+
+	return syn_variables;
+}
+
 int main(int argc, const char* argv[]) {
 	// ---------------- CONFIG STATE -------------------
 	CARLsim *sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
@@ -103,17 +142,33 @@ int main(int argc, const char* argv[]) {
 
 	// random connection with 10% probability
 	//int c0=sim->connect(spike_gen, e_c_3_layer, "random", RangeWeight(0.005f), 0.1f, RangeDelay(1,10));
-	int c0=sim->connect(spike_gen, e_c_3_layer1, "random", RangeWeight(0.5f), 0.0);
+
+	/*int c0=sim->connect(spike_gen, e_c_3_layer1, "random", RangeWeight(0.5f), 0.0);*/
+
 	//int c1=sim->connect(e_c_3_layer, e_c_5_layer, "random", RangeWeight(0.001f), 0.1f, RangeDelay(1,10));
-	int c1=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", RangeWeight(10.0f), 1.0);
+
+	/*int c1=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", RangeWeight(10.0f), 1.0);
 	int c4=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 2.5);
 	int c5=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 3.5);
 	int c6=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 4.5);
 	int c7=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 5.5);
 	int c8=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 6.5);
-	int c9=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 7.5);
+	int c9=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 7.5);*/
+
 	//int c2=sim->connect(e_c_5_layer, c_a_1_layer, "random", RangeWeight(0.003f), 0.1f, RangeDelay(1,10));
-	int c2=sim->connect(e_c_5_layer1, c_a_1_layer1, "random", RangeWeight(0.005f), 0.0);
+
+	/*int c2=sim->connect(e_c_5_layer1, c_a_1_layer1, "random", RangeWeight(0.005f), 0.0);*/
+
+	create_syn_variables syn_variables;
+	syn_variables.input_layer = e_c_3_layer1;
+	syn_variables.output_layer = e_c_5_layer1;
+	syn_variables.groups_in_layer = 8.0;
+	syn_variables.syn_connections_formed = 0;
+	//sim_ = sim;
+	syn_variables.sim = sim;
+
+	syn_variables = create_syn(syn_variables);
+	sim = syn_variables.sim;
 
 	sim->setConductances(false);
 
@@ -184,7 +239,9 @@ int main(int argc, const char* argv[]) {
 	//		target_firing_e_c_3, target_firing_e_c_5, target_firing_c_a_1, errorMarginHz);
 	double step_size = 100.0;
 	sim->runNetwork(2,0);
-	sim->biasWeights(c1, step_size, true);
+
+	/*sim->biasWeights(c1, step_size, true);*/
+
 	//sim->setWeight(c1, e_c_3_layer1, e_c_3_layer5, 10000.0, true);
 	//sim->scaleWeights(c1, 1000.0, true);
 	sim->runNetwork(2,0);
@@ -206,20 +263,3 @@ int main(int argc, const char* argv[]) {
 	return 0;
 }
 
-int create_syn(double input_layer, double output_layer, double groups_in_layer, double fire_rate_ratios[], double syn_weights[]) {
-
-	for (int i = 0; i < groups_in_layer; i++) {
-		double times_greater_ratio = int(ceil(fire_rate_ratios[i]));
-	}
-
-	/*double min_index = neuron_range[0];
-	double max_index = neuron_range[1];
-	double total_neurons = neuron_range[2];
-	double total_range = range(int(math.floor((max_index-min_index)*total_neurons)))
-	#print(total_range[-1])
-	total_range = np.array(total_range) + int(math.floor(min_index*total_neurons))
-	#print(total_range[-1])
-	len_in_layer = len(total_range)*/
-
-	return 0;
-}
