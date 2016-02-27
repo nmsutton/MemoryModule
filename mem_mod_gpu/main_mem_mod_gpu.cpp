@@ -140,6 +140,12 @@ void create_external_current(int layer[1000], int current_value, int groups_to_u
 	}
 }
 
+void create_spike_monitors(int layer[1000], int groups_to_use) {
+	for (int i = 0; i < groups_to_use; i++) {
+		SpikeMonitor* SpikeMonInput2  = sim->setSpikeMonitor(layer[i],"DEFAULT");
+	}
+}
+
 int main(int argc, const char* argv[]) {
 	// ---------------- CONFIG STATE -------------------
 	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
@@ -152,8 +158,8 @@ int main(int argc, const char* argv[]) {
 	create_layers_variables c_a_1_layer;
 	c_a_1_layer = create_layers(c_a_1_layer);
 
-	create_syn_variables syn_variables;
-	syn_variables = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, syn_variables);
+	create_syn_variables ec3_to_ca5_synapes;
+	ec3_to_ca5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ca5_synapes);
 
 	create_syn_variables ec5_to_ca1_synapes;
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
@@ -164,12 +170,13 @@ int main(int argc, const char* argv[]) {
 
 	sim->setupNetwork();
 
-	create_external_current(e_c_3_layer.layers, -160.0, int 6);
-	//sim->setExternalCurrent(e_c_3_layer.layers[0], -160.0);
-	sim->setExternalCurrent(e_c_5_layer.layers[0], -180.0);
-	sim->setExternalCurrent(c_a_1_layer.layers[0], -180.0);
+	create_external_current(e_c_3_layer.layers, -160.0, 6);
+	create_external_current(e_c_5_layer.layers, -180.0, 6);
+	create_external_current(c_a_1_layer.layers, -180.0, 6);
 
-	SpikeMonitor* SpikeMonInput2  = sim->setSpikeMonitor(e_c_3_layer.layers[0],"DEFAULT");
+	create_spike_monitors(e_c_3_layer.layers, 6);
+
+	//SpikeMonitor* SpikeMonInput2  = sim->setSpikeMonitor(e_c_3_layer.layers[0],"DEFAULT");
 	SpikeMonitor* SpikeMonInput3  = sim->setSpikeMonitor(e_c_5_layer.layers[0],"DEFAULT");
 	SpikeMonitor* SpikeMonInput4  = sim->setSpikeMonitor(c_a_1_layer.layers[0],"DEFAULT");
 	std::cout<<"e_c_5_layer.layers[0]:\n";
