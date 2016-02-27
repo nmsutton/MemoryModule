@@ -54,6 +54,8 @@
 #define SSTR( x ) static_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
 
+CARLsim *sim;
+
 struct create_syn_variables
 /*
  * Parameters for creating synapses
@@ -63,7 +65,7 @@ struct create_syn_variables
 	int output_layer;
 	double fire_rate_ratios[];
 	double syn_weights[];
-	double groups_in_layer = 8;
+	double connections_per_group = 8;
 	int syn_connections[10000]; //hardcoded 10000 as max connections for now TODO: make this dynamically sized
 	int syn_connections_formed = 0;
 	CARLsim *sim;
@@ -80,7 +82,7 @@ struct create_layers_variables
 	int layer_sim_groups[1000];
 	double group_sizes[1000] = {0.233, 0.133, 0.2, 0.1, 0.067, 0.267};
 	double neuron_parameters[4] = {0.0012f, 3.0f, -68.5f, 10.0f};
-	double groups_in_layer = 8;
+	double groups_in_layer = 6;
 	double neuronsPerGroup = 500;
 	CARLsim *sim;
 };
@@ -90,7 +92,7 @@ create_syn_variables create_syn(create_syn_variables syn_variables) {
 	/*
 	 * Generate synaptic connections between layers.
 	 */
-	int new_connections_last_index = syn_variables.groups_in_layer + syn_variables.syn_connections_formed;
+	int new_connections_last_index = syn_variables.connections_per_group + syn_variables.syn_connections_formed;
 	int normalized_delay = 0;
 	for (int i = syn_variables.syn_connections_formed; i < (new_connections_last_index); i++) {
 		double times_greater_ratio = int(ceil(syn_variables.fire_rate_ratios[i]));
@@ -110,10 +112,11 @@ create_layers_variables create_layers(create_layers_variables layers_variables) 
 	 * Generate a new layer of neurons.
 	 */
 	int last_new_layer_index = layers_variables.layers_formed + layers_variables.groups_in_layer;
+	int i = 0;
 	for (int i = layers_variables.layers_formed; i < last_new_layer_index; i++) {
-		layers_variables.layers[i]= layers_variables.sim->createGroup(SSTR(i),
+		layers_variables.layers[i]= sim->createGroup(SSTR(i),
 				ceil(layers_variables.neuronsPerGroup*layers_variables.group_sizes[i]), EXCITATORY_NEURON);
-		layers_variables.sim->setNeuronParameters(layers_variables.layers[i], layers_variables.neuron_parameters[0],
+		sim->setNeuronParameters(layers_variables.layers[i], layers_variables.neuron_parameters[0],
 				layers_variables.neuron_parameters[1], layers_variables.neuron_parameters[2], layers_variables.neuron_parameters[3]); // FS
 
 		layers_variables.layers_formed++;
@@ -122,26 +125,22 @@ create_layers_variables create_layers(create_layers_variables layers_variables) 
 	return layers_variables;
 }
 
-void create_currents() {
-
-}
-
 int main(int argc, const char* argv[]) {
 	// ---------------- CONFIG STATE -------------------
-	CARLsim *sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
-	int neuronsPerGroup = 500;
+	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
+	int neuronsPerGroup = 500;//500;
 
 	// input is a SpikeGenerator group that fires every 20 ms (50 Hz)
-	PeriodicSpikeGenerator PSG(0.01f);//1.15f);
+	/*PeriodicSpikeGenerator PSG(0.01f);//1.15f);
 	int spike_gen=sim->createSpikeGeneratorGroup("sg", neuronsPerGroup, EXCITATORY_NEURON);
-	sim->setSpikeGenerator(spike_gen, &PSG);
+	sim->setSpikeGenerator(spike_gen, &PSG);*/
 
 	create_layers_variables e_c_3_layer;
 	e_c_3_layer = create_layers(e_c_3_layer);
 	create_layers_variables e_c_5_layer;
-	e_c_5_layer = create_layers(e_c_5_layer);
+	//e_c_5_layer = create_layers(e_c_5_layer);
 	create_layers_variables c_a_1_layer;
-	c_a_1_layer = create_layers(c_a_1_layer);
+	//c_a_1_layer = create_layers(c_a_1_layer);
 
 	//
 	int e_c_3_layer1=sim->createGroup("ec3_1", ceil(neuronsPerGroup*.233), EXCITATORY_NEURON);
@@ -156,7 +155,6 @@ int main(int argc, const char* argv[]) {
 	sim->setNeuronParameters(e_c_3_layer4, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
 	sim->setNeuronParameters(e_c_3_layer5, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
 	sim->setNeuronParameters(e_c_3_layer6, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
-
 
 	//
 	int e_c_5_layer1=sim->createGroup("ec5_1", ceil(neuronsPerGroup*.233), EXCITATORY_NEURON);
@@ -186,9 +184,30 @@ int main(int argc, const char* argv[]) {
 	sim->setNeuronParameters(c_a_1_layer5, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
 	sim->setNeuronParameters(c_a_1_layer6, 0.0012f, 3.0f, -68.5f, 10.0f); // FS
 
+
+
+	// random connection with 10% probability
+	//int c0=sim->connect(spike_gen, e_c_3_layer, "random", RangeWeight(0.005f), 0.1f, RangeDelay(1,10));
+
+	/*int c0=sim->connect(spike_gen, e_c_3_layer1, "random", RangeWeight(0.5f), 0.0);*/
+
+	//int c1=sim->connect(e_c_3_layer, e_c_5_layer, "random", RangeWeight(0.001f), 0.1f, RangeDelay(1,10));
+
+	/*int c1=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", RangeWeight(10.0f), 1.0);
+	int c4=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 2.5);
+	int c5=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 3.5);
+	int c6=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 4.5);
+	int c7=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 5.5);
+	int c8=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 6.5);
+	int c9=sim->connect(e_c_3_layer1, e_c_5_layer1, "full", 1000.0, 1.0, 7.5);*/
+
+	//int c2=sim->connect(e_c_5_layer, c_a_1_layer, "random", RangeWeight(0.003f), 0.1f, RangeDelay(1,10));
+
+	/*int c2=sim->connect(e_c_5_layer1, c_a_1_layer1, "random", RangeWeight(0.005f), 0.0);*/
+
 	create_syn_variables syn_variables;
-	syn_variables.input_layer = e_c_3_layer1;//e_c_3_layer.layers[0];
-	syn_variables.output_layer = e_c_5_layer1;//e_c_5_layer.layers[0];
+	syn_variables.input_layer = e_c_3_layer.layers[0];
+	syn_variables.output_layer = e_c_5_layer.layers[0];
 	syn_variables.sim = sim;
 
 	syn_variables = create_syn(syn_variables);
@@ -201,24 +220,14 @@ int main(int argc, const char* argv[]) {
 
 	sim->setupNetwork();
 
-	/*sim->setExternalCurrent(e_c_3_layer.layers[0], -160.0);
-	sim->setExternalCurrent(e_c_5_layer.layers[0], -180.0);
-	sim->setExternalCurrent(c_a_1_layer.layers[0], -190.0);
-
-	SpikeMonitor* SpikeMonInput  = sim->setSpikeMonitor(spike_gen,"DEFAULT");
-	SpikeMonitor* SpikeMonInput2  = sim->setSpikeMonitor(e_c_3_layer.layers[0],"DEFAULT");
-	SpikeMonitor* SpikeMonInput3  = sim->setSpikeMonitor(e_c_5_layer.layers[0],"DEFAULT");
-	SpikeMonitor* SpikeMonInput4  = sim->setSpikeMonitor(c_a_1_layer.layers[0],"DEFAULT");*/
-
 	sim->setExternalCurrent(e_c_3_layer1, -160.0);
 	sim->setExternalCurrent(e_c_5_layer1, -180.0);
 	sim->setExternalCurrent(c_a_1_layer1, -190.0);
 
-	SpikeMonitor* SpikeMonInput  = sim->setSpikeMonitor(spike_gen,"DEFAULT");
+	//SpikeMonitor* SpikeMonInput  = sim->setSpikeMonitor(spike_gen,"DEFAULT");
 	SpikeMonitor* SpikeMonInput2  = sim->setSpikeMonitor(e_c_3_layer1,"DEFAULT");
 	SpikeMonitor* SpikeMonInput3  = sim->setSpikeMonitor(e_c_5_layer1,"DEFAULT");
 	SpikeMonitor* SpikeMonInput4  = sim->setSpikeMonitor(c_a_1_layer1,"DEFAULT");
-
 	//sim->setConnectionMonitor(spike_gen, e_c_3_layer1, "DEFAULT");
 
 	// accept firing rates within this range of target firing
@@ -296,4 +305,3 @@ int main(int argc, const char* argv[]) {
 	delete sim;
 	return 0;
 }
-
