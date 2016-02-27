@@ -134,6 +134,12 @@ create_syn_variables create_syn(int input_layer[1000], int output_layer[1000], c
 	return syn_variables;
 }
 
+void create_external_current(int layer[1000], int current_value, int groups_to_use) {
+	for (int i = 0; i < groups_to_use; i++) {
+		sim->setExternalCurrent(layer[i], current_value);
+	}
+}
+
 int main(int argc, const char* argv[]) {
 	// ---------------- CONFIG STATE -------------------
 	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
@@ -141,10 +147,8 @@ int main(int argc, const char* argv[]) {
 
 	create_layers_variables e_c_3_layer;
 	e_c_3_layer = create_layers(e_c_3_layer);
-	//create_layers(e_c_3_layer);
 	create_layers_variables e_c_5_layer;
 	e_c_5_layer = create_layers(e_c_5_layer);
-	//create_layers(e_c_5_layer);
 	create_layers_variables c_a_1_layer;
 	c_a_1_layer = create_layers(c_a_1_layer);
 
@@ -160,19 +164,16 @@ int main(int argc, const char* argv[]) {
 
 	sim->setupNetwork();
 
-	sim->setExternalCurrent(e_c_3_layer.layers[0], -160.0);
+	create_external_current(e_c_3_layer.layers, -160.0, int 6);
+	//sim->setExternalCurrent(e_c_3_layer.layers[0], -160.0);
 	sim->setExternalCurrent(e_c_5_layer.layers[0], -180.0);
 	sim->setExternalCurrent(c_a_1_layer.layers[0], -180.0);
-	//sim->setExternalCurrent(c_a_1_layer1, -190.0);
 
-	//SpikeMonitor* SpikeMonInput  = sim->setSpikeMonitor(spike_gen,"DEFAULT");
 	SpikeMonitor* SpikeMonInput2  = sim->setSpikeMonitor(e_c_3_layer.layers[0],"DEFAULT");
 	SpikeMonitor* SpikeMonInput3  = sim->setSpikeMonitor(e_c_5_layer.layers[0],"DEFAULT");
 	SpikeMonitor* SpikeMonInput4  = sim->setSpikeMonitor(c_a_1_layer.layers[0],"DEFAULT");
 	std::cout<<"e_c_5_layer.layers[0]:\n";
 	std::cout<<e_c_5_layer.layers[0];
-	//SpikeMonitor* SpikeMonInput4  = sim->setSpikeMonitor(c_a_1_layer1,"DEFAULT");
-	//sim->setConnectionMonitor(spike_gen, e_c_3_layer1, "DEFAULT");
 
 	// accept firing rates within this range of target firing
 	double target_firing_e_c_3_1 = 1.49;//27.4;	// target firing rate for gec3
