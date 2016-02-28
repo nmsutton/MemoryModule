@@ -85,9 +85,9 @@ struct create_syn_variables
 {
 	double fire_rate_ratios[];
 	double syn_weights[];
-	double groups_in_layer = 6;
+	static const int groups_in_layer = 6;
 	double connections_per_group = 8;
-	double connections_to_form = 0;
+	double connections_to_form[groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
 	int syn_connections[10000];
 	CARLsim *sim;
 };
@@ -142,7 +142,7 @@ create_syn_variables create_syn(int input_layer[1000], int output_layer[1000], c
 			normalized_delay = 1.5 + i2;//(new_connections_last_index - i2);
 
 			// Check for last connection section
-			remaining_connections = syn_variables.connections_to_form - i2;
+			remaining_connections = syn_variables.connections_to_form[i] - i2;
 			if (remaining_connections < 1.0 & remaining_connections > 0.0) {
 				adjusted_syn_weight = initial_syn_weight * remaining_connections;
 			}
@@ -196,11 +196,11 @@ int main(int argc, const char* argv[]) {
 	c_a_1_layer = create_layers(c_a_1_layer);
 
 	create_syn_variables ec3_to_ca5_synapes;
-	ec3_to_ca5_synapes.connections_to_form = 0.1;//6.5;
+	//ec3_to_ca5_synapes.connections_to_form = 0.1;//6.5;
 	ec3_to_ca5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ca5_synapes);
 
 	create_syn_variables ec5_to_ca1_synapes;
-	ec5_to_ca1_synapes.connections_to_form = 0.1;//4.5;
+	//ec5_to_ca1_synapes.connections_to_form = 0.1;//4.5;
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
 
 	sim->setConductances(false);
@@ -214,7 +214,7 @@ int main(int argc, const char* argv[]) {
 	create_external_current(c_a_1_layer.layers, -180.0, 6);
 
 	create_spike_monitors(e_c_3_layer.layers, 6);
-	create_spike_monitors(e_c_5_layer.layers, 1);
+	create_spike_monitors(e_c_5_layer.layers, 3);
 	create_spike_monitors(c_a_1_layer.layers, 1);
 
 	// accept firing rates within this range of target firing
