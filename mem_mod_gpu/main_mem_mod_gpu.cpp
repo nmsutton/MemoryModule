@@ -61,24 +61,12 @@ int layers_formed = 0;
 int syn_connections_formed = 0;
 CARLsim *sim;
 
-struct create_syn_variables
-/*
- * Parameters for creating synapses
- * TODO:  Currently hardcoded multiple max parameter numbers as as syn_connections for now.  For the future
- * work on having them dynamically sized.
- */
-{
-	double fire_rate_ratios[];
-	double syn_weights[];
-	double connections_per_group = 8;
-	int syn_connections[10000];
-	CARLsim *sim;
-};
-
 struct create_layers_variables
 /*
  * Parameters for creating layers.  Neuron sub groups are sized according to group_sizes[].
  * neuron_parameters[] specify izhikevich neuron parameters.
+ * TODO:  Currently hardcoded multiple max parameter numbers as as layer_sim_groups for now.  For the future
+ * work on having them dynamically sized.
  */
 {
 	int layers[1000];
@@ -87,6 +75,19 @@ struct create_layers_variables
 	double neuron_parameters[4] = {0.0012f, 3.0f, -68.5f, 10.0f};
 	double groups_in_layer = 6;
 	double neuronsPerGroup = 500;
+	CARLsim *sim;
+};
+
+struct create_syn_variables
+/*
+ * Parameters for creating synapses
+ */
+{
+	double fire_rate_ratios[];
+	double syn_weights[];
+	double connections_per_group = 8;
+	double connections_to_form;
+	int syn_connections[10000];
 	CARLsim *sim;
 };
 
@@ -103,8 +104,8 @@ create_layers_variables create_layers(create_layers_variables layers_variables) 
 				ceil(layers_variables.neuronsPerGroup*layers_variables.group_sizes[normalized_group_index]), EXCITATORY_NEURON);
 		sim->setNeuronParameters(layers_variables.layers[normalized_group_index], layers_variables.neuron_parameters[0],
 				layers_variables.neuron_parameters[1], layers_variables.neuron_parameters[2], layers_variables.neuron_parameters[3]); // FS
-		std::cout<<layers_formed;
-		std::cout<<"\n";
+		//std::cout<<layers_formed;
+		//std::cout<<"\n";
 		layers_formed++;
 	}
 
@@ -114,20 +115,46 @@ create_layers_variables create_layers(create_layers_variables layers_variables) 
 create_syn_variables create_syn(int input_layer[1000], int output_layer[1000], create_syn_variables syn_variables) {
 	/*
 	 * Generate synaptic connections between layers.
+	 * If last section of connections is a fraction then reduce the weight of that section
+	 * proportional to the fraction of connections (e.g. create 6.5 out of 8.0 connections, the 7th
+	 * section of connections has 0.5/1.0 of the full weight.
+	 *
+	 * normalized_index = connections index normalized to have the first index at 0
+	 * normalized_delay = delay index normalized to have the first index at 1.5
 	 */
 	int new_connections_last_index = syn_variables.connections_per_group + syn_connections_formed;
 	int normalized_delay = 0;
 	int initial_syn_connections_formed = syn_connections_formed;
 	int normalized_index = 0;
+	double remaining_connections = 0;
+	double full_syn_weight = 10.0f;
+	double connection_probability = 1.0;
+	bool create_connection = true;
+
 	for (int i = syn_connections_formed; i < (new_connections_last_index); i++) {
-		normalized_index = i - syn_connections_formed;
+		normalized_index = i - initial_syn_connections_formed;
 		double times_greater_ratio = int(ceil(syn_variables.fire_rate_ratios[i]));
 		normalized_delay = 1.5 + (new_connections_last_index - i);
 
+		// Check for last connection section
+		remaining_connections = syn_variables.connections_to_form - normalized_index;
+		if (remaining_connections < 1.0 & remaining_connections > 0.0) {
+			full_syn_weight = full_syn_weight * remaining_connections;
+		}
+		else if (remaining_connections <= 0.0) {
+			connection_probability = 0.0;
+		}
+
 		syn_variables.syn_connections[i]=sim->connect(input_layer[normalized_index],
-				output_layer[normalized_index], "full", RangeWeight(10.0f), 1.0, normalized_delay);
+				output_layer[normalized_index], "full", RangeWeight(full_syn_weight), connection_probability, normalized_delay);
+		std::cout<<"\n new connection:\n";
 		std::cout<<syn_connections_formed;
-		std::cout<<"  conn ud\n";
+		std::cout<<"\n remaining_connections:\n";
+		std::cout<<remaining_connections;
+		std::cout<<"\n connection_probability: \n";
+		std::cout<<connection_probability;
+		std::cout<<"\n full_syn_weight: \n";
+		std::cout<<full_syn_weight;
 		syn_connections_formed++;
 	}
 
@@ -159,9 +186,11 @@ int main(int argc, const char* argv[]) {
 	c_a_1_layer = create_layers(c_a_1_layer);
 
 	create_syn_variables ec3_to_ca5_synapes;
+	ec3_to_ca5_synapes.connections_to_form = 6.5;
 	ec3_to_ca5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ca5_synapes);
 
 	create_syn_variables ec5_to_ca1_synapes;
+	ec5_to_ca1_synapes.connections_to_form = 4.5;
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
 
 	sim->setConductances(false);
@@ -175,12 +204,8 @@ int main(int argc, const char* argv[]) {
 	create_external_current(c_a_1_layer.layers, -180.0, 6);
 
 	create_spike_monitors(e_c_3_layer.layers, 6);
-
-	//SpikeMonitor* SpikeMonInput2  = sim->setSpikeMonitor(e_c_3_layer.layers[0],"DEFAULT");
-	SpikeMonitor* SpikeMonInput3  = sim->setSpikeMonitor(e_c_5_layer.layers[0],"DEFAULT");
-	SpikeMonitor* SpikeMonInput4  = sim->setSpikeMonitor(c_a_1_layer.layers[0],"DEFAULT");
-	std::cout<<"e_c_5_layer.layers[0]:\n";
-	std::cout<<e_c_5_layer.layers[0];
+	create_spike_monitors(e_c_5_layer.layers, 1);
+	create_spike_monitors(c_a_1_layer.layers, 1);
 
 	// accept firing rates within this range of target firing
 	double target_firing_e_c_3_1 = 1.49;//27.4;	// target firing rate for gec3
