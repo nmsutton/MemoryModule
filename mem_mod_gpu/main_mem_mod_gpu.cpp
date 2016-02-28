@@ -87,7 +87,7 @@ struct create_syn_variables
 	double syn_weights[];
 	static const int groups_in_layer = 6;
 	double connections_per_group = 8;
-	double connections_to_form[groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
+	double connections_to_form[groups_in_layer];
 	int syn_connections[10000];
 	CARLsim *sim;
 };
@@ -184,9 +184,16 @@ void create_spike_monitors(int layer[1000], int groups_to_use) {
 }
 
 int main(int argc, const char* argv[]) {
+	/*
+	 * the _conn arrays set the synapse connection quantities
+	 */
 	// ---------------- CONFIG STATE -------------------
 	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
-	int neuronsPerGroup = 500;//500;
+	//int neuronsPerGroup = 500;//500;
+	create_syn_variables ec3_to_ec5_synapes;
+	create_syn_variables ec5_to_ca1_synapes;
+	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
+	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
 
 	create_layers_variables e_c_3_layer;
 	e_c_3_layer = create_layers(e_c_3_layer);
@@ -195,12 +202,10 @@ int main(int argc, const char* argv[]) {
 	create_layers_variables c_a_1_layer;
 	c_a_1_layer = create_layers(c_a_1_layer);
 
-	create_syn_variables ec3_to_ca5_synapes;
-	//ec3_to_ca5_synapes.connections_to_form = 0.1;//6.5;
-	ec3_to_ca5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ca5_synapes);
+	for (int i = 0; i < ec3_to_ec5_synapes.connections_per_group; i++) {ec3_to_ec5_synapes.connections_to_form[i]=ec3_to_ec5_conn[i];};
+	ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 
-	create_syn_variables ec5_to_ca1_synapes;
-	//ec5_to_ca1_synapes.connections_to_form = 0.1;//4.5;
+	for (int i = 0; i < ec5_to_ca1_synapes.connections_per_group; i++) {ec5_to_ca1_synapes.connections_to_form[i]=ec5_to_ca1_conn[i];};
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
 
 	sim->setConductances(false);
