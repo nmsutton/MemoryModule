@@ -196,11 +196,11 @@ int main(int argc, const char* argv[]) {
 	c_a_1_layer = create_layers(c_a_1_layer);
 
 	create_syn_variables ec3_to_ca5_synapes;
-	ec3_to_ca5_synapes.connections_to_form = 1.0;//6.5;
+	ec3_to_ca5_synapes.connections_to_form = 0.1;//6.5;
 	ec3_to_ca5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ca5_synapes);
 
 	create_syn_variables ec5_to_ca1_synapes;
-	ec5_to_ca1_synapes.connections_to_form = 1.0;//4.5;
+	ec5_to_ca1_synapes.connections_to_form = 0.1;//4.5;
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
 
 	sim->setConductances(false);
