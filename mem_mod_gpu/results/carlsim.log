@@ -5,7 +5,7 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:2034] ***************************** Configuring Network ********************************
 [INFO carlsim/kernel/src/snn_cpu.cpp:2036] Starting CARLsim simulation "MemModGPU" in USER mode
 [INFO carlsim/kernel/src/snn_cpu.cpp:2037] Random number seed: 42
-[DEBUG carlsim/kernel/src/snn_cpu.cpp:2043] Current local time and date: Sat Feb 27 23:10:03 2016
+[DEBUG carlsim/kernel/src/snn_cpu.cpp:2043] Current local time and date: Sat Feb 27 23:59:55 2016
 
 [INFO carlsim/kernel/src/snn_gpu.cu:2905] CUDA devices Configuration:
 [INFO carlsim/kernel/src/snn_gpu.cu:2906]   - Number of CUDA devices          =         1
@@ -1567,8 +1567,8 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:4475] *****************      Initializing GPU Simulation      *************************
 [INFO carlsim/kernel/src/snn_gpu.cu:2991] GPU Memory Management: (Total 3.999 GB)
 [INFO carlsim/kernel/src/snn_gpu.cu:2992] Data			Size		Total Used	Total Available
-[INFO carlsim/kernel/src/snn_gpu.cu:2994] Init:			3.999 GB	0.855 GB	3.144 GB
-[INFO carlsim/kernel/src/snn_gpu.cu:3001] Ntw Params:		0.000 GB	0.855 GB	3.144 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:2994] Init:			3.999 GB	0.885 GB	3.114 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3001] Ntw Params:		0.000 GB	0.885 GB	3.114 GB
 [DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 117, Total Buffer Cnt = 1, Buffer Cnt = 1
 [DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 67, Total Buffer Cnt = 2, Buffer Cnt = 1
 [DEBUG carlsim/kernel/src/snn_gpu.cu:280] Grp Size = 100, Total Buffer Cnt = 3, Buffer Cnt = 1
@@ -1612,11 +1612,11 @@
 [DEBUG carlsim/kernel/src/snn_gpu.cu:311] 19. Start=1372, size=128 grpId=17:17 (SpikeMonId=-1) (GroupMonId=-1)
 [DEBUG carlsim/kernel/src/snn_gpu.cu:311] 20. Start=1500, size=6 grpId=17:17 (SpikeMonId=-1) (GroupMonId=-1)
 [DEBUG carlsim/kernel/src/snn_gpu.cu:319] GPU loadBufferSize = 128, GPU loadBufferCount = 21
-[INFO carlsim/kernel/src/snn_gpu.cu:3008] Static Load:		0.001 GB	0.856 GB	3.143 GB
-[INFO carlsim/kernel/src/snn_gpu.cu:3014] Group Id:		0.000 GB	0.856 GB	3.143 GB
-[INFO carlsim/kernel/src/snn_gpu.cu:3030] Conn Info:		0.015 GB	0.871 GB	3.128 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3008] Static Load:		0.001 GB	0.886 GB	3.113 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3014] Group Id:		0.000 GB	0.886 GB	3.113 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3030] Conn Info:		0.015 GB	0.901 GB	3.098 GB
 [DEBUG carlsim/kernel/src/snn_gpu.cu:2820] copyExternalCurrent: grpId=-1, ptrPos=0, length=1506, allocate=y
-[INFO carlsim/kernel/src/snn_gpu.cu:3045] State Info:		0.013 GB	0.884 GB	3.115 GB
+[INFO carlsim/kernel/src/snn_gpu.cu:3045] State Info:		0.013 GB	0.914 GB	3.085 GB
 
 
 [DEBUG carlsim/kernel/src/snn_gpu.cu:3084] Transfering group settings to GPU:
@@ -1917,32 +1917,56 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 6 (6)
 [INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 7 (7)
 [INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 8 (8)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 9 (9)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 10 (10)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 11 (11)
 [INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 12 (12)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 13 (13)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 14 (14)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 15 (15)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 16 (16)
+[INFO carlsim/kernel/src/snn_cpu.cpp:1262] SpikeMonitor set for group 17 (17)
 [DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=2000ms, printRunSummary=y, copyState=n
 [INFO carlsim/kernel/src/snn_cpu.cpp:766] 
 [INFO carlsim/kernel/src/snn_cpu.cpp:769] ******************** Running GPU Simulation on GPU 0 ***************************
 [INFO carlsim/kernel/src/snn_cpu.cpp:773] 
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 0(0) has 1288 spikes in 2000ms (5.50 +/- 0.05 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 1(1) has 738 spikes in 2000ms (5.51 +/- 0.06 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 2(2) has 1101 spikes in 2000ms (5.51 +/- 0.05 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 3(3) has 551 spikes in 2000ms (5.51 +/- 0.07 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 4(4) has 375 spikes in 2000ms (5.51 +/- 0.09 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 5(5) has 1476 spikes in 2000ms (5.51 +/- 0.06 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 6(6) has 4452 spikes in 2000ms (19.03 +/- 0.28 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 7(7) has 5099 spikes in 2000ms (38.05 +/- 0.43 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 8(8) has 3406 spikes in 2000ms (17.03 +/- 0.30 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 12(12) has 7262 spikes in 2000ms (31.03 +/- 0.37 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 0(0) has 1404 spikes in 2000ms (6.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 1(1) has 804 spikes in 2000ms (6.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 2(2) has 1200 spikes in 2000ms (6.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 3(3) has 600 spikes in 2000ms (6.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 4(4) has 408 spikes in 2000ms (6.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 5(5) has 1608 spikes in 2000ms (6.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 6(6) has 5031 spikes in 2000ms (21.50 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 7(7) has 5697 spikes in 2000ms (42.51 +/- 0.12 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 8(8) has 4000 spikes in 2000ms (20.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 9(9) has 1400 spikes in 2000ms (14.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 10(10) has 748 spikes in 2000ms (11.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 11(11) has 5896 spikes in 2000ms (22.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 12(12) has 7724 spikes in 2000ms (33.01 +/- 0.09 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 13(13) has 8654 spikes in 2000ms (64.58 +/- 0.67 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 14(14) has 6201 spikes in 2000ms (31.00 +/- 0.05 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 15(15) has 1854 spikes in 2000ms (18.54 +/- 0.28 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 16(16) has 1022 spikes in 2000ms (15.03 +/- 0.17 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=2.000s) SpikeMonitor for group 17(17) has 9108 spikes in 2000ms (33.99 +/- 0.27 Hz)
 [DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=2000ms, printRunSummary=y, copyState=n
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 0(0) has 1053 spikes in 2000ms (4.50 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 1(1) has 603 spikes in 2000ms (4.50 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 2(2) has 900 spikes in 2000ms (4.50 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 3(3) has 450 spikes in 2000ms (4.50 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 4(4) has 306 spikes in 2000ms (4.50 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 5(5) has 1206 spikes in 2000ms (4.50 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 6(6) has 3748 spikes in 2000ms (16.02 +/- 0.18 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 7(7) has 4494 spikes in 2000ms (33.54 +/- 0.31 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 8(8) has 3003 spikes in 2000ms (15.02 +/- 0.15 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 12(12) has 5625 spikes in 2000ms (24.04 +/- 0.42 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 0(0) has 937 spikes in 2000ms (4.00 +/- 0.05 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 1(1) has 537 spikes in 2000ms (4.01 +/- 0.06 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 2(2) has 801 spikes in 2000ms (4.01 +/- 0.05 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 3(3) has 401 spikes in 2000ms (4.01 +/- 0.07 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 4(4) has 273 spikes in 2000ms (4.01 +/- 0.09 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 5(5) has 1074 spikes in 2000ms (4.01 +/- 0.06 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 6(6) has 3978 spikes in 2000ms (17.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 7(7) has 4288 spikes in 2000ms (32.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 8(8) has 3100 spikes in 2000ms (15.50 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 9(9) has 1100 spikes in 2000ms (11.00 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 10(10) has 578 spikes in 2000ms (8.50 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 11(11) has 4692 spikes in 2000ms (17.51 +/- 0.06 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 12(12) has 5971 spikes in 2000ms (25.52 +/- 0.18 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 13(13) has 6441 spikes in 2000ms (48.07 +/- 0.55 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 14(14) has 5104 spikes in 2000ms (25.52 +/- 0.20 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 15(15) has 1403 spikes in 2000ms (14.03 +/- 0.21 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 16(16) has 785 spikes in 2000ms (11.54 +/- 0.26 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=4.000s) SpikeMonitor for group 17(17) has 6976 spikes in 2000ms (26.03 +/- 0.24 Hz)
 [DEBUG carlsim/kernel/src/snn_cpu.cpp:756] runNetwork: runDur=1500ms, printRunSummary=y, copyState=n
 [INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 0(0) has 819 spikes in 1500ms (4.67 +/- 0.00 Hz)
 [INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 1(1) has 469 spikes in 1500ms (4.67 +/- 0.00 Hz)
@@ -1951,9 +1975,17 @@
 [INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 4(4) has 238 spikes in 1500ms (4.67 +/- 0.00 Hz)
 [INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 5(5) has 938 spikes in 1500ms (4.67 +/- 0.00 Hz)
 [INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 6(6) has 3160 spikes in 1500ms (18.01 +/- 0.06 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 7(7) has 3686 spikes in 1500ms (36.68 +/- 0.08 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 8(8) has 2600 spikes in 1500ms (17.33 +/- 0.00 Hz)
-[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 12(12) has 5383 spikes in 1500ms (30.67 +/- 0.06 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 7(7) has 3488 spikes in 1500ms (34.71 +/- 0.33 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 8(8) has 2402 spikes in 1500ms (16.01 +/- 0.13 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 9(9) has 901 spikes in 1500ms (12.01 +/- 0.09 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 10(10) has 443 spikes in 1500ms (8.69 +/- 0.11 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 11(11) has 3759 spikes in 1500ms (18.70 +/- 0.15 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 12(12) has 4567 spikes in 1500ms (26.02 +/- 0.25 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 13(13) has 5698 spikes in 1500ms (56.70 +/- 0.24 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 14(14) has 3802 spikes in 1500ms (25.35 +/- 0.13 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 15(15) has 1300 spikes in 1500ms (17.33 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 16(16) has 680 spikes in 1500ms (13.33 +/- 0.00 Hz)
+[INFO carlsim/kernel/src/print_snn_info.cpp:165] (t=5.500s) SpikeMonitor for group 17(17) has 5763 spikes in 1500ms (28.67 +/- 0.28 Hz)
 [INFO carlsim/kernel/src/snn_cpu.cpp:3008] 
 
 [INFO carlsim/kernel/src/snn_cpu.cpp:3010] ********************      GPU Simulation Summary      ***************************
@@ -1963,12 +1995,12 @@
 [INFO carlsim/kernel/src/snn_cpu.cpp:3016] Simulation Mode:	CUBA
 [INFO carlsim/kernel/src/snn_cpu.cpp:3017] Random Seed:		42
 [INFO carlsim/kernel/src/snn_cpu.cpp:3018] Timing:			Model Simulation Time = 5 sec
-[INFO carlsim/kernel/src/snn_cpu.cpp:3019] 			Actual Execution Time = 0.92 sec
-[INFO carlsim/kernel/src/snn_cpu.cpp:3020] Average Firing Rate:	2+ms delay = 8.030 Hz
+[INFO carlsim/kernel/src/snn_cpu.cpp:3019] 			Actual Execution Time = 0.91 sec
+[INFO carlsim/kernel/src/snn_cpu.cpp:3020] Average Firing Rate:	2+ms delay = 8.367 Hz
 [INFO carlsim/kernel/src/snn_cpu.cpp:3021] 			1ms delay = inf Hz
-[INFO carlsim/kernel/src/snn_cpu.cpp:3022] 			Overall = 18.206 Hz
-[INFO carlsim/kernel/src/snn_cpu.cpp:3023] Overall Firing Count:	2+ms delay = 60463
-[INFO carlsim/kernel/src/snn_cpu.cpp:3024] 			1ms delay = 76629
-[INFO carlsim/kernel/src/snn_cpu.cpp:3025] 			Total = 137092
+[INFO carlsim/kernel/src/snn_cpu.cpp:3022] 			Overall = 18.488 Hz
+[INFO carlsim/kernel/src/snn_cpu.cpp:3023] Overall Firing Count:	2+ms delay = 63002
+[INFO carlsim/kernel/src/snn_cpu.cpp:3024] 			1ms delay = 76211
+[INFO carlsim/kernel/src/snn_cpu.cpp:3025] 			Total = 139213
 [INFO carlsim/kernel/src/snn_cpu.cpp:3026] *********************************************************************************
 

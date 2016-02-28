@@ -59,6 +59,8 @@
 
 int layers_formed = 0;
 int syn_connections_formed = 0;
+int spike_monitors_formed = 0;
+SpikeMonitor* spike_monitors[1000];
 CARLsim *sim;
 
 struct create_layers_variables
@@ -179,7 +181,8 @@ void create_external_current(int layer[1000], int current_value, int groups_to_u
 
 void create_spike_monitors(int layer[1000], int groups_to_use) {
 	for (int i = 0; i < groups_to_use; i++) {
-		SpikeMonitor* SpikeMonInput2  = sim->setSpikeMonitor(layer[i],"DEFAULT");
+		spike_monitors[spike_monitors_formed] = sim->setSpikeMonitor(layer[i],"DEFAULT");
+		spike_monitors_formed++;
 	}
 }
 
@@ -219,8 +222,8 @@ int main(int argc, const char* argv[]) {
 	create_external_current(c_a_1_layer.layers, -180.0, 6);
 
 	create_spike_monitors(e_c_3_layer.layers, 6);
-	create_spike_monitors(e_c_5_layer.layers, 3);
-	create_spike_monitors(c_a_1_layer.layers, 1);
+	create_spike_monitors(e_c_5_layer.layers, 6);
+	create_spike_monitors(c_a_1_layer.layers, 6);
 
 	// accept firing rates within this range of target firing
 	double target_firing_e_c_3_1 = 1.49;//27.4;	// target firing rate for gec3
@@ -293,6 +296,12 @@ int main(int argc, const char* argv[]) {
 	sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
 	sim->scaleWeights(c0, 2.0, false);
 	sim->runNetwork(10,0);*/
+	std::cout<<"spike mon output:\t";
+	//std::cout<<
+	//std::cout<<sim->getSpikeMonitor(0)->getAllFiringRates();//getNeuronNumSpikes(0);
+	double thisRate = sim->getSpikeMonitor(e_c_5_layer.layers[0])->getNeuronNumSpikes(0);//getPopMeanFiringRate();
+	std::cout<<thisRate;
+	std::cout<<"\noutput end";
 
 	delete sim;
 	return 0;
