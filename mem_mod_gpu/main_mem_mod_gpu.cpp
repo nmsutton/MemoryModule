@@ -85,6 +85,7 @@ struct create_syn_variables
 {
 	double fire_rate_ratios[];
 	double syn_weights[];
+	double groups_in_layer = 6;
 	double connections_per_group = 8;
 	double connections_to_form;
 	int syn_connections[10000];
@@ -122,40 +123,45 @@ create_syn_variables create_syn(int input_layer[1000], int output_layer[1000], c
 	 * normalized_index = connections index normalized to have the first index at 0
 	 * normalized_delay = delay index normalized to have the first index at 1.5
 	 */
-	int new_connections_last_index = syn_variables.connections_per_group + syn_connections_formed;
+	//int new_connections_last_index = syn_variables.groups_in_layer + syn_connections_formed;
 	int normalized_delay = 0;
-	int initial_syn_connections_formed = syn_connections_formed;
-	int normalized_index = 0;
+	//int initial_syn_connections_formed = syn_connections_formed;
+	//int normalized_index = 0;
 	double remaining_connections = 0;
-	double full_syn_weight = 10.0f;
+	double adjusted_syn_weight = 10.0f;
 	double connection_probability = 1.0;
-	bool create_connection = true;
+	//bool create_connection = true;
 
-	for (int i = syn_connections_formed; i < (new_connections_last_index); i++) {
-		normalized_index = i - initial_syn_connections_formed;
-		double times_greater_ratio = int(ceil(syn_variables.fire_rate_ratios[i]));
-		normalized_delay = 1.5 + (new_connections_last_index - i);
+	for (int i = 0; i < syn_variables.groups_in_layer; i++) {
+		for (int i2 = 0; i2 < syn_variables.connections_per_group; i2++) {
+			//normalized_index = i - initial_syn_connections_formed;
+			//double times_greater_ratio = int(ceil(syn_variables.fire_rate_ratios[i]));
+			normalized_delay = 1.5 + i2;//(new_connections_last_index - i2);
 
-		// Check for last connection section
-		remaining_connections = syn_variables.connections_to_form - normalized_index;
-		if (remaining_connections < 1.0 & remaining_connections > 0.0) {
-			full_syn_weight = full_syn_weight * remaining_connections;
+			// Check for last connection section
+			remaining_connections = syn_variables.connections_to_form - i2;
+			if (remaining_connections < 1.0 & remaining_connections > 0.0) {
+				adjusted_syn_weight = adjusted_syn_weight * remaining_connections;
+			}
+			else if (remaining_connections <= 0.0) {
+				connection_probability = 0.0;
+			}
+
+			syn_variables.syn_connections[syn_connections_formed]=sim->connect(input_layer[i],
+					output_layer[i], "full", RangeWeight(adjusted_syn_weight), connection_probability, normalized_delay);
+
+			std::cout<<"\n new connection:\n";
+			std::cout<<syn_connections_formed;
+			std::cout<<"\ni:\t";std::cout<<i;std::cout<<"\tinput:\t";std::cout<<SSTR(input_layer[i]);std::cout<<"\toutput:\t";std::cout<<SSTR(output_layer[i]);
+			std::cout<<"\n remaining_connections:\n";
+			std::cout<<remaining_connections;
+			std::cout<<"\n connection_probability: \n";
+			std::cout<<connection_probability;
+			std::cout<<"\n full_syn_weight: \n";
+			std::cout<<adjusted_syn_weight;
+
+			syn_connections_formed++;
 		}
-		else if (remaining_connections <= 0.0) {
-			connection_probability = 0.0;
-		}
-
-		syn_variables.syn_connections[i]=sim->connect(input_layer[normalized_index],
-				output_layer[normalized_index], "full", RangeWeight(full_syn_weight), connection_probability, normalized_delay);
-		std::cout<<"\n new connection:\n";
-		std::cout<<syn_connections_formed;
-		std::cout<<"\n remaining_connections:\n";
-		std::cout<<remaining_connections;
-		std::cout<<"\n connection_probability: \n";
-		std::cout<<connection_probability;
-		std::cout<<"\n full_syn_weight: \n";
-		std::cout<<full_syn_weight;
-		syn_connections_formed++;
 	}
 
 	return syn_variables;
@@ -186,11 +192,11 @@ int main(int argc, const char* argv[]) {
 	c_a_1_layer = create_layers(c_a_1_layer);
 
 	create_syn_variables ec3_to_ca5_synapes;
-	ec3_to_ca5_synapes.connections_to_form = 6.5;
+	ec3_to_ca5_synapes.connections_to_form = 8.0;//6.5;
 	ec3_to_ca5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ca5_synapes);
 
 	create_syn_variables ec5_to_ca1_synapes;
-	ec5_to_ca1_synapes.connections_to_form = 4.5;
+	ec5_to_ca1_synapes.connections_to_form = 8.0;//4.5;
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
 
 	sim->setConductances(false);
