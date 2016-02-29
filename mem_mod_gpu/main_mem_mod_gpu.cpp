@@ -226,9 +226,18 @@ int main(int argc, const char* argv[]) {
 	create_spike_monitors(c_a_1_layer.layers, 6);
 
 	// accept firing rates within this range of target firing
-	double target_firing_e_c_3_1 = 1.49;//27.4;	// target firing rate for gec3
-	double target_firing_e_c_5 = 2.6;//42.8;	// target firing rate for gec5
-	double target_firing_c_a_1 = 1.2;//42.8;	// target firing rate for gca1
+	double target_firing_e_c_3_1 = 1.4917;
+	double target_firing_e_c_3_2 = 2.2081;
+	double target_firing_e_c_3_3 = 2.2081;
+	double target_firing_e_c_3_4 = 0.6152;
+	double target_firing_e_c_3_5 = 0.3024;
+	double target_firing_e_c_3_6 = 0.3024;
+	double target_firing_e_c_5_1 = 6.8895;
+	double target_firing_e_c_5_2 = 4.6546;
+	double target_firing_e_c_5_3 = 1.6016;
+	double target_firing_e_c_5_4 = 5.7480;
+	double target_firing_e_c_5_5 = 5.7480;
+	double target_firing_e_c_5_6 = 7.6722;
 
 	// algorithm will terminate when at least one of the termination conditions is reached
 	double errorMarginHz = 0.015;	// error margin
