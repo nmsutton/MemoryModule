@@ -199,7 +199,7 @@ int main(int argc, const char* argv[]) {
 	create_syn_variables ec3_to_ec5_synapes;
 	create_syn_variables ec5_to_ca1_synapes;
 	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.00874, 0.0086, 0.0087, 0.0086, 0.019, 0.021};
-	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
+	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.024, 0.0615, 0.042, 0.0188, 0.0139, 0.0029};
 	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
 
 	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
@@ -305,8 +305,8 @@ int main(int argc, const char* argv[]) {
 
 	//sim->setWeight(c1, e_c_3_layer1, e_c_3_layer5, 10000.0, true);
 	//sim->scaleWeights(c1, 1000.0, true);
-	sim->runNetwork(2,0);
-	sim->runNetwork(1,500);
+	//sim->runNetwork(2,0);
+	//sim->runNetwork(1,500);
 	/*sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
 	sim->scaleWeights(c0, 0.9, false);
 	sim->runNetwork(2,0);
