@@ -187,47 +187,6 @@ void create_spike_monitors(int layer[1000], int groups_to_use) {
 	}
 }
 
-void create_initial_spike_gen(int neuronsPerGroup) {
-	/*// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
-	PeriodicSpikeGenerator PSG_for_ec3(50.0f);
-	int psg_input = sim->createSpikeGeneratorGroup("psg1",
-			ceil(neuronsPerGroup), EXCITATORY_NEURON);
-	sim->setSpikeGenerator(psg_input, &PSG_for_ec3);*/
-	// input is a SpikeGenerator group that fires every 20 ms (50 Hz)
-	/*PeriodicSpikeGenerator PSG(50.0f);
-	int gIn=sim->createSpikeGeneratorGroup("in", 1000, EXCITATORY_NEURON);
-	sim->setSpikeGenerator(gIn, &PSG);*/
-
-	/*// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
-	double PSG_firing_rates[6] = {50.0f, 50.0f, 50.0f, 50.0f, 50.0f, 50.0f};
-	int psg_input[groups_in_layer];
-	PeriodicSpikeGenerator PSG_for_ec3_1(50.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_2(50.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_3(50.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_4(50.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_5(50.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_6(50.0f);
-	//psg_input[0]
-	int psg_input1 = sim->createSpikeGeneratorGroup("psg_1",
-			ceil(neuronsPerGroup*group_sizes[0]), EXCITATORY_NEURON);
-	psg_input[1] = sim->createSpikeGeneratorGroup("psg_2",
-			ceil(neuronsPerGroup*group_sizes[1]), EXCITATORY_NEURON);
-	psg_input[2] = sim->createSpikeGeneratorGroup("psg_3",
-			ceil(neuronsPerGroup*group_sizes[2]), EXCITATORY_NEURON);
-	psg_input[3] = sim->createSpikeGeneratorGroup("psg_4",
-			ceil(neuronsPerGroup*group_sizes[3]), EXCITATORY_NEURON);
-	psg_input[4] = sim->createSpikeGeneratorGroup("psg_5",
-			ceil(neuronsPerGroup*group_sizes[4]), EXCITATORY_NEURON);
-	psg_input[5] = sim->createSpikeGeneratorGroup("psg_6",
-			ceil(neuronsPerGroup*group_sizes[5]), EXCITATORY_NEURON);
-	//sim->setSpikeGenerator(psg_input1, &PSG_for_ec3_1);*/
-	/*sim->setSpikeGenerator(psg_input[1], &PSG_for_ec3_2);
-	sim->setSpikeGenerator(psg_input[2], &PSG_for_ec3_3);
-	sim->setSpikeGenerator(psg_input[3], &PSG_for_ec3_4);
-	sim->setSpikeGenerator(psg_input[4], &PSG_for_ec3_5);
-	sim->setSpikeGenerator(psg_input[5], &PSG_for_ec3_6);*/
-}
-
 int main(int argc, const char* argv[]) {
 	/*
 	 * the _conn arrays set the synapse connection quantities
@@ -239,13 +198,13 @@ int main(int argc, const char* argv[]) {
 	create_syn_variables sg_to_ec3_synapes;
 	create_syn_variables ec3_to_ec5_synapes;
 	create_syn_variables ec5_to_ca1_synapes;
-	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.01, 0.005, 0.005, 0.005, 0.005, 0.005};
+	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.00874, 0.0086, 0.0087, 0.0086, 0.019, 0.021};
 	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
 	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
 
 	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
 	create_layers_variables sg_layer;
-	PeriodicSpikeGenerator PSG_for_ec3(00.01f);//(00.1f);//(50.0f);
+	PeriodicSpikeGenerator PSG_for_ec3(00.8f);//(00.1f);//(50.0f);
 	int psg_input = sim->createSpikeGeneratorGroup("psg1",
 			sg_layer.neuronsPerGroup, EXCITATORY_NEURON);
 	sim->setSpikeGenerator(psg_input, &PSG_for_ec3);
@@ -272,7 +231,7 @@ int main(int argc, const char* argv[]) {
 
 	sim->setupNetwork();
 
-	create_external_current(e_c_3_layer.layers, 170.0);//-172.0, 6);//-171.196, 6);
+	create_external_current(e_c_3_layer.layers, -172.0, 6);//-172.0, 6);//-171.196, 6);
 	create_external_current(e_c_5_layer.layers, -180.0, 6);
 	create_external_current(c_a_1_layer.layers, -180.0, 6);
 
