@@ -43,7 +43,8 @@
 #include <sstream>
 #include <iostream>
 #include <stdlib.h>
-//#include <algorithm>
+#include <string>
+#include <algorithm>
 
 #if defined(WIN32) || defined(WIN64)
 	#define _CRT_SECURE_NO_WARNINGS
@@ -173,7 +174,7 @@ create_syn_variables create_syn(int input_layer[1000], int output_layer[1000], c
 	return syn_variables;
 }
 
-void create_external_current(int layer[1000], int current_value, int groups_to_use) {
+void create_external_current(int layer[1000], double current_value, int groups_to_use) {
 	for (int i = 0; i < groups_to_use; i++) {
 		sim->setExternalCurrent(layer[i], current_value);
 	}
@@ -186,12 +187,49 @@ void create_spike_monitors(int layer[1000], int groups_to_use) {
 	}
 }
 
+void create_initial_spike_gen(int groups_to_use, int neuronsPerGroup, double group_sizes[]) {
+	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
+	/*PeriodicSpikeGenerator PSG_for_ec3_1(50.0f);
+	PeriodicSpikeGenerator PSG_for_ec3_2(50.0f);
+	PeriodicSpikeGenerator PSG_for_ec3_3(50.0f);
+	PeriodicSpikeGenerator PSG_for_ec3_4(50.0f);
+	PeriodicSpikeGenerator PSG_for_ec3_5(50.0f);
+	PeriodicSpikeGenerator PSG_for_ec3_6(50.0f);*/
+	//PeriodicSpikeGenerator PSG_for_ec3[] = {};
+	double PSG_firing_rates[6] = {50.0f, 50.0f, 50.0f, 50.0f, 50.0f, 50.0f};
+	int psg_input[groups_to_use];
+	for (int i = 0; i < groups_to_use; i++) {
+		PeriodicSpikeGenerator PSG(PSG_firing_rates[i]);
+
+		psg_input[i] = sim->createSpikeGeneratorGroup(SSTR(i),
+				ceil(neuronsPerGroup*group_sizes[i]), EXCITATORY_NEURON);
+		//int gIn=sim->createSpikeGeneratorGroup("in", 500, EXCITATORY_NEURON);
+
+		/*std::stringstream ss;
+		for (int i = 0; i < 200; i++) {
+			ss.str( std::string() );
+			ss.clear();
+			ss << "../../../OpenGL/Media/diffGaus/plot1/diffGaus_";
+			ss << i;
+			ss << ".bmp";
+			std::string s = ss.str();
+			const char* p = s.c_str();
+			strcpy(texGroup[i], p);
+		}*/
+
+		sim->setSpikeGenerator(psg_input[i], &PSG);
+		//sim->setSpikeGenerator(gIn, &PSG);
+	}
+}
+
 int main(int argc, const char* argv[]) {
 	/*
 	 * the _conn arrays set the synapse connection quantities
 	 */
 	// ---------------- CONFIG STATE -------------------
 	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
+
+
 	//int neuronsPerGroup = 500;//500;
 	create_syn_variables ec3_to_ec5_synapes;
 	create_syn_variables ec5_to_ca1_synapes;
@@ -217,7 +255,7 @@ int main(int argc, const char* argv[]) {
 
 	sim->setupNetwork();
 
-	create_external_current(e_c_3_layer.layers, -160.0, 6);
+	create_external_current(e_c_3_layer.layers, -171.196, 6);
 	create_external_current(e_c_5_layer.layers, -180.0, 6);
 	create_external_current(c_a_1_layer.layers, -180.0, 6);
 
@@ -285,7 +323,7 @@ int main(int argc, const char* argv[]) {
 	//printf("\n- Verify result (gec3=%.4fHz, gec5=%.4fHz, gac1=%.4fHz, +/- %.4fHz)\n",
 	//		target_firing_e_c_3, target_firing_e_c_5, target_firing_c_a_1, errorMarginHz);
 	double step_size = 100.0;
-	sim->runNetwork(2,0);
+	sim->runNetwork(20,0);
 
 	/*sim->biasWeights(c1, step_size, true);*/
 
@@ -311,6 +349,27 @@ int main(int argc, const char* argv[]) {
 	double thisRate = sim->getSpikeMonitor(e_c_5_layer.layers[0])->getNeuronNumSpikes(0);//getPopMeanFiringRate();
 	std::cout<<thisRate;
 	std::cout<<"\noutput end";
+
+	//double e_c_5_layer_exper_sizes[6] = {7.0, 4.0, 6.0, 3.0, 2.0, 8.0};
+	double e_c_5_exper_firing_rates[6] = {423.9286, 627.5, 627.5, 174.8462, 174.8462, 174.8462};
+	//double c_a_1_layer_exper_sizes[6] = {7.0, 4.0, 6.0, 3.0, 2.0, 8.0};
+	double c_a_1_exper_firing_rates[6] = {2920.7727, 2920.7727, 1005.0201, 1005.0201, 1005.0201, 1341.4554};
+	for (int i = 0; i < 6; i++) {
+		std::cout<<"\ne_c_5_layer group:";
+		std::cout<<i;
+		std::cout<<"\tsize:\t";
+		std::cout<<e_c_5_layer.group_sizes[i]*e_c_5_layer.neuronsPerGroup;
+		std::cout<<"\tfiring:\t";
+		std::cout<<(e_c_5_layer.group_sizes[i]*e_c_5_layer.neuronsPerGroup)*e_c_5_exper_firing_rates[i];
+	}
+	for (int i = 0; i < 6; i++) {
+		std::cout<<"\nc_a_1_layer group:";
+		std::cout<<i;
+		std::cout<<"\tsize:\t";
+		std::cout<<c_a_1_layer.group_sizes[i]*c_a_1_layer.neuronsPerGroup;
+		std::cout<<"\tfiring:\t";
+		std::cout<<(c_a_1_layer.group_sizes[i]*c_a_1_layer.neuronsPerGroup)*c_a_1_exper_firing_rates[i];
+	}
 
 	delete sim;
 	return 0;
