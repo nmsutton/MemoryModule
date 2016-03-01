@@ -187,39 +187,51 @@ void create_spike_monitors(int layer[1000], int groups_to_use) {
 	}
 }
 
-void create_initial_spike_gen(int groups_to_use, int neuronsPerGroup, double group_sizes[]) {
+void create_initial_spike_gen(int groups_in_layer, int neuronsPerGroup, double group_sizes[]) {
 	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
-	/*PeriodicSpikeGenerator PSG_for_ec3_1(50.0f);
+	double PSG_firing_rates[6] = {50.0f, 50.0f, 50.0f, 50.0f, 50.0f, 50.0f};
+	PeriodicSpikeGenerator PSG_for_ec3_1(50.0f);
 	PeriodicSpikeGenerator PSG_for_ec3_2(50.0f);
 	PeriodicSpikeGenerator PSG_for_ec3_3(50.0f);
 	PeriodicSpikeGenerator PSG_for_ec3_4(50.0f);
 	PeriodicSpikeGenerator PSG_for_ec3_5(50.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_6(50.0f);*/
-	//PeriodicSpikeGenerator PSG_for_ec3[] = {};
-	double PSG_firing_rates[6] = {50.0f, 50.0f, 50.0f, 50.0f, 50.0f, 50.0f};
-	int psg_input[groups_to_use];
-	for (int i = 0; i < groups_to_use; i++) {
-		PeriodicSpikeGenerator PSG(PSG_firing_rates[i]);
+	PeriodicSpikeGenerator PSG_for_ec3_6(50.0f);
+	//PeriodicSpikeGenerator PSG_array;
+	int psg_input[groups_in_layer];
+	std::string psg_name = "";
+	std::stringstream ss;
+	for (int i = 0; i < groups_in_layer; i++) {
+		//PeriodicSpikeGenerator PSG(PSG_firing_rates[i]);
 
-		psg_input[i] = sim->createSpikeGeneratorGroup(SSTR(i),
+		//for (int i = 0; i < 200; i++) {
+			ss.str( std::string() );
+			ss.clear();
+			ss << "psg_unit_";
+			ss << SSTR(i);
+			psg_name = ss.str();
+			//const char* p = s.c_str();
+			//string::strcpy(psg_name, p);
+		//}
+
+		psg_input[i] = sim->createSpikeGeneratorGroup(psg_name,
 				ceil(neuronsPerGroup*group_sizes[i]), EXCITATORY_NEURON);
 		//int gIn=sim->createSpikeGeneratorGroup("in", 500, EXCITATORY_NEURON);
 
-		/*std::stringstream ss;
-		for (int i = 0; i < 200; i++) {
-			ss.str( std::string() );
-			ss.clear();
-			ss << "../../../OpenGL/Media/diffGaus/plot1/diffGaus_";
-			ss << i;
-			ss << ".bmp";
-			std::string s = ss.str();
-			const char* p = s.c_str();
-			strcpy(texGroup[i], p);
-		}*/
-
-		sim->setSpikeGenerator(psg_input[i], &PSG);
+		//sim->setSpikeGenerator(psg_input[i], &PSG);
 		//sim->setSpikeGenerator(gIn, &PSG);
 	}
+	psg_input[0] = sim->createSpikeGeneratorGroup('psg_name1",
+			ceil(neuronsPerGroup*group_sizes[0]), EXCITATORY_NEURON);
+	psg_input[1] = sim->createSpikeGeneratorGroup("psg_name2",
+			ceil(neuronsPerGroup*group_sizes[1]), EXCITATORY_NEURON);
+	sim->setSpikeGenerator(psg_input[0], &PSG_for_ec3_1);
+	sim->setSpikeGenerator(psg_input[1], &PSG_for_ec3_2);
+	/*sim->setSpikeGenerator(psg_input[0], &PSG_for_ec3_1);
+	sim->setSpikeGenerator(psg_input[1], &PSG_for_ec3_2);
+	sim->setSpikeGenerator(psg_input[2], &PSG_for_ec3_3);
+	sim->setSpikeGenerator(psg_input[3], &PSG_for_ec3_4);
+	sim->setSpikeGenerator(psg_input[4], &PSG_for_ec3_5);
+	sim->setSpikeGenerator(psg_input[5], &PSG_for_ec3_6);*/
 }
 
 int main(int argc, const char* argv[]) {
@@ -229,7 +241,6 @@ int main(int argc, const char* argv[]) {
 	// ---------------- CONFIG STATE -------------------
 	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
 
-
 	//int neuronsPerGroup = 500;//500;
 	create_syn_variables ec3_to_ec5_synapes;
 	create_syn_variables ec5_to_ca1_synapes;
@@ -237,6 +248,7 @@ int main(int argc, const char* argv[]) {
 	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
 
 	create_layers_variables e_c_3_layer;
+	create_initial_spike_gen(e_c_3_layer.groups_in_layer, e_c_3_layer.neuronsPerGroup, e_c_3_layer.group_sizes);
 	e_c_3_layer = create_layers(e_c_3_layer);
 	create_layers_variables e_c_5_layer;
 	e_c_5_layer = create_layers(e_c_5_layer);
