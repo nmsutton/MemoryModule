@@ -43,8 +43,8 @@
 #include <sstream>
 #include <iostream>
 #include <stdlib.h>
-#include <string>
-#include <algorithm>
+//#include <string>
+//#include <algorithm>
 
 #if defined(WIN32) || defined(WIN64)
 	#define _CRT_SECURE_NO_WARNINGS
@@ -187,47 +187,41 @@ void create_spike_monitors(int layer[1000], int groups_to_use) {
 	}
 }
 
-void create_initial_spike_gen(int groups_in_layer, int neuronsPerGroup, double group_sizes[]) {
-	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
+void create_initial_spike_gen(int neuronsPerGroup) {
+	/*// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
+	PeriodicSpikeGenerator PSG_for_ec3(50.0f);
+	int psg_input = sim->createSpikeGeneratorGroup("psg1",
+			ceil(neuronsPerGroup), EXCITATORY_NEURON);
+	sim->setSpikeGenerator(psg_input, &PSG_for_ec3);*/
+	// input is a SpikeGenerator group that fires every 20 ms (50 Hz)
+	/*PeriodicSpikeGenerator PSG(50.0f);
+	int gIn=sim->createSpikeGeneratorGroup("in", 1000, EXCITATORY_NEURON);
+	sim->setSpikeGenerator(gIn, &PSG);*/
+
+	/*// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
 	double PSG_firing_rates[6] = {50.0f, 50.0f, 50.0f, 50.0f, 50.0f, 50.0f};
+	int psg_input[groups_in_layer];
 	PeriodicSpikeGenerator PSG_for_ec3_1(50.0f);
 	PeriodicSpikeGenerator PSG_for_ec3_2(50.0f);
 	PeriodicSpikeGenerator PSG_for_ec3_3(50.0f);
 	PeriodicSpikeGenerator PSG_for_ec3_4(50.0f);
 	PeriodicSpikeGenerator PSG_for_ec3_5(50.0f);
 	PeriodicSpikeGenerator PSG_for_ec3_6(50.0f);
-	//PeriodicSpikeGenerator PSG_array;
-	int psg_input[groups_in_layer];
-	std::string psg_name = "";
-	std::stringstream ss;
-	for (int i = 0; i < groups_in_layer; i++) {
-		//PeriodicSpikeGenerator PSG(PSG_firing_rates[i]);
-
-		//for (int i = 0; i < 200; i++) {
-			ss.str( std::string() );
-			ss.clear();
-			ss << "psg_unit_";
-			ss << SSTR(i);
-			psg_name = ss.str();
-			//const char* p = s.c_str();
-			//string::strcpy(psg_name, p);
-		//}
-
-		psg_input[i] = sim->createSpikeGeneratorGroup(psg_name,
-				ceil(neuronsPerGroup*group_sizes[i]), EXCITATORY_NEURON);
-		//int gIn=sim->createSpikeGeneratorGroup("in", 500, EXCITATORY_NEURON);
-
-		//sim->setSpikeGenerator(psg_input[i], &PSG);
-		//sim->setSpikeGenerator(gIn, &PSG);
-	}
-	psg_input[0] = sim->createSpikeGeneratorGroup('psg_name1",
+	//psg_input[0]
+	int psg_input1 = sim->createSpikeGeneratorGroup("psg_1",
 			ceil(neuronsPerGroup*group_sizes[0]), EXCITATORY_NEURON);
-	psg_input[1] = sim->createSpikeGeneratorGroup("psg_name2",
+	psg_input[1] = sim->createSpikeGeneratorGroup("psg_2",
 			ceil(neuronsPerGroup*group_sizes[1]), EXCITATORY_NEURON);
-	sim->setSpikeGenerator(psg_input[0], &PSG_for_ec3_1);
-	sim->setSpikeGenerator(psg_input[1], &PSG_for_ec3_2);
-	/*sim->setSpikeGenerator(psg_input[0], &PSG_for_ec3_1);
-	sim->setSpikeGenerator(psg_input[1], &PSG_for_ec3_2);
+	psg_input[2] = sim->createSpikeGeneratorGroup("psg_3",
+			ceil(neuronsPerGroup*group_sizes[2]), EXCITATORY_NEURON);
+	psg_input[3] = sim->createSpikeGeneratorGroup("psg_4",
+			ceil(neuronsPerGroup*group_sizes[3]), EXCITATORY_NEURON);
+	psg_input[4] = sim->createSpikeGeneratorGroup("psg_5",
+			ceil(neuronsPerGroup*group_sizes[4]), EXCITATORY_NEURON);
+	psg_input[5] = sim->createSpikeGeneratorGroup("psg_6",
+			ceil(neuronsPerGroup*group_sizes[5]), EXCITATORY_NEURON);
+	//sim->setSpikeGenerator(psg_input1, &PSG_for_ec3_1);*/
+	/*sim->setSpikeGenerator(psg_input[1], &PSG_for_ec3_2);
 	sim->setSpikeGenerator(psg_input[2], &PSG_for_ec3_3);
 	sim->setSpikeGenerator(psg_input[3], &PSG_for_ec3_4);
 	sim->setSpikeGenerator(psg_input[4], &PSG_for_ec3_5);
@@ -248,7 +242,13 @@ int main(int argc, const char* argv[]) {
 	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
 
 	create_layers_variables e_c_3_layer;
-	create_initial_spike_gen(e_c_3_layer.groups_in_layer, e_c_3_layer.neuronsPerGroup, e_c_3_layer.group_sizes);
+
+	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
+	PeriodicSpikeGenerator PSG_for_ec3(50.0f);
+	int psg_input = sim->createSpikeGeneratorGroup("psg1",
+			500, EXCITATORY_NEURON);
+	sim->setSpikeGenerator(psg_input, &PSG_for_ec3);
+
 	e_c_3_layer = create_layers(e_c_3_layer);
 	create_layers_variables e_c_5_layer;
 	e_c_5_layer = create_layers(e_c_5_layer);
