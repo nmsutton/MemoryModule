@@ -236,24 +236,29 @@ int main(int argc, const char* argv[]) {
 	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
 
 	//int neuronsPerGroup = 500;//500;
+	create_syn_variables sg_to_ec3_synapes;
 	create_syn_variables ec3_to_ec5_synapes;
 	create_syn_variables ec5_to_ca1_synapes;
+	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.01, 0.005, 0.005, 0.005, 0.005, 0.005};
 	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
 	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
 
-	create_layers_variables e_c_3_layer;
-
 	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
-	PeriodicSpikeGenerator PSG_for_ec3(50.0f);
+	create_layers_variables sg_layer;
+	PeriodicSpikeGenerator PSG_for_ec3(00.01f);//(00.1f);//(50.0f);
 	int psg_input = sim->createSpikeGeneratorGroup("psg1",
-			500, EXCITATORY_NEURON);
+			sg_layer.neuronsPerGroup, EXCITATORY_NEURON);
 	sim->setSpikeGenerator(psg_input, &PSG_for_ec3);
 
+	create_layers_variables e_c_3_layer;
 	e_c_3_layer = create_layers(e_c_3_layer);
 	create_layers_variables e_c_5_layer;
 	e_c_5_layer = create_layers(e_c_5_layer);
 	create_layers_variables c_a_1_layer;
 	c_a_1_layer = create_layers(c_a_1_layer);
+
+	for (int i = 0; i < sg_to_ec3_synapes.connections_per_group; i++) {sg_to_ec3_synapes.connections_to_form[i]=sg_to_ec3_conn[i];};
+	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);
 
 	for (int i = 0; i < ec3_to_ec5_synapes.connections_per_group; i++) {ec3_to_ec5_synapes.connections_to_form[i]=ec3_to_ec5_conn[i];};
 	ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
@@ -267,7 +272,7 @@ int main(int argc, const char* argv[]) {
 
 	sim->setupNetwork();
 
-	create_external_current(e_c_3_layer.layers, -171.196, 6);
+	create_external_current(e_c_3_layer.layers, 170.0);//-172.0, 6);//-171.196, 6);
 	create_external_current(e_c_5_layer.layers, -180.0, 6);
 	create_external_current(c_a_1_layer.layers, -180.0, 6);
 
@@ -362,17 +367,32 @@ int main(int argc, const char* argv[]) {
 	std::cout<<thisRate;
 	std::cout<<"\noutput end";
 
+	double e_c_3_exper_firing_rates[6] = {284.17424, 284.17424, 284.17424, 284.17424,  578.0694,  578.0694};
 	//double e_c_5_layer_exper_sizes[6] = {7.0, 4.0, 6.0, 3.0, 2.0, 8.0};
 	double e_c_5_exper_firing_rates[6] = {423.9286, 627.5, 627.5, 174.8462, 174.8462, 174.8462};
 	//double c_a_1_layer_exper_sizes[6] = {7.0, 4.0, 6.0, 3.0, 2.0, 8.0};
 	double c_a_1_exper_firing_rates[6] = {2920.7727, 2920.7727, 1005.0201, 1005.0201, 1005.0201, 1341.4554};
+	double orig_exper_neuron_size = 30; //neurons in orig groups
+	double time_conversion = 0.01; // 200k/2000k ms simulated from orig exper
+	for (int i = 0; i < 6; i++) {
+		std::cout<<"\ne_c_3_layer group:";
+		std::cout<<i;
+		std::cout<<"\tsize:\t";
+		std::cout<<e_c_3_layer.group_sizes[i]*e_c_3_layer.neuronsPerGroup;
+		std::cout<<"\tfiring:\t";
+		std::cout<<(e_c_3_layer.neuronsPerGroup/orig_exper_neuron_size)*e_c_3_exper_firing_rates[i]*time_conversion;
+		std::cout<<"\ttotal firing:\t";
+		std::cout<<(e_c_3_layer.neuronsPerGroup/orig_exper_neuron_size)*e_c_3_exper_firing_rates[i]*time_conversion*e_c_3_layer.group_sizes[i]*e_c_3_layer.neuronsPerGroup;
+	}
 	for (int i = 0; i < 6; i++) {
 		std::cout<<"\ne_c_5_layer group:";
 		std::cout<<i;
 		std::cout<<"\tsize:\t";
 		std::cout<<e_c_5_layer.group_sizes[i]*e_c_5_layer.neuronsPerGroup;
 		std::cout<<"\tfiring:\t";
-		std::cout<<(e_c_5_layer.group_sizes[i]*e_c_5_layer.neuronsPerGroup)*e_c_5_exper_firing_rates[i];
+		std::cout<<(e_c_5_layer.neuronsPerGroup/orig_exper_neuron_size)*e_c_5_exper_firing_rates[i]*time_conversion;
+		std::cout<<"\ttotal firing:\t";
+		std::cout<<(e_c_5_layer.neuronsPerGroup/orig_exper_neuron_size)*e_c_5_exper_firing_rates[i]*time_conversion*e_c_5_layer.group_sizes[i]*e_c_5_layer.neuronsPerGroup;
 	}
 	for (int i = 0; i < 6; i++) {
 		std::cout<<"\nc_a_1_layer group:";
@@ -380,7 +400,9 @@ int main(int argc, const char* argv[]) {
 		std::cout<<"\tsize:\t";
 		std::cout<<c_a_1_layer.group_sizes[i]*c_a_1_layer.neuronsPerGroup;
 		std::cout<<"\tfiring:\t";
-		std::cout<<(c_a_1_layer.group_sizes[i]*c_a_1_layer.neuronsPerGroup)*c_a_1_exper_firing_rates[i];
+		std::cout<<(c_a_1_layer.neuronsPerGroup/orig_exper_neuron_size)*c_a_1_exper_firing_rates[i]*time_conversion;
+		std::cout<<"\ttotal firing:\t";
+		std::cout<<(c_a_1_layer.neuronsPerGroup/orig_exper_neuron_size)*c_a_1_exper_firing_rates[i]*time_conversion*c_a_1_layer.group_sizes[i]*c_a_1_layer.neuronsPerGroup;
 	}
 
 	delete sim;
