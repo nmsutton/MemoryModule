@@ -238,7 +238,36 @@ double create_syn_weights(string syn_type, int group_number, double init_firing,
 //(syn_weight_variables.neuronsPerGroup*
 	return synapse_weight;
 }
-// -1.905898141·10-7 x1 + 1.736592471·10-2 x2 - 4.510761393·10-3
+
+double create_syn_weights2(string syn_type, int group_number, double init_firing, double group_size,
+		double tot_neurons, double targ_firing, int i) {
+	/*
+	 * Synapse weights are generated based on a model fitted to example data
+	 * using this tool: http://www.xuru.org/rt/MLR.asp#CopyPaste
+	 */
+	double synapse_weight;
+	double x_1;
+	double x_2;
+	double x_3;
+	double x_4;
+
+	// -1.905898141·10-7 x1 + 1.736592471·10-2 x2 - 4.510761393·10-3
+	if (syn_type == "ec3_to_ec5") {
+		x_1 = -1.905898141*pow(10,-7);
+		x_2 = 1.736592471*pow(10,-2);
+		x_3 = 4.510761393*pow(10, -3);
+	}
+	else if (syn_type == "ec5_to_ca1") {
+		x_1 = 3.033292035*.00001;
+		x_2 = -2.514693722*.001;
+		x_3 = 7.446468689*.01;
+		x_4 = -5.280723543*.01;
+	}
+
+	synapse_weight = (x_1*init_firing)+(x_2*targ_firing)+x_3;
+	cout<<"\n++syn\t";cout<<i;cout<<"\tv\t";cout<<synapse_weight;cout<<"\n";
+	return synapse_weight;
+}
 
 int main(int argc, const char* argv[]) {
 	/*
