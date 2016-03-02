@@ -43,6 +43,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdlib.h>
+#include <math.h>
 //#include <array>
 //#include <string>
 //#include <algorithm>
@@ -210,24 +211,31 @@ double create_syn_weights(create_syn_weight_variables syn_weight_variables, int 
 	double x_2;
 	double x_3;
 	double x_4;
+	/*cout<<"\ntest\n";
+	double test1 = pow(10, -6);
+	cout<<test1;
+	cout<<"\n";*/
 
 	if (syn_weight_variables.syn_type == "ec3_to_ec5") {
-		x_1 = 3.912113944*.000001;
+		x_1 = 3.912113944*pow(10,-6);
 		x_2 = -4.16315869*.0001;
 		x_3 = 2.623349094*.01;
 		x_4 = 2.139377967*.001;
 	}
-	else if (syn_weight_variables.syn_type == "ec3_to_ec5") {
+	else if (syn_weight_variables.syn_type == "ec5_to_ca1") {
 		x_1 = 3.033292035*.00001;
 		x_2 = -2.514693722*.001;
 		x_3 = 7.446468689*.01;
 		x_4 = -5.280723543*.01;
 	}
-	//for (int i = 0; i < syn_weight_variables.groups_in_layer; i++) {
-		synapse_weight = x_1*syn_weight_variables.inital_firing[i]+x_2*
-		(syn_weight_variables.neuronsPerGroup*syn_weight_variables.group_sizes[i])+
-		x_3*syn_weight_variables.target_firing_rates[i]+x_4;
-	//}
+
+	synapse_weight = x_1*syn_weight_variables.inital_firing[i]+x_2*
+	(syn_weight_variables.neuronsPerGroup*syn_weight_variables.group_sizes[i])+
+	x_3*syn_weight_variables.target_firing_rates[i]+x_4;
+	cout<<"\n++syn\t";cout<<i;cout<<"\tx1\t";cout<<x_1;cout<<"\tif\t";cout<<syn_weight_variables.inital_firing[i];cout<<"\tx2\t";
+	cout<<syn_weight_variables.group_sizes[i];cout<<"\tx3\t";
+	cout<<x_3*syn_weight_variables.target_firing_rates[i];cout<<"\tx4\t";cout<<x_4;cout<<"\tv\t";cout<<synapse_weight;cout<<"\n";
+//(syn_weight_variables.neuronsPerGroup*
 	return synapse_weight;
 }
 
@@ -235,11 +243,12 @@ int main(int argc, const char* argv[]) {
 	/*
 	 * the _conn arrays set the synapse connection quantities
 	 */
+	std::cout.precision(17);
 	double *synapse_weights;
-	double sg_to_ec3_initial_firing[] = {5968, 3352, 5002, 2600, 3203, 11137};
-	double ec3_to_ec5_initial_firing[] = {8545, 6835, 10002, 1252, 1122, 4154};
-	double ec5_to_ca1_initial_firing[] = {56752, 33250, 15803, 8151, 5610, 32574};
-	double sg_to_ec3_target_firing[] = {1.4917, 2.2081, 2.2081, 0.6152, 0.3024, 0.3024};
+	//double sg_to_ec3_initial_firing[] = {5968, 3352, 5002, 2600, 3203, 11137};
+	double ec3_to_ec5_initial_firing[] = {5968.0, 3352.0, 5002.0, 2600.0, 3203.0, 11137.0};//{8545, 6835, 10002, 1252, 1122, 4154};
+	double ec5_to_ca1_initial_firing[] = {8545.0, 6835.0, 10002.0, 1252.0, 1122.0, 4154.0};//{56752, 33250, 15803, 8151, 5610, 32574};
+	//double sg_to_ec3_target_firing[] = {1.4917, 2.2081, 2.2081, 0.6152, 0.3024, 0.3024};
 	double ec3_to_ec5_target_firing[] = {1.4917, 2.2081, 2.2081, 0.6152, 0.3024, 0.3024};
 	double ec5_to_ca1_target_firing[] = {6.8895, 4.6546, 1.6016, 5.7480, 5.7480, 7.6722};
 
@@ -266,27 +275,30 @@ int main(int argc, const char* argv[]) {
 	c_a_1_layer = create_layers(c_a_1_layer);
 
 	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.000075, 0.0001, 0.000061, 0.000078, 0.001, 0.0008};
-	for (int i = 0; i < sg_to_ec3_synapes.connections_per_group; i++) {sg_to_ec3_synapes.connections_to_form[i]=sg_to_ec3_conn[i];};
+	for (int i = 0; i < sg_to_ec3_synapes.groups_in_layer; i++) {sg_to_ec3_synapes.connections_to_form[i]=sg_to_ec3_conn[i];};
 	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);
 
 	syn_weight_variables.groups_in_layer = sg_to_ec3_synapes.groups_in_layer;
 	syn_weight_variables.neuronsPerGroup = sg_layer.neuronsPerGroup;
-	syn_weight_variables.syn_type ="sg_to_ec3";
+	syn_weight_variables.syn_type ="ec3_to_ec5";
 	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.group_sizes[i]=sg_layer.group_sizes[i];};
 	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.inital_firing[i]=ec3_to_ec5_initial_firing[i];};
 	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.target_firing_rates[i]=ec3_to_ec5_target_firing[i];};
 	//synapse_weights = create_syn_weights(syn_weight_variables);
 
-	for (int i = 0; i < ec3_to_ec5_synapes.connections_per_group; i++) {ec3_to_ec5_synapes.connections_to_form[i]=
-			create_syn_weights(syn_weight_variables, i);}
+	for (int i = 0; i < ec3_to_ec5_synapes.groups_in_layer; i++) {ec3_to_ec5_synapes.connections_to_form[i]=
+			create_syn_weights(syn_weight_variables, i);};/*cout<<"\n**syn\t";cout<<i;cout<<"\tval\t";
+			cout<<create_syn_weights(syn_weight_variables, i);}*/
 	ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 
+	syn_weight_variables.syn_type ="ec5_to_ca1";
 	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.inital_firing[i]=ec5_to_ca1_initial_firing[i];};
 	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.target_firing_rates[i]=ec5_to_ca1_target_firing[i];};
 	//synapse_weights = create_syn_weights(syn_weight_variables);
 
-	for (int i = 0; i < ec5_to_ca1_synapes.connections_per_group; i++) {ec5_to_ca1_synapes.connections_to_form[i]=
-			create_syn_weights(syn_weight_variables, i);}
+	for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=
+			create_syn_weights(syn_weight_variables, i);};/*cout<<"\n**syn\t";cout<<i;cout<<"\tval\t";
+			cout<<create_syn_weights(syn_weight_variables, i);}*/
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
 
 	sim->setConductances(false);
