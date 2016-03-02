@@ -102,7 +102,7 @@ struct create_syn_weight_variables
 	double inital_firing[];
 	double group_sizes[1000];
 	double neuronsPerGroup;
-	double target_firing_rate; // accept firing rates within this range of target firing
+	double target_firing_rates[]; // accept firing rates within this range of target firing
 };
 
 create_layers_variables create_layers(create_layers_variables layers_variables) {
@@ -197,12 +197,12 @@ void create_spike_monitors(int layer[1000], int groups_to_use) {
 	}
 }
 
-double create_syn_weights(create_syn_weight_variables syn_weight_variables) {
+double * create_syn_weights(create_syn_weight_variables syn_weight_variables) {
 	/*
 	 * Synapse weights are generated based on a model fitted to example data
 	 * using this tool: http://www.xuru.org/rt/MLR.asp#CopyPaste
 	 */
-	double synapse_weights[1000];
+	double *synapse_weights;
 	double x_1;
 	double x_2;
 	double x_3;
@@ -222,28 +222,38 @@ double create_syn_weights(create_syn_weight_variables syn_weight_variables) {
 	}
 	for (int i = 0; i < syn_weight_variables.groups_in_layer; i++) {
 		synapse_weights[i] = x_1*syn_weight_variables.inital_firing[i]+x_2*
-		(syn_weight_variables.neuronsPerGroup*syn_weight_variables.group_sizes)+
-		x_3*syn_weight_variables.target_firing_rate[i]+x_4;
+		(syn_weight_variables.neuronsPerGroup*syn_weight_variables.group_sizes[i])+
+		x_3*syn_weight_variables.target_firing_rates[i]+x_4;
 	}
 	return synapse_weights;
+}
+
+double * copy_dbl_array(double input_array[], int indices_number) {
+	double * output_array;
+	for (int i = 0; i < indices_number; i++) { output_array[i] = input_array[i]; }
+	return output_array;
 }
 
 int main(int argc, const char* argv[]) {
 	/*
 	 * the _conn arrays set the synapse connection quantities
 	 */
-	double syn_weights[];
+	double *synapse_weights;
 
 	// ---------------- CONFIG STATE -------------------
 	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
 
-	//int neuronsPerGroup = 500;//500;
+	create_layers_variables sg_layer;
 	create_syn_variables sg_to_ec3_synapes;
 	create_syn_variables ec3_to_ec5_synapes;
 	create_syn_variables ec5_to_ca1_synapes;
 	create_syn_weight_variables syn_weight_variables;
+	syn_weight_variables.groups_in_layer = sg_to_ec3_synapes.groups_in_layer;
+	syn_weight_variables.neuronsPerGroup = sg_layer.neuronsPerGroup;
+	syn_weight_variables.syn_type ="sg_to_ec3";
+	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.group_sizes[i]=sg_layer.group_sizes[i];};
 
-	syn_weights = create_syn_weights(syn_weight_variables);
+	synapse_weights = create_syn_weights(syn_weight_variables);
 	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.000075, 0.0001, 0.000061, 0.000078, 0.001, 0.0008};
 	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.012, 0.04386, 0.028, 0.002785, 0.00314, 0.000871};
 	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.2, 0.7, 0.025, 0.215, 0.21, 0.45};
@@ -263,7 +273,6 @@ int main(int argc, const char* argv[]) {
 	double target_firing_e_c_5_6 = 7.6722;
 
 	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
-	create_layers_variables sg_layer;
 	PeriodicSpikeGenerator PSG_for_ec3(10.0f);//(00.1f);//(50.0f);
 	int psg_input = sim->createSpikeGeneratorGroup("psg1",
 			sg_layer.neuronsPerGroup, EXCITATORY_NEURON);
