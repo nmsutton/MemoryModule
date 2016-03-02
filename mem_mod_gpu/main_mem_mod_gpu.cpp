@@ -198,13 +198,13 @@ int main(int argc, const char* argv[]) {
 	create_syn_variables sg_to_ec3_synapes;
 	create_syn_variables ec3_to_ec5_synapes;
 	create_syn_variables ec5_to_ca1_synapes;
-	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.00874, 0.0086, 0.0087, 0.0086, 0.019, 0.021};
-	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.024, 0.0615, 0.042, 0.0188, 0.0139, 0.0029};
+	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.000075, 0.0001, 0.0087, 0.0086, 0.019, 0.021};
+	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.012, 0.0615, 0.042, 0.0188, 0.0139, 0.0029};
 	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {8.0, 2.0, 0.1, 0.1, 0.1, 0.1};
 
 	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
 	create_layers_variables sg_layer;
-	PeriodicSpikeGenerator PSG_for_ec3(00.8f);//(00.1f);//(50.0f);
+	PeriodicSpikeGenerator PSG_for_ec3(10.0f);//(00.1f);//(50.0f);
 	int psg_input = sim->createSpikeGeneratorGroup("psg1",
 			sg_layer.neuronsPerGroup, EXCITATORY_NEURON);
 	sim->setSpikeGenerator(psg_input, &PSG_for_ec3);
