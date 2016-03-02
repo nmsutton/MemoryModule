@@ -95,6 +95,16 @@ struct create_syn_variables
 	CARLsim *sim;
 };
 
+struct create_syn_weight_variables
+{
+	std::string syn_type;
+	int groups_in_layer;
+	double inital_firing[];
+	double group_sizes[1000];
+	double neuronsPerGroup;
+	double target_firing_rate; // accept firing rates within this range of target firing
+};
+
 create_layers_variables create_layers(create_layers_variables layers_variables) {
 	/*
 	 * Generate a new layer of neurons.
@@ -187,10 +197,43 @@ void create_spike_monitors(int layer[1000], int groups_to_use) {
 	}
 }
 
+double create_syn_weights(create_syn_weight_variables syn_weight_variables) {
+	/*
+	 * Synapse weights are generated based on a model fitted to example data
+	 * using this tool: http://www.xuru.org/rt/MLR.asp#CopyPaste
+	 */
+	double synapse_weights[1000];
+	double x_1;
+	double x_2;
+	double x_3;
+	double x_4;
+
+	if (syn_weight_variables.syn_type == "ec3_to_ec5") {
+		x_1 = 3.912113944*.000001;
+		x_2 = -4.16315869*.0001;
+		x_3 = 2.623349094*.01;
+		x_4 = 2.139377967*.001;
+	}
+	else if (syn_weight_variables.syn_type == "ec3_to_ec5") {
+		x_1 = 3.033292035*.00001;
+		x_2 = -2.514693722*.001;
+		x_3 = 7.446468689*.01;
+		x_4 = -5.280723543*.01;
+	}
+	for (int i = 0; i < syn_weight_variables.groups_in_layer; i++) {
+		synapse_weights[i] = x_1*syn_weight_variables.inital_firing[i]+x_2*
+		(syn_weight_variables.neuronsPerGroup*syn_weight_variables.group_sizes)+
+		x_3*syn_weight_variables.target_firing_rate[i]+x_4;
+	}
+	return synapse_weights;
+}
+
 int main(int argc, const char* argv[]) {
 	/*
 	 * the _conn arrays set the synapse connection quantities
 	 */
+	double syn_weights[];
+
 	// ---------------- CONFIG STATE -------------------
 	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
 
@@ -198,9 +241,26 @@ int main(int argc, const char* argv[]) {
 	create_syn_variables sg_to_ec3_synapes;
 	create_syn_variables ec3_to_ec5_synapes;
 	create_syn_variables ec5_to_ca1_synapes;
+	create_syn_weight_variables syn_weight_variables;
+
+	syn_weights = create_syn_weights(syn_weight_variables);
 	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.000075, 0.0001, 0.000061, 0.000078, 0.001, 0.0008};
 	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.012, 0.04386, 0.028, 0.002785, 0.00314, 0.000871};
 	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.2, 0.7, 0.025, 0.215, 0.21, 0.45};
+
+
+	double target_firing_e_c_3_1 = 1.4917;
+	double target_firing_e_c_3_2 = 2.2081;
+	double target_firing_e_c_3_3 = 2.2081;
+	double target_firing_e_c_3_4 = 0.6152;
+	double target_firing_e_c_3_5 = 0.3024;
+	double target_firing_e_c_3_6 = 0.3024;
+	double target_firing_e_c_5_1 = 6.8895;
+	double target_firing_e_c_5_2 = 4.6546;
+	double target_firing_e_c_5_3 = 1.6016;
+	double target_firing_e_c_5_4 = 5.7480;
+	double target_firing_e_c_5_5 = 5.7480;
+	double target_firing_e_c_5_6 = 7.6722;
 
 	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
 	create_layers_variables sg_layer;
@@ -238,20 +298,6 @@ int main(int argc, const char* argv[]) {
 	create_spike_monitors(e_c_3_layer.layers, 6);
 	create_spike_monitors(e_c_5_layer.layers, 6);
 	create_spike_monitors(c_a_1_layer.layers, 6);
-
-	// accept firing rates within this range of target firing
-	double target_firing_e_c_3_1 = 1.4917;
-	double target_firing_e_c_3_2 = 2.2081;
-	double target_firing_e_c_3_3 = 2.2081;
-	double target_firing_e_c_3_4 = 0.6152;
-	double target_firing_e_c_3_5 = 0.3024;
-	double target_firing_e_c_3_6 = 0.3024;
-	double target_firing_e_c_5_1 = 6.8895;
-	double target_firing_e_c_5_2 = 4.6546;
-	double target_firing_e_c_5_3 = 1.6016;
-	double target_firing_e_c_5_4 = 5.7480;
-	double target_firing_e_c_5_5 = 5.7480;
-	double target_firing_e_c_5_6 = 7.6722;
 
 	// algorithm will terminate when at least one of the termination conditions is reached
 	double errorMarginHz = 0.015;	// error margin
