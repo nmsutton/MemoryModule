@@ -198,9 +198,9 @@ int main(int argc, const char* argv[]) {
 	create_syn_variables sg_to_ec3_synapes;
 	create_syn_variables ec3_to_ec5_synapes;
 	create_syn_variables ec5_to_ca1_synapes;
-	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.000075, 0.0001, 0.0087, 0.0086, 0.019, 0.021};
-	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.012, 0.0615, 0.042, 0.0188, 0.0139, 0.0029};
-	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {8.0, 2.0, 0.1, 0.1, 0.1, 0.1};
+	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.000075, 0.0001, 0.000061, 0.000078, 0.001, 0.0008};
+	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.012, 0.04386, 0.028, 0.002785, 0.00314, 0.000871};
+	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.7, 0.7, 0.1, 0.1, 0.1, 0.45};
 
 	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
 	create_layers_variables sg_layer;
