@@ -333,17 +333,19 @@ double create_syn_weights3(string syn_type, int group_number, double init_firing
 	double x_2 = targ_firing;
 	cout<<"\ncomp pow\t";
 	cout<<pow(x_1, 2);cout<<"\t";
-	cout<<pow_x(x_1, 2);
+	cout<<pow_x(x_1, 2);cout<<"\t";
+	cout<<(double)5968*(double)1.4918;cout<<"\t";
+	cout<<x_1;cout<<"\t";cout<<init_firing;cout<<"\t";cout<<x_2;cout<<"\t";cout<<targ_firing;cout<<"\t";cout<<x_1*x_2;
 
-	//y = -6.965915842·10-10 x12 - 8.120424322·10-6 x1 x2 + 6.075802417·10-3 x22 + 1.342876445·10-5 x1 + 3.195615112·10-2 x2 - 3.524002339·10-2
+	//-1.179096929·10-9 x12 - 8.597476548·10-6 x1 x2 + 5.91313401·10-3 x22 + 1.922300225·10-5 x1 + 3.464477757·10-2 x2 - 4.90256488·10-2
 	if (syn_type == "ec3_to_ec5") {
-		a = -6.965915842*pow(10, -10);
-		b = -8.120424322*pow(10, -6);
-		c = 6.075802417*pow(10, -3);
-		d = 1.342876445*pow(10, -5);
-		e = 3.195615112*pow(10, -2);
-		f = -3.524002339*pow(10, -2);
-		synapse_weight = a * pow(x_1, 2) + b * (x_1*x_2) + c * pow(x_2, 2) + d * x_1 + e * x_2 - f;
+		a = -1.179096929*pow(10, -9);
+		b = -8.597476548*pow(10, -6);
+		c = 5.91313401*pow(10, -3);
+		d = 1.922300225*pow(10, -5);
+		e = 3.464477757*pow(10, -2);
+		f = -4.90256488*pow(10, -2);
+		synapse_weight = a * pow(x_1, 2) + b * (x_1*x_2) + c * pow(x_2, 2) + d * x_1 + e * x_2 + f;
 	}
 	// y = 1.880657863·10-8 x12 - 3.280482222·10-4 x1 x2 - 3.985943993·10-1 x22 + 1.879435901·10-3 x1 + 6.690053854 x2 - 25.09180372
 	else if (syn_type == "ec5_to_ca1") {
@@ -353,7 +355,7 @@ double create_syn_weights3(string syn_type, int group_number, double init_firing
 		d = 1.879435901*pow(10, -3);
 		e = 6.690053854;
 		f = 25.09180372;
-		synapse_weight = a * pow(x_1, 2) + b * (x_1*x_2) + c * pow(x_2, 2) + d * x_1 + e * x_2 - f;
+		synapse_weight = a * pow(x_1, 2) + b * (x_1*x_2) + c * pow(x_2, 2) + d * x_1 + e * x_2 + f;
 	}
 	//synapse_weight = round_nplaces(synapse_weight, 2); // round due to unwanted fraction difference issues
 	cout<<"\n++syn\t";cout<<i;cout<<"\tv\t";cout<<synapse_weight;
@@ -372,8 +374,8 @@ int main(int argc, const char* argv[]) {
 	double ec3_to_ec5_initial_firing[] = {5968.0, 3352.0, 5002.0, 2600.0, 3203.0, 11137.0};//{8545, 6835, 10002, 1252, 1122, 4154};
 	double ec5_to_ca1_initial_firing[] = {8545.0, 6835.0, 10002.0, 1252.0, 1122.0, 4154.0};//{56752, 33250, 15803, 8151, 5610, 32574};
 	//double sg_to_ec3_target_firing[] = {1.4917, 2.2081, 2.2081, 0.6152, 0.3024, 0.3024};
-	double ec3_to_ec5_target_firing[] = {1.4917, 2.2081, 2.2081, 0.6152, 0.3024, 0.3024};
-	double ec5_to_ca1_target_firing[] = {6.8895, 4.6546, 1.6016, 5.7480, 5.7480, 7.6722};
+	double ec3_to_ec5_target_firing[] = {1.4918, 2.2082, 2.2082, 0.6153, 0.3025, 0.3025};
+	double ec5_to_ca1_target_firing[] = {6.8898, 4.6546, 1.6016, 5.7480, 5.7480, 7.6722};
 
 	// ---------------- CONFIG STATE -------------------
 	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
@@ -423,9 +425,9 @@ int main(int argc, const char* argv[]) {
 	//synapse_weights = create_syn_weights(syn_weight_variables);
 
 	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.2, 0.7, 0.025, 0.215, 0.21, 0.45};
-	for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=ec5_to_ca1_conn[i];};
-			/*create_syn_weights3("ec5_to_ca1", ec5_to_ca1_synapes.groups_in_layer, ec5_to_ca1_initial_firing[i], sg_layer.group_sizes[i],
-								sg_layer.neuronsPerGroup, ec5_to_ca1_target_firing[i], i);};*/
+	for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=//ec5_to_ca1_conn[i];};
+			create_syn_weights3("ec5_to_ca1", ec5_to_ca1_synapes.groups_in_layer, ec5_to_ca1_initial_firing[i], sg_layer.group_sizes[i],
+								sg_layer.neuronsPerGroup, ec5_to_ca1_target_firing[i], i);};
 			//create_syn_weights(syn_weight_variables, i);};/*cout<<"\n**syn\t";cout<<i;cout<<"\tval\t";
 			//cout<<create_syn_weights(syn_weight_variables, i);}*/
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
