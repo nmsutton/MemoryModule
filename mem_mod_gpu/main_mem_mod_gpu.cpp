@@ -43,7 +43,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdlib.h>
-#include <array>
+//#include <array>
 //#include <string>
 //#include <algorithm>
 
@@ -200,12 +200,12 @@ void create_spike_monitors(int layer[1000], int groups_to_use) {
 	}
 }
 
-array<double, 6> create_syn_weights(create_syn_weight_variables syn_weight_variables) {
+double create_syn_weights(create_syn_weight_variables syn_weight_variables, int i) {
 	/*
 	 * Synapse weights are generated based on a model fitted to example data
 	 * using this tool: http://www.xuru.org/rt/MLR.asp#CopyPaste
 	 */
-	array<double, 6> synapse_weights;
+	double synapse_weight;
 	double x_1;
 	double x_2;
 	double x_3;
@@ -223,12 +223,12 @@ array<double, 6> create_syn_weights(create_syn_weight_variables syn_weight_varia
 		x_3 = 7.446468689*.01;
 		x_4 = -5.280723543*.01;
 	}
-	for (int i = 0; i < syn_weight_variables.groups_in_layer; i++) {
-		synapse_weights[i] = x_1*syn_weight_variables.inital_firing[i]+x_2*
+	//for (int i = 0; i < syn_weight_variables.groups_in_layer; i++) {
+		synapse_weight = x_1*syn_weight_variables.inital_firing[i]+x_2*
 		(syn_weight_variables.neuronsPerGroup*syn_weight_variables.group_sizes[i])+
 		x_3*syn_weight_variables.target_firing_rates[i]+x_4;
-	}
-	return synapse_weights;
+	//}
+	return synapse_weight;
 }
 
 int main(int argc, const char* argv[]) {
@@ -275,16 +275,18 @@ int main(int argc, const char* argv[]) {
 	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.group_sizes[i]=sg_layer.group_sizes[i];};
 	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.inital_firing[i]=ec3_to_ec5_initial_firing[i];};
 	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.target_firing_rates[i]=ec3_to_ec5_target_firing[i];};
-	synapse_weights = create_syn_weights(syn_weight_variables);
+	//synapse_weights = create_syn_weights(syn_weight_variables);
 
-	for (int i = 0; i < ec3_to_ec5_synapes.connections_per_group; i++) {ec3_to_ec5_synapes.connections_to_form[i]=synapse_weights[i];};
+	for (int i = 0; i < ec3_to_ec5_synapes.connections_per_group; i++) {ec3_to_ec5_synapes.connections_to_form[i]=
+			create_syn_weights(syn_weight_variables, i);}
 	ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 
 	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.inital_firing[i]=ec5_to_ca1_initial_firing[i];};
 	for (int i = 0; i < sg_layer.groups_in_layer; i++) {syn_weight_variables.target_firing_rates[i]=ec5_to_ca1_target_firing[i];};
-	synapse_weights = create_syn_weights(syn_weight_variables);
+	//synapse_weights = create_syn_weights(syn_weight_variables);
 
-	for (int i = 0; i < ec5_to_ca1_synapes.connections_per_group; i++) {ec5_to_ca1_synapes.connections_to_form[i]=synapse_weights[i];};
+	for (int i = 0; i < ec5_to_ca1_synapes.connections_per_group; i++) {ec5_to_ca1_synapes.connections_to_form[i]=
+			create_syn_weights(syn_weight_variables, i);}
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
 
 	sim->setConductances(false);
