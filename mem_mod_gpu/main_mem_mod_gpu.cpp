@@ -200,7 +200,7 @@ int main(int argc, const char* argv[]) {
 	create_syn_variables ec5_to_ca1_synapes;
 	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.00874, 0.0086, 0.0087, 0.0086, 0.019, 0.021};
 	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.024, 0.0615, 0.042, 0.0188, 0.0139, 0.0029};
-	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.1, 10.0, 0.1, 0.1, 0.1, 0.1};
+	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {8.0, 2.0, 0.1, 0.1, 0.1, 0.1};
 
 	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
 	create_layers_variables sg_layer;
@@ -319,7 +319,9 @@ int main(int argc, const char* argv[]) {
 	sim->setWeight(c0, spike_gen, e_c_3_layer1, 0.0, false);
 	sim->scaleWeights(c0, 2.0, false);
 	sim->runNetwork(10,0);*/
-	std::cout<<"spike mon output:\t";
+
+	///// output expected firing ////////
+	/*std::cout<<"spike mon output:\t";
 	//std::cout<<
 	//std::cout<<sim->getSpikeMonitor(0)->getAllFiringRates();//getNeuronNumSpikes(0);
 	double thisRate = sim->getSpikeMonitor(e_c_5_layer.layers[0])->getNeuronNumSpikes(0);//getPopMeanFiringRate();
@@ -362,7 +364,7 @@ int main(int argc, const char* argv[]) {
 		std::cout<<(c_a_1_layer.neuronsPerGroup/orig_exper_neuron_size)*c_a_1_exper_firing_rates[i]*time_conversion;
 		std::cout<<"\ttotal firing:\t";
 		std::cout<<(c_a_1_layer.neuronsPerGroup/orig_exper_neuron_size)*c_a_1_exper_firing_rates[i]*time_conversion*c_a_1_layer.group_sizes[i]*c_a_1_layer.neuronsPerGroup;
-	}
+	}*/
 
 	delete sim;
 	return 0;
