@@ -200,12 +200,12 @@ void create_spike_monitors(int layer[1000], int groups_to_use) {
 	}
 }
 
-double * create_syn_weights(create_syn_weight_variables syn_weight_variables) {
+array<double, 6> create_syn_weights(create_syn_weight_variables syn_weight_variables) {
 	/*
 	 * Synapse weights are generated based on a model fitted to example data
 	 * using this tool: http://www.xuru.org/rt/MLR.asp#CopyPaste
 	 */
-	double *synapse_weights;
+	array<double, 6> synapse_weights;
 	double x_1;
 	double x_2;
 	double x_3;
