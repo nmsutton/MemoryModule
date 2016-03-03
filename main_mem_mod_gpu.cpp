@@ -172,7 +172,7 @@ double create_syn_weights(string syn_type, int group_number, double init_firing,
 		double tot_neurons, double targ_firing, int i) {
 	/*
 	 * Synapse weights are generated based on a model fitted to example data
-	 * using this tool: http://www.xuru.org/rt/MPR.asp#CopyPaste
+	 * using this tool: http://www.xuru.org/rt/MPR.asp
 	 */
 	double synapse_weight;
 	double a;
@@ -184,7 +184,7 @@ double create_syn_weights(string syn_type, int group_number, double init_firing,
 	double x_1 = init_firing;
 	double x_2 = targ_firing;
 
-	//-1.179096929·10-9 x12 - 8.597476548·10-6 x1 x2 + 5.91313401·10-3 x22 + 1.922300225·10-5 x1 + 3.464477757·10-2 x2 - 4.90256488·10-2
+	// y = -1.179096929·10-9 x12 - 8.597476548·10-6 x1 x2 + 5.91313401·10-3 x22 + 1.922300225·10-5 x1 + 3.464477757·10-2 x2 - 4.90256488·10-2
 	if (syn_type == "ec3_to_ec5") {
 		a = -1.179096929*pow(10, -9);
 		b = -8.597476548*pow(10, -6);
