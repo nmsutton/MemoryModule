@@ -201,9 +201,10 @@ double create_syn_weights(string syn_type, int group_number, double init_firing,
 		c = -3.985943993*pow(10, -1);
 		d = 1.879435901*pow(10, -3);
 		e = 6.690053854;
-		f = 25.09180372;
+		f = -25.09180372;
 		synapse_weight = a * pow(x_1, 2) + b * (x_1*x_2) + c * pow(x_2, 2) + d * x_1 + e * x_2 + f;
 	}
+
 	return synapse_weight;
 }
 
