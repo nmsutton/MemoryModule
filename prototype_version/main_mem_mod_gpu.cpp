@@ -124,32 +124,42 @@ create_syn_variables create_syn(int input_layer[1000], int output_layer[1000], c
 	 * normalized_index = connections index normalized to have the first index at 0
 	 * normalized_delay = delay index normalized to have the first index at 1.5
 	 */
-	double normalized_delay = 0;
+	int normalized_delay = 0;
 	double remaining_connections = 0;
-	double initial_syn_weight = 100.0f;//10.0f;
+	double initial_syn_weight = 10.0f;
 	double adjusted_syn_weight = 0.0f;
 	double connection_probability = 1.0;
 
 	for (int i = 0; i < syn_variables.groups_in_layer; i++) {
 		adjusted_syn_weight = initial_syn_weight;
 		connection_probability = 1.0;
-		for (double i2 = 0; i2 < syn_variables.connections_per_group; i2++) {
+		for (int i2 = 0; i2 < syn_variables.connections_per_group; i2++) {
 			normalized_delay = 1.5 + i2;
 
 			// Check for last connection section
 			remaining_connections = syn_variables.connections_to_form[i] - i2;
-			if  (remaining_connections >= 1.0) {
-				//adjusted_syn_weight = 1.0;
-			}
-			else if(remaining_connections < 1.0 & remaining_connections > 0.0) {
+			if (remaining_connections < 1.0 & remaining_connections > 0.0) {
 				adjusted_syn_weight = initial_syn_weight * remaining_connections;
 			}
 			else if (remaining_connections <= 0.0) {
 				connection_probability = 0.0;
 			}
 
+			if (remaining_connections >= 0.0) {
 			syn_variables.syn_connections[syn_connections_formed]=sim->connect(input_layer[i],
 					output_layer[i], "full", RangeWeight(adjusted_syn_weight), connection_probability, normalized_delay);
+			}
+
+			std::cout<<"\n new connection:\n";
+			std::cout<<syn_connections_formed;
+			//std::cout<<"\n";
+			std::cout<<"\ni:\t";std::cout<<i;std::cout<<"\tinput:\t";std::cout<<SSTR(input_layer[i]);std::cout<<"\toutput:\t";std::cout<<SSTR(output_layer[i]);
+			std::cout<<"\n remaining_connections:\n";
+			std::cout<<remaining_connections;
+			std::cout<<"\n connection_probability: \n";
+			std::cout<<connection_probability;
+			std::cout<<"\n full_syn_weight: \n";
+			std::cout<<adjusted_syn_weight;
 
 			syn_connections_formed++;
 		}
@@ -211,37 +221,6 @@ double create_syn_weights(string syn_type, int group_number, double init_firing,
 	return synapse_weight;
 }
 
-/*int * create_spike_generators(int neuronsPerGroup, int groups_in_layer, float sg_vals[], string sg_names[]) {
-	//
-	// SpikeGenerator to generate ec3's input to setup the first input to the simulation.
-	// TODO: Make the creations here more automated instead of the repeated lines.
-	//
-	int sg_ids[groups_in_layer];
-	PeriodicSpikeGenerator PSG_for_ec3_1(20.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_2(20.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_3(20.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_4(20.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_5(20.0f);
-	PeriodicSpikeGenerator PSG_for_ec3_6(20.0f);
-	//for (int i = 0; i < groups_in_layer; i++) {
-	//	sg_ids[i] = sim->createSpikeGeneratorGroup(sg_names[i], neuronsPerGroup, EXCITATORY_NEURON);
-	//}
-	sg_ids[0] = sim->createSpikeGeneratorGroup("test0", neuronsPerGroup, EXCITATORY_NEURON);
-	sg_ids[1] = sim->createSpikeGeneratorGroup("test1", neuronsPerGroup, EXCITATORY_NEURON);
-	sg_ids[2] = sim->createSpikeGeneratorGroup("test2", neuronsPerGroup, EXCITATORY_NEURON);
-	sg_ids[3] = sim->createSpikeGeneratorGroup("test3", neuronsPerGroup, EXCITATORY_NEURON);
-	sg_ids[4] = sim->createSpikeGeneratorGroup("test4", neuronsPerGroup, EXCITATORY_NEURON);
-	sg_ids[5] = sim->createSpikeGeneratorGroup("test5", neuronsPerGroup, EXCITATORY_NEURON);
-	sim->setSpikeGenerator(sg_ids[0], &PSG_for_ec3_1);
-	sim->setSpikeGenerator(sg_ids[1], &PSG_for_ec3_2);
-	sim->setSpikeGenerator(sg_ids[2], &PSG_for_ec3_3);
-	sim->setSpikeGenerator(sg_ids[3], &PSG_for_ec3_4);
-	sim->setSpikeGenerator(sg_ids[4], &PSG_for_ec3_5);
-	sim->setSpikeGenerator(sg_ids[5], &PSG_for_ec3_6);
-
-	return sg_ids;
-}*/
-
 int main(int argc, const char* argv[]) {
 	/*
 	 * the _conn arrays set the synapse connection quantities
@@ -251,66 +230,44 @@ int main(int argc, const char* argv[]) {
 	double ec5_to_ca1_initial_firing[] = {8545.0, 6835.0, 10002.0, 1252.0, 1122.0, 4154.0};
 	double ec3_to_ec5_target_firing[] = {1.4918, 2.2082, 2.2082, 0.6153, 0.3025, 0.3025};
 	double ec5_to_ca1_target_firing[] = {6.8898, 4.6546, 1.6016, 5.7480, 5.7480, 7.6722};
-	//create_layers_variables sg_layer;
-	//create_syn_variables sg_to_ec3_synapes;
-	create_layers_variables e_c_5_layer;
-	create_layers_variables c_a_1_layer;
-	create_syn_variables ec3_to_ec5_synapes;
-	create_syn_variables ec5_to_ca1_synapes;
-	double ec3[ec3_to_ec5_synapes.groups_in_layer];
-	double sg_vals[] = {0.0315, 1894.4949/20000, 1420.8712/20000, 710.4356/20000, 963.4490/20000, 3853.7960/20000};
-	string sg_names[] = {"ec3_sg_1", "ec3_sg_2", "ec3_sg_3", "ec3_sg_4", "ec3_sg_5", "ec3_sg_6"};
-	int *e_c_3_layer;
 
 	// ---------------- CONFIG STATE -------------------
 	sim = new CARLsim("MemModGPU", GPU_MODE, USER, 0, 42);
 
-	//e_c_3_layer = create_spike_generators(e_c_5_layer.neuronsPerGroup, ec3_to_ec5_synapes.groups_in_layer, sg_vals, sg_names);
-	int groups_in_layer = ec3_to_ec5_synapes.groups_in_layer;
-	int neuronsPerGroup = e_c_5_layer.neuronsPerGroup;
-	int sg_ids[groups_in_layer];
-	PeriodicSpikeGenerator PSG_for_ec3_1(sg_vals[0]);
-	PeriodicSpikeGenerator PSG_for_ec3_2(sg_vals[1]);
-	PeriodicSpikeGenerator PSG_for_ec3_3(sg_vals[2]);
-	PeriodicSpikeGenerator PSG_for_ec3_4(sg_vals[3]);
-	PeriodicSpikeGenerator PSG_for_ec3_5(sg_vals[4]);
-	PeriodicSpikeGenerator PSG_for_ec3_6(sg_vals[5]);
-	//for (int i = 0; i < groups_in_layer; i++) {
-		sg_ids[0] = sim->createSpikeGeneratorGroup(sg_names[0], neuronsPerGroup, EXCITATORY_NEURON);
-	//}
-	sim->setSpikeGenerator(sg_ids[0], &PSG_for_ec3_1);
-	//sim->setSpikeRate(sg_ids[0], )
-	/*sim->setSpikeGenerator(sg_ids[1], &PSG_for_ec3_2);
-	sim->setSpikeGenerator(sg_ids[2], &PSG_for_ec3_3);
-	sim->setSpikeGenerator(sg_ids[3], &PSG_for_ec3_4);
-	sim->setSpikeGenerator(sg_ids[4], &PSG_for_ec3_5);
-	sim->setSpikeGenerator(sg_ids[5], &PSG_for_ec3_6);*/
+	create_layers_variables sg_layer;
+	create_syn_variables sg_to_ec3_synapes;
+	create_syn_variables ec3_to_ec5_synapes;
+	create_syn_variables ec5_to_ca1_synapes;
 
-	//create_layers_variables e_c_3_layer;
-	//e_c_3_layer = create_layers(e_c_3_layer);
-	//create_layers_variables e_c_5_layer;
+	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
+	PeriodicSpikeGenerator PSG_for_ec3(10.0f);
+	int psg_input = sim->createSpikeGeneratorGroup("psg1",
+			sg_layer.neuronsPerGroup, EXCITATORY_NEURON);
+	sim->setSpikeGenerator(psg_input, &PSG_for_ec3);
+
+	create_layers_variables e_c_3_layer;
+	e_c_3_layer = create_layers(e_c_3_layer);
+	create_layers_variables e_c_5_layer;
 	e_c_5_layer = create_layers(e_c_5_layer);
-	//create_layers_variables c_a_1_layer;
+	create_layers_variables c_a_1_layer;
 	c_a_1_layer = create_layers(c_a_1_layer);
 
 	// synapses for sg_to_ec3
-	/*double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.00002874007, 0.00002, 0.000028, 0.000008, 0.00002, 0.00001};
+	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.0000075, 0.0001, 0.000061, 0.000078, 0.001, 0.0008};
 	for (int i = 0; i < sg_to_ec3_synapes.groups_in_layer; i++) {sg_to_ec3_synapes.connections_to_form[i]=sg_to_ec3_conn[i];};
-	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);*/
+	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);
 
 	// synapses for ec3_to_ec5
-	//double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.012, 0.04386, 0.028, 0.002785, 0.00314, 0.000871};
-	//double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.018, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001};
-	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {8.0, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001};
-	for (int i = 0; i < ec3_to_ec5_synapes.groups_in_layer; i++) {ec3_to_ec5_synapes.connections_to_form[i]=ec3_to_ec5_conn[i];};
-			/*create_syn_weights("ec3_to_ec5", 1, ec3_to_ec5_initial_firing[i], e_c_5_layer.group_sizes[i],
-					e_c_5_layer.neuronsPerGroup, ec3_to_ec5_target_firing[i], i);};*/
-	ec3_to_ec5_synapes = create_syn(sg_ids, e_c_5_layer.layers, ec3_to_ec5_synapes);
+	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.03, 0.04386, 0.028, 0.002785, 0.00314, 0.000871};
+	/*for (int i = 0; i < ec3_to_ec5_synapes.groups_in_layer; i++) {ec3_to_ec5_synapes.connections_to_form[i]=
+			create_syn_weights("ec3_to_ec5", sg_to_ec3_synapes.groups_in_layer, ec3_to_ec5_initial_firing[i], sg_layer.group_sizes[i],
+								sg_layer.neuronsPerGroup, ec3_to_ec5_target_firing[i], i);};*/
+	ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 
 	// synapses for ec5_to_ca1
-	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {1.0, 0.7, 0.025, 0.215, 0.21, 0.45};
-	for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=ec5_to_ca1_conn[i];};
-			/*create_syn_weights("ec5_to_ca1", ec5_to_ca1_synapes.groups_in_layer, ec5_to_ca1_initial_firing[i], sg_layer.group_sizes[i],
+	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {20.0, 0.7, 0.025, 0.215, 0.21, 0.45};
+	/*for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=
+			create_syn_weights("ec5_to_ca1", ec5_to_ca1_synapes.groups_in_layer, ec5_to_ca1_initial_firing[i], sg_layer.group_sizes[i],
 								sg_layer.neuronsPerGroup, ec5_to_ca1_target_firing[i], i);};*/
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
 
@@ -320,17 +277,15 @@ int main(int argc, const char* argv[]) {
 
 	sim->setupNetwork();
 
-	//create_external_current(e_c_3_layer.layers, -172.0, 6);
+	create_external_current(e_c_3_layer.layers, -172.0, 6);
 	create_external_current(e_c_5_layer.layers, -180.0, 6);
 	create_external_current(c_a_1_layer.layers, -180.0, 6);
 
-	//create_spike_monitors(sg_layer.layers, 6);
-	SpikeMonitor* SpikeMonInput  = sim->setSpikeMonitor(sg_ids[0],"DEFAULT");
-	//create_spike_monitors(e_c_3_layer.layers, 6);
-	create_spike_monitors(e_c_5_layer.layers, 1);
-	create_spike_monitors(c_a_1_layer.layers, 1);
+	create_spike_monitors(e_c_3_layer.layers, 6);
+	create_spike_monitors(e_c_5_layer.layers, 6);
+	create_spike_monitors(c_a_1_layer.layers, 6);
 
-	sim->runNetwork(200,0);
+	sim->runNetwork(20,0);
 
 	delete sim;
 	return 0;
