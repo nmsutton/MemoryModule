@@ -253,7 +253,7 @@ int main(int argc, const char* argv[]) {
 	c_a_1_layer = create_layers(c_a_1_layer);
 
 	// synapses for sg_to_ec3
-	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.0001575, 0.0001, 0.000061, 0.000078, 0.001, 0.0008};
+	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.00021492, 0.0001, 0.000061, 0.000078, 0.001, 0.0008};
 	for (int i = 0; i < sg_to_ec3_synapes.groups_in_layer; i++) {sg_to_ec3_synapes.connections_to_form[i]=sg_to_ec3_conn[i];};
 	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);
 
@@ -264,13 +264,14 @@ int main(int argc, const char* argv[]) {
 								sg_layer.neuronsPerGroup, ec3_to_ec5_target_firing[i], i);};*/
 	//ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 	int c1=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 1.0);
-	int c2=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 2.0);
-	int c3=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 3.0);
+	int c2=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(0.3f), 1.0f, 2.0);
+	/*int c3=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 3.0);
 	int c4=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 4.0);
 	int c5=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 5.0);
 	int c6=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 6.0);
 	int c7=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 7.0);
 	int c8=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 8.0);
+	int c9=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 9.0);*/
 
 	// synapses for ec5_to_ca1
 	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {20.0, 0.7, 0.025, 0.215, 0.21, 0.45};
@@ -286,6 +287,29 @@ int main(int argc, const char* argv[]) {
 	int c16=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 6.0);
 	int c17=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 7.0);
 	int c18=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 8.0);
+	int c19=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 9.0);
+	int c20=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 10.0);
+	int c21=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 11.0);
+	int c22=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 12.0);
+	int c23=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 13.0);
+	int c24=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 14.0);
+	int c25=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 15.0);
+	int c26=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 16.0);
+	int c27=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 17.0);
+	int c28=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 18.0);
+	int c29=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 19.0);
+	int c30=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 20.0);
+	int c31=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 18.5);
+	int c32=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 19.5);
+	int c33=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 14.5);
+	int c34=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 15.5);
+	int c35=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 16.5);
+	int c36=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 17.5);
+	int c37=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 13.5);
+	int c38=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 12.5);
+	int c39=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 11.5);
+	int c40=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 10.5);
+	int c41=sim->connect(e_c_5_layer.layers[0], c_a_1_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 9.5);
 
 	sim->setConductances(false);
 
