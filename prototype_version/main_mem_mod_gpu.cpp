@@ -105,7 +105,11 @@ create_layers_variables create_layers(create_layers_variables layers_variables) 
 	for (int i = layers_formed; i < last_new_layer_index; i++) {
 		normalized_group_index = i - initial_layers_formed;
 		layers_variables.layers[normalized_group_index]= sim->createGroup(SSTR(i),
-				ceil(layers_variables.neuronsPerGroup*layers_variables.group_sizes[normalized_group_index]), EXCITATORY_NEURON);
+						ceil(layers_variables.neuronsPerGroup*layers_variables.group_sizes[normalized_group_index]), EXCITATORY_NEURON);
+		/*if (i != 5) {layers_variables.layers[normalized_group_index]= sim->createGroup(SSTR(i),
+				ceil(layers_variables.neuronsPerGroup*layers_variables.group_sizes[normalized_group_index]), EXCITATORY_NEURON);}
+		else {layers_variables.layers[normalized_group_index]= sim->createGroup(SSTR(i),
+						ceil(layers_variables.neuronsPerGroup*layers_variables.group_sizes[normalized_group_index]), INHIBITORY_NEURON);}*/
 		sim->setNeuronParameters(layers_variables.layers[normalized_group_index], layers_variables.neuron_parameters[0],
 				layers_variables.neuron_parameters[1], layers_variables.neuron_parameters[2], layers_variables.neuron_parameters[3]); // FS
 		layers_formed++;
@@ -253,7 +257,7 @@ int main(int argc, const char* argv[]) {
 	c_a_1_layer = create_layers(c_a_1_layer);
 
 	// synapses for sg_to_ec3
-	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.00021492, 0.0001, 0.000061, 0.000078, 0.001, 0.0008};
+	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.00021492, 0.0001, 0.000061, 0.000078, 0.001, 0.000214884};
 	for (int i = 0; i < sg_to_ec3_synapes.groups_in_layer; i++) {sg_to_ec3_synapes.connections_to_form[i]=sg_to_ec3_conn[i];};
 	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);
 
@@ -265,6 +269,8 @@ int main(int argc, const char* argv[]) {
 	//ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 	int c1=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 1.0);
 	int c2=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(0.3f), 1.0f, 2.0);
+	//int c1_2=sim->connect(e_c_3_layer.layers[5], e_c_5_layer.layers[5], "random", RangeWeight(190.0f), 1.0f, 1.0);
+	int c2_2=sim->connect(e_c_3_layer.layers[5], e_c_5_layer.layers[5], "random", RangeWeight(0.047f), 1.0f, 2.0);
 	/*int c3=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 3.0);
 	int c4=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 4.0);
 	int c5=sim->connect(e_c_3_layer.layers[0], e_c_5_layer.layers[0], "random", RangeWeight(190.0f), 1.0f, 5.0);
