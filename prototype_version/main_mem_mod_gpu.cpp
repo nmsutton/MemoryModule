@@ -148,6 +148,19 @@ create_syn_variables create_syn(int input_layer[1000], int output_layer[1000], c
 			if (remaining_connections >= 0.0) {
 			syn_variables.syn_connections[syn_connections_formed]=sim->connect(input_layer[i],
 					output_layer[i], "full", RangeWeight(adjusted_syn_weight), connection_probability, normalized_delay);
+
+			std::cout<<"\n new connection:\n";
+			std::cout<<syn_connections_formed;
+			//std::cout<<"\n";
+			std::cout<<"\ni:\t";std::cout<<i;std::cout<<"\tinput:\t";std::cout<<SSTR(input_layer[i]);std::cout<<"\toutput:\t";std::cout<<SSTR(output_layer[i]);
+			std::cout<<"\n remaining_connections:\n";
+			std::cout<<remaining_connections;
+			std::cout<<"\n connection_probability: \n";
+			std::cout<<connection_probability;
+			std::cout<<"\n full_syn_weight: \n";
+			std::cout<<adjusted_syn_weight;
+			std::cout<<"\n output_layer[0]: \n";
+			std::cout<<output_layer[0];
 			}
 
 			syn_connections_formed++;
@@ -247,10 +260,10 @@ int main(int argc, const char* argv[]) {
 	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);
 
 	// synapses for ec3_to_ec5
-	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {6.3, 3.0, 3.0, 0.19, 0.185, 0.047};
-	for (int i = 0; i < ec3_to_ec5_synapes.groups_in_layer; i++) {ec3_to_ec5_synapes.connections_to_form[i]=
-			create_syn_weights("ec3_to_ec5", sg_to_ec3_synapes.groups_in_layer, ec3_to_ec5_initial_firing[i], sg_layer.group_sizes[i],
-								sg_layer.neuronsPerGroup, ec3_to_ec5_target_firing[i], i);};
+	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {1.3, 3.0, 3.0, 0.19, 0.185, 0.047};
+	for (int i = 0; i < ec3_to_ec5_synapes.groups_in_layer; i++) {ec3_to_ec5_synapes.connections_to_form[i]=ec3_to_ec5_conn[i];};
+			/*create_syn_weights("ec3_to_ec5", sg_to_ec3_synapes.groups_in_layer, ec3_to_ec5_initial_firing[i], sg_layer.group_sizes[i],
+								sg_layer.neuronsPerGroup, ec3_to_ec5_target_firing[i], i);};*/
 	ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 
 	// synapses for ec5_to_ca1
