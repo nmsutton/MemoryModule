@@ -75,7 +75,7 @@ struct create_layers_variables
 	int layers[1000];
 	int layer_sim_groups[1000];
 	double group_sizes[1000] = {0.233, 0.133, 0.2, 0.1, 0.067, 0.267};
-	double neuron_parameters[4] = {0.0012f, 3.0f, -68.5f, 10.0f};
+	double neuron_parameters[4] = {0.0012, 3.0, -65.8, 10.0};
 	double groups_in_layer = 6;
 	double neuronsPerGroup = 500;
 	CARLsim *sim;
@@ -126,8 +126,8 @@ create_syn_variables create_syn(int input_layer[1000], int output_layer[1000], c
 	 */
 	int normalized_delay = 0;
 	double remaining_connections = 0;
-	double initial_syn_weight = 10.0f;
-	double adjusted_syn_weight = 0.0f;
+	double initial_syn_weight = 10.0;
+	double adjusted_syn_weight = 0.0;
 	double connection_probability = 1.0;
 
 	for (int i = 0; i < syn_variables.groups_in_layer; i++) {
@@ -242,7 +242,7 @@ int main(int argc, const char* argv[]) {
 	create_syn_variables ec5_to_ca1_synapes;
 
 	// SpikeGenerator to help feed input to ec3 to setup the simulated layer.
-	PeriodicSpikeGenerator PSG_for_ec3(10.0f);
+	PeriodicSpikeGenerator PSG_for_ec3(10.0);
 	int psg_input = sim->createSpikeGeneratorGroup("psg1",
 			sg_layer.neuronsPerGroup, EXCITATORY_NEURON);
 	sim->setSpikeGenerator(psg_input, &PSG_for_ec3);
@@ -255,22 +255,22 @@ int main(int argc, const char* argv[]) {
 	c_a_1_layer = create_layers(c_a_1_layer);
 
 	// synapses for sg_to_ec3
-	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.00021492, 0.0002144, 0.0002148, 0.0002145, 0.0002147999, 0.000214884};
+	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.000206975, 0.00020585, 0.0002059, 0.0002059, 0.00020710845, 0.0002071121049};
 	for (int i = 0; i < sg_to_ec3_synapes.groups_in_layer; i++) {sg_to_ec3_synapes.connections_to_form[i]=sg_to_ec3_conn[i];};
 	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);
 
 	// synapses for ec3_to_ec5
-	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {1.3, 3.0, 3.0, 0.19, 0.185, 0.047};
+	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {0.6, 3.0, 3.0, 0.19, 0.185, 0.047};
 	for (int i = 0; i < ec3_to_ec5_synapes.groups_in_layer; i++) {ec3_to_ec5_synapes.connections_to_form[i]=ec3_to_ec5_conn[i];};
 			/*create_syn_weights("ec3_to_ec5", sg_to_ec3_synapes.groups_in_layer, ec3_to_ec5_initial_firing[i], sg_layer.group_sizes[i],
 								sg_layer.neuronsPerGroup, ec3_to_ec5_target_firing[i], i);};*/
 	ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 
 	// synapses for ec5_to_ca1
-	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {0.2, 0.7, 0.025, 0.215, 0.21, 0.45};
-	for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=
-			create_syn_weights("ec5_to_ca1", ec5_to_ca1_synapes.groups_in_layer, ec5_to_ca1_initial_firing[i], sg_layer.group_sizes[i],
-								sg_layer.neuronsPerGroup, ec5_to_ca1_target_firing[i], i);};
+	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {11.32, 0.7, 0.025, 0.215, 0.21, 0.45};
+	for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=ec5_to_ca1_conn[i];};
+			/*create_syn_weights("ec5_to_ca1", ec5_to_ca1_synapes.groups_in_layer, ec5_to_ca1_initial_firing[i], sg_layer.group_sizes[i],
+								sg_layer.neuronsPerGroup, ec5_to_ca1_target_firing[i], i);};*/
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
 
 	sim->setConductances(false);
