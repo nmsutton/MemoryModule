@@ -261,14 +261,14 @@ int main(int argc, const char* argv[]) {
 	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);
 
 	// synapses for ec3_to_ec5
-	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {2.0, 3.0, 3.0, 0.19, 0.185, 0.047};
+	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {1.7, 3.0, 3.3, 0.12, 0.04, 0.015};
 	for (int i = 0; i < ec3_to_ec5_synapes.groups_in_layer; i++) {ec3_to_ec5_synapes.connections_to_form[i]=ec3_to_ec5_conn[i];};
 			/*create_syn_weights("ec3_to_ec5", sg_to_ec3_synapes.groups_in_layer, ec3_to_ec5_initial_firing[i], sg_layer.group_sizes[i],
 								sg_layer.neuronsPerGroup, ec3_to_ec5_target_firing[i], i);};*/
 	ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 
 	// synapses for ec5_to_ca1
-	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {20.0, 0.7, 0.025, 0.215, 0.21, 0.45};
+	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {20.0, 20.0, 4.5, 7.7, 9.7, 9.0};
 	for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=ec5_to_ca1_conn[i];};
 			/*create_syn_weights("ec5_to_ca1", ec5_to_ca1_synapes.groups_in_layer, ec5_to_ca1_initial_firing[i], sg_layer.group_sizes[i],
 								sg_layer.neuronsPerGroup, ec5_to_ca1_target_firing[i], i);};*/
