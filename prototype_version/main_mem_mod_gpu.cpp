@@ -149,7 +149,7 @@ create_syn_variables create_syn(int input_layer[1000], int output_layer[1000], c
 			syn_variables.syn_connections[syn_connections_formed]=sim->connect(input_layer[i],
 					output_layer[i], "full", RangeWeight(adjusted_syn_weight), connection_probability, normalized_delay);
 
-			std::cout<<"\n new connection:\n";
+			/*std::cout<<"\n new connection:\n";
 			std::cout<<syn_connections_formed;
 			//std::cout<<"\n";
 			std::cout<<"\ni:\t";std::cout<<i;std::cout<<"\tinput:\t";std::cout<<SSTR(input_layer[i]);std::cout<<"\toutput:\t";std::cout<<SSTR(output_layer[i]);
@@ -160,7 +160,7 @@ create_syn_variables create_syn(int input_layer[1000], int output_layer[1000], c
 			std::cout<<"\n full_syn_weight: \n";
 			std::cout<<adjusted_syn_weight;
 			std::cout<<"\n output_layer[0]: \n";
-			std::cout<<output_layer[0];
+			std::cout<<output_layer[0];*/
 			}
 
 			syn_connections_formed++;
@@ -199,27 +199,35 @@ double create_syn_weights(string syn_type, int group_number, double init_firing,
 	double x_1 = init_firing;
 	double x_2 = targ_firing;
 
-	// y = -1.179096929·10-9 x12 - 8.597476548·10-6 x1 x2 + 5.91313401·10-3 x22 + 1.922300225·10-5 x1 + 3.464477757·10-2 x2 - 4.90256488·10-2
+	// y = -3.243224433·10-6 x12 - 8.453549021·10-4 x1 x2 + 8.808208543·10-1 x22 + 3.491527807·10-3 x1 - 6.541997654·10-2 x2 - 5.459357633·10-1
 	if (syn_type == "ec3_to_ec5") {
-		a = -1.179096929*pow(10, -9);
-		b = -8.597476548*pow(10, -6);
-		c = 5.91313401*pow(10, -3);
-		d = 1.922300225*pow(10, -5);
-		e = 3.464477757*pow(10, -2);
-		f = -4.90256488*pow(10, -2);
+		a = -3.243224433*pow(10, -6);
+		b = -8.453549021*pow(10, -4);
+		c = 8.808208543*pow(10, -1);
+		d = 3.491527807*pow(10, -3);
+		e = -6.541997654*pow(10, -2);
+		f = -5.459357633*pow(10, -1);
 		synapse_weight = a * pow(x_1, 2) + b * (x_1*x_2) + c * pow(x_2, 2) + d * x_1 + e * x_2 + f;
 	}
-	// y = 1.880657863·10-8 x12 - 3.280482222·10-4 x1 x2 - 3.985943993·10-1 x22 + 1.879435901·10-3 x1 + 6.690053854 x2 - 25.09180372
+	// y = 3.18151867·10-4 x12 - 1.525851879·10-1 x1 x2 - 11.90618389 x22 + 8.041278944·10-1 x1 + 197.9136262 x2 - 732.4225399
 	else if (syn_type == "ec5_to_ca1") {
-		a = 1.880657863*pow(10,-8);
-		b = -3.280482222*pow(10, -4);
-		c = -3.985943993*pow(10, -1);
-		d = 1.879435901*pow(10, -3);
-		e = 6.690053854;
-		f = -25.09180372;
+		a = 3.18151867*pow(10,-4);
+		b = -1.525851879*pow(10, -1);
+		c = -11.90618389;
+		d = 8.041278944*pow(10, -1);
+		e = 197.9136262;
+		f = -732.4225399;
 		synapse_weight = a * pow(x_1, 2) + b * (x_1*x_2) + c * pow(x_2, 2) + d * x_1 + e * x_2 + f;
 	}
-
+	cout<<"\n++syn\t";cout<<i;cout<<"\tv\t";cout<<synapse_weight;cout<<"\n";
+	cout<<a;cout<<"\t";
+	cout<<pow(x_1, 2);cout<<"\t";
+	cout<<b;cout<<"\t";cout<<(x_1*x_2);cout<<"\t";cout<<c;cout<<"\t";
+	cout<<pow(x_2, 2);cout<<"\t";cout<<d;cout<<"\t";cout<<x_1;cout<<"\t";cout<<e;cout<<"\t";cout<<x_2;cout<<"\t";cout<<f;
+	/*cout<<"\n++syn\t";cout<<i;cout<<"\tx1\t";cout<<x_1;cout<<"\tif\t";cout<<init_firing;cout<<"\tx2\t";
+	cout<<group_size;cout<<"\tx3\t";
+	cout<<x_3*targ_firing;cout<<"\tx4\t";cout<<x_4;cout<<"\tv\t";cout<<synapse_weight;cout<<"\n";*/
+	//(syn_weight_variables.neuronsPerGroup*
 	return synapse_weight;
 }
 
@@ -228,8 +236,8 @@ int main(int argc, const char* argv[]) {
 	 * the _conn arrays set the synapse connection quantities
 	 */
 	std::cout.precision(17);
-	double ec3_to_ec5_initial_firing[] = {5968.0, 3352.0, 5002.0, 2600.0, 3203.0, 11137.0};
-	double ec5_to_ca1_initial_firing[] = {8545.0, 6835.0, 10002.0, 1252.0, 1122.0, 4154.0};
+	double ec3_to_ec5_initial_firing[] = {351.0, 201.0, 300.0, 150.0, 204.0, 804.0};
+	double ec5_to_ca1_initial_firing[] = {468.0, 402.0, 600.0, 100.0, 34.0, 268.0};
 	double ec3_to_ec5_target_firing[] = {1.4918, 2.2082, 2.2082, 0.6153, 0.3025, 0.3025};
 	double ec5_to_ca1_target_firing[] = {6.8898, 4.6546, 1.6016, 5.7480, 5.7480, 7.6722};
 
@@ -261,17 +269,17 @@ int main(int argc, const char* argv[]) {
 	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);
 
 	// synapses for ec3_to_ec5
-	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {1.7, 3.8, 3.8, 0.12, 0.04, 0.02};
-	for (int i = 0; i < ec3_to_ec5_synapes.groups_in_layer; i++) {ec3_to_ec5_synapes.connections_to_form[i]=ec3_to_ec5_conn[i];};
-			/*create_syn_weights("ec3_to_ec5", sg_to_ec3_synapes.groups_in_layer, ec3_to_ec5_initial_firing[i], sg_layer.group_sizes[i],
-								sg_layer.neuronsPerGroup, ec3_to_ec5_target_firing[i], i);};*/
+	//double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {1.7, 3.8, 3.8, 0.12, 0.04, 0.02};
+	for (int i = 0; i < ec3_to_ec5_synapes.groups_in_layer; i++) {ec3_to_ec5_synapes.connections_to_form[i]=//ec3_to_ec5_conn[i];};
+			create_syn_weights("ec3_to_ec5", sg_to_ec3_synapes.groups_in_layer, ec3_to_ec5_initial_firing[i], sg_layer.group_sizes[i],
+								sg_layer.neuronsPerGroup, ec3_to_ec5_target_firing[i], i);};
 	ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 
 	// synapses for ec5_to_ca1
-	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {20.0, 20.0, 4.4, 7.7, 9.7, 9.8};
-	for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=ec5_to_ca1_conn[i];};
-			/*create_syn_weights("ec5_to_ca1", ec5_to_ca1_synapes.groups_in_layer, ec5_to_ca1_initial_firing[i], sg_layer.group_sizes[i],
-								sg_layer.neuronsPerGroup, ec5_to_ca1_target_firing[i], i);};*/
+	//double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {20.0, 20.0, 4.4, 7.7, 9.7, 9.8};
+	for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=//ec5_to_ca1_conn[i];};
+			create_syn_weights("ec5_to_ca1", ec5_to_ca1_synapes.groups_in_layer, ec5_to_ca1_initial_firing[i], sg_layer.group_sizes[i],
+								sg_layer.neuronsPerGroup, ec5_to_ca1_target_firing[i], i);};
 	ec5_to_ca1_synapes = create_syn(e_c_5_layer.layers, c_a_1_layer.layers, ec5_to_ca1_synapes);
 
 	sim->setConductances(false);
