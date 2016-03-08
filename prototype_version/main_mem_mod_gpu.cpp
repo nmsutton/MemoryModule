@@ -256,19 +256,19 @@ int main(int argc, const char* argv[]) {
 
 	// synapses for sg_to_ec3
 	//double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {0.000206975, 0.00020585, 0.0002059, 0.0002059, 0.00020710845, 0.0002071121049};
-	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {2.0, 2.4, 2.6, 2.0, 5.0, 5.0};
+	double sg_to_ec3_conn[sg_to_ec3_synapes.groups_in_layer] = {2.0, 2.4, 2.6, 2.8, 5.0, 5.0};
 	for (int i = 0; i < sg_to_ec3_synapes.groups_in_layer; i++) {sg_to_ec3_synapes.connections_to_form[i]=sg_to_ec3_conn[i];};
 	sg_to_ec3_synapes = create_syn(sg_layer.layers, e_c_3_layer.layers, sg_to_ec3_synapes);
 
 	// synapses for ec3_to_ec5
-	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {1.7, 3.0, 3.3, 0.12, 0.04, 0.015};
+	double ec3_to_ec5_conn[ec3_to_ec5_synapes.groups_in_layer] = {1.7, 3.8, 3.8, 0.12, 0.04, 0.02};
 	for (int i = 0; i < ec3_to_ec5_synapes.groups_in_layer; i++) {ec3_to_ec5_synapes.connections_to_form[i]=ec3_to_ec5_conn[i];};
 			/*create_syn_weights("ec3_to_ec5", sg_to_ec3_synapes.groups_in_layer, ec3_to_ec5_initial_firing[i], sg_layer.group_sizes[i],
 								sg_layer.neuronsPerGroup, ec3_to_ec5_target_firing[i], i);};*/
 	ec3_to_ec5_synapes = create_syn(e_c_3_layer.layers, e_c_5_layer.layers, ec3_to_ec5_synapes);
 
 	// synapses for ec5_to_ca1
-	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {20.0, 20.0, 4.5, 7.7, 9.7, 9.0};
+	double ec5_to_ca1_conn[ec5_to_ca1_synapes.groups_in_layer] = {20.0, 20.0, 4.4, 7.7, 9.7, 9.8};
 	for (int i = 0; i < ec5_to_ca1_synapes.groups_in_layer; i++) {ec5_to_ca1_synapes.connections_to_form[i]=ec5_to_ca1_conn[i];};
 			/*create_syn_weights("ec5_to_ca1", ec5_to_ca1_synapes.groups_in_layer, ec5_to_ca1_initial_firing[i], sg_layer.group_sizes[i],
 								sg_layer.neuronsPerGroup, ec5_to_ca1_target_firing[i], i);};*/
