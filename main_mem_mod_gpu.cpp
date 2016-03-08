@@ -36,6 +36,9 @@
  *
  * CARLsim available from http://socsci.uci.edu/~jkrichma/CARL/CARLsim/
  * Ver 12/3/2014
+ *
+ * The original work on this project is copyright to Nate Sutton as of 2016.
+ * Licensing is described in the licensing document
  */
 
 #include <carlsim.h>
